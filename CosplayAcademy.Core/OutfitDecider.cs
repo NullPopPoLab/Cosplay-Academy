@@ -66,11 +66,11 @@ namespace Cosplay_Academy
                             find = overridefolder;
                         }
                         var Overridecards = find.GetAllCards();
-                        outfitData[sets].Insert(hstate, Overridecards, Overridecards.Count > 0);//assign "is" set and store data
+                        outfitData[sets].Insert(Overridecards, Overridecards.Count > 0);//assign "is" set and store data
                         continue;
                     }
 
-                    if (outfitData[sets].IsSet(hstate))//Skip set items
+                    if (outfitData[sets].IsSet(0))//Skip set items
                     {
                         continue;
                     }
@@ -83,7 +83,7 @@ namespace Cosplay_Academy
 
                         if (AllFolder.Count == 0)
                         {
-                            outfitData[sets].Insert(hstate, new List<CardData>(), false);
+                            outfitData[sets].Insert(new List<CardData>(), false);
                             continue;
                         }
 
@@ -93,7 +93,7 @@ namespace Cosplay_Academy
 
                         var isset = selectedfolder.FolderPath.Contains($"{sep}Sets{sep}");
 
-                        outfitData[sets].Insert(hstate, selectedfolder.GetAllCards(), isset);
+                        outfitData[sets].Insert(selectedfolder.GetAllCards(), isset);
 
                         if (!Settings.IndividualSets.Value && isset)
                         {
@@ -103,7 +103,7 @@ namespace Cosplay_Academy
                     }
                     var cards = hstatefolder.GetAllCards();
                     cards.AddRange(Grabber(sets, hstate));
-                    outfitData[sets].Insert(hstate, cards, false);
+                    outfitData[sets].Insert(cards, false);
                 }
                 overridefolder = null;
             }
@@ -178,7 +178,7 @@ namespace Cosplay_Academy
                         continue;
                     }
                     var temp = find.GetAllCards();
-                    outfitData[sets].Insert(hexp, find.GetAllCards(), true);
+                    outfitData[sets].Insert(find.GetAllCards(), true);
                 }
             }
         }
@@ -190,11 +190,11 @@ namespace Cosplay_Academy
             {
                 case Hexp.RandConstant:
                     ThisOutfitData.Hvalue = RandHExperience;
-                    ThisOutfitData.alloutfitpaths[Path_Num] = outfitData[Data_Num].Random(RandHExperience, uniform_type, false, status.personality, status.attribute, ThisOutfitData.ChaControl.GetBustCategory(), ThisOutfitData.ChaControl.GetHeightCategory());
+                    ThisOutfitData.alloutfitpaths[Path_Num] = outfitData[Data_Num].Random(uniform_type, false, status.personality, status.attribute, ThisOutfitData.ChaControl.GetBustCategory(), ThisOutfitData.ChaControl.GetHeightCategory());
                     break;
                 case Hexp.Maximize:
                     ThisOutfitData.Hvalue = HExperience;
-                    ThisOutfitData.alloutfitpaths[Path_Num] = outfitData[Data_Num].Random(HExperience, uniform_type, false, status.personality, status.attribute, ThisOutfitData.ChaControl.GetBustCategory(), ThisOutfitData.ChaControl.GetHeightCategory());
+                    ThisOutfitData.alloutfitpaths[Path_Num] = outfitData[Data_Num].Random(uniform_type, false, status.personality, status.attribute, ThisOutfitData.ChaControl.GetBustCategory(), ThisOutfitData.ChaControl.GetHeightCategory());
                     break;
                 default:
                     ThisOutfitData.Hvalue = UnityEngine.Random.RandomRangeInt(0, HExperience + 1);

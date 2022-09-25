@@ -34,40 +34,31 @@ namespace Cosplay_Academy
             }
         }
 
-        public List<CardData> Sum(int level)//returns list that is the sum of all available lists.
+        public List<CardData> Sum()//returns list that is the sum of all available lists.
         {
             var temp = new List<CardData>();
-            if (!Anger)
-            {
-                if (level >= 3)
-                    temp.AddRange(Outfits_Per_State[3]);
-                if (level >= 2)
-                    temp.AddRange(Outfits_Per_State[2]);
-                if (level >= 1)
-                    temp.AddRange(Outfits_Per_State[1]);
-            }
             temp.AddRange(Outfits_Per_State[0]);
             return temp;
         }
 
-        public void Insert(int level, List<CardData> Data, bool IsSet)//Insert data according to Outfits_Per_State[3] state and confirm if it is a setitem.
+        public void Insert(List<CardData> Data, bool IsSet)//Insert data according to Outfits_Per_State[3] state and confirm if it is a setitem.
         {
             Data.Add(Defaultcard);
-            Outfits_Per_State[level] = Data;
-            Part_of_Set[level] = IsSet;
+            Outfits_Per_State[0] = Data;
+            Part_of_Set[0] = IsSet;
         }
 
-        public CardData Random(int level, bool Match, bool unrestricted, int personality = 0, ChaFileParameter.Attribute trait = null, int breast = 0, int height = 0)//get any random outfit according to experience
+        public CardData Random(bool Match, bool unrestricted, int personality = 0, ChaFileParameter.Attribute trait = null, int breast = 0, int height = 0)//get any random outfit according to experience
         {
             if (Match)
             {
-                return Match_Outfit_Paths[level];
+                return Match_Outfit_Paths[0];
             }
             IEnumerable<CardData> applicable;
             if (!Anger)
             {
                 var Tries = 0;
-                var EXP = level;
+                var EXP = 0;
                 CardData Result;
                 do
                 {
@@ -175,10 +166,7 @@ namespace Cosplay_Academy
 
         public void Coordinate()//set a random outfit to coordinate for non-set items when coordinated
         {
-            for (var i = 0; i < Part_of_Set.Length; i++)
-            {
-                Match_Outfit_Paths[i] = Random(i, false, true);
-            }
+                Match_Outfit_Paths[0] = Random(false, true);
         }
 
         public bool IsSet(int level)
