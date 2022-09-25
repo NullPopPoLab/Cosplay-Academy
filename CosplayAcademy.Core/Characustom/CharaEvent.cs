@@ -65,6 +65,8 @@ namespace Cosplay_Academy
             Settings.Logger.LogWarning($"Processing {ChaControl.chaFile.parameter.fullname} {Firstpass}");
 #endif
             var IsMaker = currentGameMode == GameMode.Maker;
+            // エディット中は作用させない 
+            if (IsMaker) return;
 #if TRACE
             var Start = Time.ElapsedMilliseconds;
             if (ThisOutfitData == null || !ThisOutfitData.processed || currentGameMode == GameMode.Maker)
