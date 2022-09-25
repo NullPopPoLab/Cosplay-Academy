@@ -44,6 +44,25 @@ namespace Cosplay_Academy
             return result;
         }
 
+        public FolderData SelectSubFolder(string path)
+        {
+            var sep = Path.DirectorySeparatorChar;
+
+            for (var i = 0; i < FolderData.Count; ++i)
+            {
+                var f2 = FolderData[i];
+                var p2 = f2.FolderPath;
+                var l1 = path.Length;
+                var l2 = p2.Length;
+                if (l1 < l2) continue;
+                if (p2 == path) return f2;
+                if (p2 != path.Substring(0, l2) + sep) continue;
+                return f2.SelectSubFolder(path);
+            }
+
+            return null;
+        }
+
         public void Populate(string path)
         {
             var sep = Path.DirectorySeparatorChar;

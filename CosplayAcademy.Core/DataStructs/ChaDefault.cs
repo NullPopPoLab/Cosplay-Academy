@@ -105,10 +105,13 @@ namespace Cosplay_Academy
         {
             for (var i = 0; i < Constants.GameCoordinateSize; i++)
             {
-                outfitpaths[i] = alloutfitpaths[i].GetFullPath();
+                var card = alloutfitpaths[i];
+                if (card == null) continue;
+                outfitpaths[i] = card.GetFullPath();
 
-                //Settings.Logger.LogWarning($"{(ChaFileDefine.CoordinateType)i} assigning " + outfitpaths[i]);
+                Settings.Logger.LogDebug($"{(ChaFileDefine.CoordinateType)i} assigning " + outfitpaths[i]);
             }
+
             var simpledirectory = ClothingLoader.CardInfo.SimpleFolderDirectory;
             var simplenull = simpledirectory.IsNullOrEmpty();
             var advanced = ClothingLoader.CardInfo.AdvancedDirectory;
@@ -119,6 +122,7 @@ namespace Cosplay_Academy
                 FolderStruct ADVStruct = null;
                 var defaultpath = Settings.CoordinatePath.Value;
                 var adv = ClothingLoader.CardInfo.AdvancedFolderDirectory;
+
                 if (!simplenull)
                 {
                     var simplepath = defaultpath + sep + simpledirectory;
@@ -131,6 +135,7 @@ namespace Cosplay_Academy
                         SimpleStruct = DataStruct.LoadFullStructure(simplepath);
                     }
                 }
+
                 for (var i = 0; i < Constants.GameCoordinateSize; i++)
                 {
                     if (SimpleStruct != null)
@@ -139,6 +144,7 @@ namespace Cosplay_Academy
                             if (cards.Count > 0)
                             {
                                 outfitpaths[i] = cards[UnityEngine.Random.RandomRangeInt(0, cards.Count)].GetFullPath();
+                                Settings.Logger.LogDebug($"{(ChaFileDefine.CoordinateType)i} assigning " + outfitpaths[i]);
                             }
                     }
 
@@ -162,6 +168,7 @@ namespace Cosplay_Academy
                                 if (cards.Count > 0)
                                 {
                                     outfitpaths[i] = cards[UnityEngine.Random.RandomRangeInt(0, cards.Count)].GetFullPath();
+                                    Settings.Logger.LogDebug($"{(ChaFileDefine.CoordinateType)i} assigning " + outfitpaths[i]);
                                 }
                             }
                         }

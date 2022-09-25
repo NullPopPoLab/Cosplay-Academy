@@ -123,7 +123,8 @@ namespace Cosplay_Academy
 
             for (var i = 0; i < Constants.CoordinateRoles.Length; ++i)
             {
-                list[i].Populate(coordinatepath + Constants.CoordinateRoles[i]);
+                var path = coordinatepath + Constants.CoordinateRoles[i];
+                list[i].Populate(path);
             }
             SaveFile();
             return list;

@@ -53,11 +53,13 @@ namespace Cosplay_Academy
             {
                 var Tries = 0;
                 var EXP = 0;
-                CardData Result;
+                CardData Result=null;
                 do
                 {
                     applicable = Outfits_Per_State.Where(x => Filter(x, unrestricted, personality, trait, breast, height));
-                    var rand = UnityEngine.Random.Range(0, applicable.Count());
+                    var ac = applicable.Count();
+                    if (ac < 1) break;
+                    var rand = UnityEngine.Random.Range(0, ac);
                     Result = applicable.ElementAt(rand);
                     var isdefault = Result.Filepath == defaultstring;
                     if (Settings.EnableDefaults.Value && isdefault || !isdefault)
@@ -76,8 +78,12 @@ namespace Cosplay_Academy
                 } while (EXP > -1);
                 return Result;
             }
-            applicable = Outfits_Per_State.Where(x => Filter(x, unrestricted, personality, trait, breast, height));
-            return applicable.ElementAt(UnityEngine.Random.Range(0, applicable.Count()));
+            else{
+                applicable = Outfits_Per_State.Where(x => Filter(x, unrestricted, personality, trait, breast, height));
+                var ac = applicable.Count();
+                if (ac < 1) return null;
+                return applicable.ElementAt(UnityEngine.Random.Range(0, ac));
+            }
         }
 
         public CardData RandomSet(bool Match, bool unrestricted, int personality = 0, ChaFileParameter.Attribute trait = null, int breast = 0, int height = 0)//if set exists add its items to pool along with any coordinated outfit and other choices
@@ -115,6 +121,7 @@ namespace Cosplay_Academy
                         } while (EXP > -1);
                         return Result;
 
+#if false // 再検討 
             var temp = new List<CardData>();
 
                 if (Part_of_Set || !Match)
@@ -129,6 +136,7 @@ namespace Cosplay_Academy
                 LastResult = temp[UnityEngine.Random.Range(0, temp.Count)];
             } while (++tries < 3 && LastResult == Defaultcard && !Settings.EnableDefaults.Value);
             return LastResult;
+#endif
         }
 
         public List<CardData> Exportarray()

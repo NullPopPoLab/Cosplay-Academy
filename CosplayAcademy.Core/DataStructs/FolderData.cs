@@ -100,6 +100,22 @@ namespace Cosplay_Academy
             }
         }
 
+        public FolderData SelectSubFolder(string path)
+        {
+            var sep = Path.DirectorySeparatorChar;
+
+            for (var i = 0; i < Subfolderdata.Count; ++i)
+            {
+                var f2 = Subfolderdata[i];
+                var p2 = f2.FolderPath;
+                if (p2 == path) return f2;
+                if (p2 != path.Substring(0, p2.Length) + sep) continue;
+                return f2.SelectSubFolder(path);
+            }
+
+            return null;
+        }
+
         public List<CardData> GetAllCards()
         {
             var list = new List<CardData>();

@@ -42,7 +42,14 @@ namespace Cosplay_Academy
         {
             for (int sets = 0, setslen = Constants.GameCoordinateSize; sets < setslen; sets++)
             {
-                    var hstatefolder = DataStruct.DefaultFolder[0];
+                var order = Constants.SpecificCategories[sets];
+                if(order==""){
+                    // ランダムカテゴリから選択 
+				}
+
+                var f1 = DataStruct.DefaultFolder[0];
+                var f2 = f1.SelectSubFolder(Settings.CoordinatePath.Value + Constants.CoordinateRoles[0] + sep + order);
+                if (f2 == null) continue;
 
                     if (outfitData[sets].IsSet())//Skip set items
                     {
@@ -51,7 +58,7 @@ namespace Cosplay_Academy
 
                     if (Settings.EnableSets.Value)
                     {
-                        var AllFolder = hstatefolder.GetAllFolders();
+                        var AllFolder = f2.GetAllFolders();
 
                         Grabber(ref AllFolder, sets, 0);
 
@@ -63,14 +70,14 @@ namespace Cosplay_Academy
 
                         var selectedfolder = AllFolder[UnityEngine.Random.Range(0, AllFolder.Count)];
 
-//                        Settings.Logger.LogWarning($"Selected folder for set {sets}: {selectedfolder.FolderPath}");
+                        Settings.Logger.LogDebug($"Selected folder for set {sets}: {order}: {selectedfolder.FolderPath}");
 
                         var isset = false;
 
                         outfitData[sets].Insert(selectedfolder.GetAllCards(), isset);
                         continue;
                     }
-                    var cards = hstatefolder.GetAllCards();
+                    var cards = f2.GetAllCards();
                     cards.AddRange(Grabber(sets));
                     outfitData[sets].Insert(cards, false);
             }
@@ -130,19 +137,27 @@ namespace Cosplay_Academy
         {
             var status = ThisOutfitData.ChaControl.fileParam;
             var bust = ThisOutfitData.ChaControl.GetBustCategory();
-            var height = ThisOutfitData.ChaControl.GetBustCategory();
+            var height = ThisOutfitData.ChaControl.GetHeightCategory();
+            var src = outfitData[Data_Num];
+            if (src == null)
+            {
+                Settings.Logger.LogWarning($"Generalized_Assignment: uniform={uniform_type} pn={Path_Num} dn={Data_Num} is null");
+                ThisOutfitData.alloutfitpaths[Path_Num] = null;
+                return;
+            }
+
             Settings.Logger.LogDebug($"Generalized_Assignment: uniform={uniform_type} pn={Path_Num} dn={Data_Num} bust={bust} height={height}");
 
             switch (Settings.H_EXP_Choice.Value)
             {
                 case Hexp.RandConstant:
-                    ThisOutfitData.alloutfitpaths[Path_Num] = outfitData[Data_Num].Random(uniform_type, false, status.personality, status.attribute, bust, height);
+                    ThisOutfitData.alloutfitpaths[Path_Num] = src.Random(uniform_type, false, status.personality, status.attribute, bust, height);
                     break;
                 case Hexp.Maximize:
-                    ThisOutfitData.alloutfitpaths[Path_Num] = outfitData[Data_Num].Random(uniform_type, false, status.personality, status.attribute, bust, height);
+                    ThisOutfitData.alloutfitpaths[Path_Num] = src.Random(uniform_type, false, status.personality, status.attribute, bust, height);
                     break;
                 default:
-                    ThisOutfitData.alloutfitpaths[Path_Num] = outfitData[Data_Num].RandomSet(uniform_type, false, status.personality, status.attribute, bust, height);
+                    ThisOutfitData.alloutfitpaths[Path_Num] = src.RandomSet(uniform_type, false, status.personality, status.attribute, bust, height);
                     break;
             }
         }
