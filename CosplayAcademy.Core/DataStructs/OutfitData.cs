@@ -106,7 +106,7 @@ namespace Cosplay_Academy
             level++;
             for (var i = 0; i < level; i++)
             {
-                Weight += Settings.HStateWeights[i].Value;
+                Weight += Settings.HStateWeight;
             }
             IEnumerable<CardData> applicable;
             if (Weight > 0)
@@ -114,7 +114,7 @@ namespace Cosplay_Academy
                 var RandResult = UnityEngine.Random.Range(0, Weight);
                 for (var i = 0; i < level; i++)
                 {
-                    if (RandResult < Settings.HStateWeights[i].Value)
+                    if (RandResult < Settings.HStateWeight)
                     {
                         var EXP = i;
                         var Tries = 0;
@@ -146,7 +146,7 @@ namespace Cosplay_Academy
                         } while (EXP > -1);
                         return Result;
                     }
-                    RandResult -= Settings.HStateWeights[i].Value;
+                    RandResult -= Settings.HStateWeight;
                 }
             }
 

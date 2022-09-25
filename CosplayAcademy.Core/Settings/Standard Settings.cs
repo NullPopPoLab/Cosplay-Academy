@@ -48,7 +48,7 @@ namespace Cosplay_Academy
 
         public static ConfigEntry<bool> ChangeOutfit { get; set; }
 
-        public static ConfigEntry<int>[] HStateWeights { get; private set; } = new ConfigEntry<int>[Enum.GetValues(typeof(HStates)).Length];
+        public const int HStateWeight = 50;
         public static ConfigEntry<Hexp> H_EXP_Choice { get; private set; }
 
         public static ConfigEntry<OutfitUpdate> UpdateFrequency { get; private set; }
@@ -112,10 +112,6 @@ namespace Cosplay_Academy
 
             //prob
             H_EXP_Choice = Config.Bind("Probability", "Outfit Picker logic", Hexp.RandConstant, new ConfigDescription("Randomize: Each outfit can be from different H States\nRandConstant: Randomizes H State, but will choose the same level if outfit is found (will get next highest if Enable Default is not enabled)\nMaximize: Do I really gotta say?", null, AdvancedConfig));
-            for (var i = 0; i < HStateWeights.Length; i++)
-            {
-                HStateWeights[i] = Config.Bind("Probability", $"Weight of {(HStates)i}", 50, new ConfigDescription($"Weight of {(HStates)i} category\nNot actually % chance", new AcceptableValueRange<int>(0, 100), new ConfigurationManagerAttributes { ShowRangeAsPercent = false, IsAdvanced = true, Order = HStateWeights.Length - i }));
-            }
 
             //Maker
             Makerview = Config.Bind("Maker", "Enable Maker Mode", false, new ConfigDescription("", null, AdvancedConfig));
