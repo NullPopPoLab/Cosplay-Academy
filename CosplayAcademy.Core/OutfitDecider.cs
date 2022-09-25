@@ -44,7 +44,7 @@ namespace Cosplay_Academy
             {
                     var hstatefolder = DataStruct.DefaultFolder[0].FolderData;
 
-                    if (outfitData[sets].IsSet(0))//Skip set items
+                    if (outfitData[sets].IsSet())//Skip set items
                     {
                         continue;
                     }

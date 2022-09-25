@@ -10,49 +10,43 @@ namespace Cosplay_Academy
         const string defaultstring = "Default";
         private readonly static CardData Defaultcard = new CardData(defaultstring);
 
-        private readonly bool[] Part_of_Set = new bool[1];
-        public readonly List<CardData>[] Outfits_Per_State = new List<CardData>[1];
-        private readonly CardData[] Match_Outfit_Paths = new CardData[1];
+        private bool Part_of_Set = false;
+        public List<CardData> Outfits_Per_State = new List<CardData>();
+        private CardData Match_Outfit_Paths = null;
         public static bool Anger = false;
 
         public OutfitData()
         {
-            for (var i = 0; i < Match_Outfit_Paths.Length; i++)
-            {
-                Match_Outfit_Paths[i] = Defaultcard;
-                Part_of_Set[i] = false;
-                Outfits_Per_State[i] = new List<CardData>();
-            }
+                Match_Outfit_Paths = Defaultcard;
+                Part_of_Set = false;
+                Outfits_Per_State = new List<CardData>();
         }
 
         public void Clear()
         {
-            for (var i = 0; i < Match_Outfit_Paths.Length; i++)
-            {
-                Outfits_Per_State[i].Clear();
-                Part_of_Set[i] = false;
-            }
+                Outfits_Per_State.Clear();
+                Part_of_Set = false;
         }
 
         public List<CardData> Sum()//returns list that is the sum of all available lists.
         {
             var temp = new List<CardData>();
-            temp.AddRange(Outfits_Per_State[0]);
+            temp.AddRange(Outfits_Per_State);
             return temp;
         }
 
         public void Insert(List<CardData> Data, bool IsSet)//Insert data according to Outfits_Per_State[3] state and confirm if it is a setitem.
         {
             Data.Add(Defaultcard);
-            Outfits_Per_State[0] = Data;
-            Part_of_Set[0] = IsSet;
+            Outfits_Per_State = Data;
+            Part_of_Set = IsSet;
         }
 
         public CardData Random(bool Match, bool unrestricted, int personality = 0, ChaFileParameter.Attribute trait = null, int breast = 0, int height = 0)//get any random outfit according to experience
         {
             if (Match)
             {
-                return Match_Outfit_Paths[0];
+                return Match_Outfit_Paths;
             }
             IEnumerable<CardData> applicable;
             if (!Anger)
@@ -62,7 +56,7 @@ namespace Cosplay_Academy
                 CardData Result;
                 do
                 {
-                    applicable = Outfits_Per_State[EXP].Where(x => Filter(x, unrestricted, personality, trait, breast, height));
+                    applicable = Outfits_Per_State.Where(x => Filter(x, unrestricted, personality, trait, breast, height));
                     var rand = UnityEngine.Random.Range(0, applicable.Count());
                     Result = applicable.ElementAt(rand);
                     var isdefault = Result.Filepath == defaultstring;
@@ -74,7 +68,7 @@ namespace Cosplay_Academy
                     {
                         EXP--;
                         Tries = 0;
-                        while (EXP > -1 && Outfits_Per_State[EXP].Count == 1)
+                        while (EXP > -1 && Outfits_Per_State.Count == 1)
                         {
                             EXP--;
                         }
@@ -82,7 +76,7 @@ namespace Cosplay_Academy
                 } while (EXP > -1);
                 return Result;
             }
-            applicable = Outfits_Per_State[0].Where(x => Filter(x, unrestricted, personality, trait, breast, height));
+            applicable = Outfits_Per_State.Where(x => Filter(x, unrestricted, personality, trait, breast, height));
             return applicable.ElementAt(UnityEngine.Random.Range(0, applicable.Count()));
         }
 
@@ -103,14 +97,14 @@ namespace Cosplay_Academy
                         var Result = Defaultcard;
                         do
                         {
-                            if (Part_of_Set[0] || !Match)
+                            if (Part_of_Set || !Match)
                             {
-                                applicable = Outfits_Per_State[EXP].Where(x => Filter(x, unrestricted, personality, trait, breast, height));
+                                applicable = Outfits_Per_State.Where(x => Filter(x, unrestricted, personality, trait, breast, height));
                                 var rand = UnityEngine.Random.Range(0, applicable.Count());
                                 Result = applicable.ElementAt(rand);
                             }
                             else
-                                Result = Match_Outfit_Paths[EXP];
+                                Result = Match_Outfit_Paths;
                             var isdefault = Result.Filepath == defaultstring;
                             if (Settings.EnableDefaults.Value && isdefault || !isdefault)
                             {
@@ -120,7 +114,7 @@ namespace Cosplay_Academy
                             {
                                 EXP--;
                                 Tries = 0;
-                                while (EXP > -1 && Outfits_Per_State[EXP].Count < 2)
+                                while (EXP > -1 && Outfits_Per_State.Count < 2)
                                 {
                                     EXP--;
                                 }
@@ -133,10 +127,10 @@ namespace Cosplay_Academy
 
             var temp = new List<CardData>();
 
-                if (Part_of_Set[0] || !Match)
-                    temp.AddRange(Outfits_Per_State[0].Where(x => Filter(x, unrestricted, personality, trait, breast, height)));
+                if (Part_of_Set || !Match)
+                    temp.AddRange(Outfits_Per_State.Where(x => Filter(x, unrestricted, personality, trait, breast, height)));
                 else
-                    temp.Add(Match_Outfit_Paths[0]);
+                    temp.Add(Match_Outfit_Paths);
 
             CardData LastResult;
             var tries = 0;
@@ -147,25 +141,19 @@ namespace Cosplay_Academy
             return LastResult;
         }
 
-        public List<CardData> Exportarray(int level)
+        public List<CardData> Exportarray()
         {
-            return Outfits_Per_State[level];
+            return Outfits_Per_State;
         }
 
         public void Coordinate()//set a random outfit to coordinate for non-set items when coordinated
         {
-                Match_Outfit_Paths[0] = Random(false, true);
+                Match_Outfit_Paths = Random(false, true);
         }
 
-        public bool IsSet(int level)
+        public bool IsSet()
         {
-            if (level == 3)
-                return Part_of_Set[3];
-            if (level == 2)
-                return Part_of_Set[2];
-            if (level == 1)
-                return Part_of_Set[1];
-            return Part_of_Set[0];
+            return Part_of_Set;
         }
 
         private bool Filter(CardData check, bool unrestricted, int personality, ChaFileParameter.Attribute trait, int breast, int height)
