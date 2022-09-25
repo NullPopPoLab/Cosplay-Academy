@@ -108,17 +108,7 @@ namespace Cosplay_Academy
                     {
                         CoordinateType++;
                     }
-                    if (CoordinateType == 4)
-                    {
-                        var club = MessagePackSerializer.Deserialize<int>((byte[])ACI_Data.data["ClubType_Restriction"]);
-                        if (club < 0)
-                        {
-                            Settings.Logger.LogWarning($"Coordinate {FileName} is defined as a club type with no club type assigned");
-                            continue;
-                        }
-                        ClubResult = Constants.ClubPaths[club];
-                    }
-                    Result = coordinatepath + Constants.AllCoordinatePaths[CoordinateType] + ClubResult + SubPath;
+                    Result = coordinatepath + Constants.AllCoordinatePaths[CoordinateType] + SubPath;
                     if (!Directory.Exists(Result))
                         Directory.CreateDirectory(Result);
                     Result += FileName;
