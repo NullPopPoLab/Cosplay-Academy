@@ -4,12 +4,12 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Cosplay Academy")]
+[assembly: AssemblyTitle("CosplayParty")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("https://github.com/jalil49/Cosplay-Academy")]
-[assembly: AssemblyProduct("Cosplay Academy")]
-[assembly: AssemblyCopyright("Copyright ©  2021")]
+[assembly: AssemblyCompany("NullPopPoLab")]
+[assembly: AssemblyProduct("CosplayParty")]
+[assembly: AssemblyCopyright("Copyright ©  2021 jalil49 / ©  2022 NullPopPo")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

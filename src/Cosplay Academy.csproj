@@ -8,7 +8,7 @@
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Cosplay_Academy</RootNamespace>
-    <AssemblyName>Cosplay Academy</AssemblyName>
+    <AssemblyName>CosplayParty</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
@@ -111,11 +111,8 @@
   <Import Project="..\CosplayAcademy.Core\CosplayAcademy.Core.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>IF EXIST "F:\Satisfactory\" (
- xcopy "$(TargetFileName)" "F:\[ScrewThisNoise] Koikatsu BetterRepack R9.2\BepInEx\plugins" /S /Y /D 
-xcopy "$(TargetFileName)" "C:\Program Files (x86)\Steam\steamapps\common\Koikatsu Party\BepInEx\plugins" /S /Y /D
-)
-</PostBuildEvent>
+    <PostBuildEvent>
+    </PostBuildEvent>
   </PropertyGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>

@@ -14,14 +14,14 @@ using System.Diagnostics;
 
 namespace Cosplay_Academy
 {
-    [BepInPlugin(GUID, "Cosplay Academy", Version)]
+    [BepInPlugin(GUID, "CosplayParty", Version)]
     [BepInDependency(KKAPI.KoikatuAPI.GUID, KKAPI.KoikatuAPI.VersionConst)]
     [BepInDependency(MoreAccessoriesKOI.MoreAccessories.GUID, MoreAccessoriesKOI.MoreAccessories.versionNum)]
     [BepInDependency(Sideloader.Sideloader.GUID)]
     public partial class Settings : BaseUnityPlugin
     {
-        public const string GUID = "Cosplay_Academy";
-        public const string Version = "0.9.3";
+        public const string GUID = "CosplayParty";
+        public const string Version = "0.9.0.1";
         public static Settings Instance;
         internal static new ManualLogSource Logger { get; private set; }
 
@@ -126,7 +126,7 @@ namespace Cosplay_Academy
             //Other Mods
             UnderwearStates = Config.Bind("Other Mods", "Randomize Underwear: ACC_States", true, "Attempts to write logic for AccStateSync and Accessory states to use.");
 
-            CoordinatePath = Config.Bind("Coordinate Location", "Path to coordinate folder", new DirectoryInfo(UserData.Path).FullName + "Coordinate" + sep + "Cosplay Academy", "Coordinate Path");
+            CoordinatePath = Config.Bind("Coordinate Location", "Path to coordinate folder", new DirectoryInfo(UserData.Path).FullName + "Coordinate" + sep + "CosplayParty", "Coordinate Path");
             UpdateFolders = Config.Bind("Coordinate Location", "Folder Options", false, new ConfigDescription("", null, new ConfigurationManagerAttributes() { HideSettingName = true, HideDefaultButton = true, CustomDrawer = new Action<ConfigEntryBase>(FolderUpdateGUI) }));
 
             //Overrides
