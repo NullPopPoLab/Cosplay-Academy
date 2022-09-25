@@ -10,8 +10,6 @@ namespace Cosplay_Academy
         private static readonly OutfitData[] outfitData;
 
         private static ChaDefault ThisOutfitData;
-        private static int HExperience;
-        private static int RandHExperience;
 
         static OutfitDecider()
         {
@@ -128,14 +126,11 @@ namespace Cosplay_Academy
 #if KK
                 OutfitData.Anger = person.isAnger;
 #endif
-                HExperience = (int)person.HExperience;
             }
             else
             {
                 OutfitData.Anger = false;
-                HExperience = 0;
             }
-            RandHExperience = UnityEngine.Random.Range(0, HExperience + 1);
             for (var i = 0; i < Constants.InputStrings.Length; i++)
             {
                 Generalized_Assignment(Settings.MatchGeneric[i].Value, i, i);
@@ -154,16 +149,13 @@ namespace Cosplay_Academy
             switch (Settings.H_EXP_Choice.Value)
             {
                 case Hexp.RandConstant:
-                    ThisOutfitData.Hvalue = RandHExperience;
                     ThisOutfitData.alloutfitpaths[Path_Num] = outfitData[Data_Num].Random(uniform_type, false, status.personality, status.attribute, ThisOutfitData.ChaControl.GetBustCategory(), ThisOutfitData.ChaControl.GetHeightCategory());
                     break;
                 case Hexp.Maximize:
-                    ThisOutfitData.Hvalue = HExperience;
                     ThisOutfitData.alloutfitpaths[Path_Num] = outfitData[Data_Num].Random(uniform_type, false, status.personality, status.attribute, ThisOutfitData.ChaControl.GetBustCategory(), ThisOutfitData.ChaControl.GetHeightCategory());
                     break;
                 default:
-                    ThisOutfitData.Hvalue = UnityEngine.Random.RandomRangeInt(0, HExperience + 1);
-                    ThisOutfitData.alloutfitpaths[Path_Num] = outfitData[Data_Num].RandomSet(ThisOutfitData.Hvalue, uniform_type, false, status.personality, status.attribute, ThisOutfitData.ChaControl.GetBustCategory(), ThisOutfitData.ChaControl.GetHeightCategory());
+                    ThisOutfitData.alloutfitpaths[Path_Num] = outfitData[Data_Num].RandomSet(uniform_type, false, status.personality, status.attribute, ThisOutfitData.ChaControl.GetBustCategory(), ThisOutfitData.ChaControl.GetHeightCategory());
                     break;
             }
         }

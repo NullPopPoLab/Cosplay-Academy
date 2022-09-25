@@ -86,33 +86,24 @@ namespace Cosplay_Academy
             return applicable.ElementAt(UnityEngine.Random.Range(0, applicable.Count()));
         }
 
-        public CardData RandomSet(int level, bool Match, bool unrestricted, int personality = 0, ChaFileParameter.Attribute trait = null, int breast = 0, int height = 0)//if set exists add its items to pool along with any coordinated outfit and other choices
+        public CardData RandomSet(bool Match, bool unrestricted, int personality = 0, ChaFileParameter.Attribute trait = null, int breast = 0, int height = 0)//if set exists add its items to pool along with any coordinated outfit and other choices
         {
             var Weight = 0;
-            if (Anger)
-            {
-                level = 0;
-            }
 
-            level++;
-            for (var i = 0; i < level; i++)
-            {
-                Weight += Settings.HStateWeight;
-            }
+            Weight += Settings.HStateWeight;
+
             IEnumerable<CardData> applicable;
             if (Weight > 0)
             {
                 var RandResult = UnityEngine.Random.Range(0, Weight);
-                for (var i = 0; i < level; i++)
-                {
                     if (RandResult < Settings.HStateWeight)
                     {
-                        var EXP = i;
+                        var EXP = 0;
                         var Tries = 0;
                         var Result = Defaultcard;
                         do
                         {
-                            if (Part_of_Set[i] || !Match)
+                            if (Part_of_Set[0] || !Match)
                             {
                                 applicable = Outfits_Per_State[EXP].Where(x => Filter(x, unrestricted, personality, trait, breast, height));
                                 var rand = UnityEngine.Random.Range(0, applicable.Count());
@@ -138,18 +129,15 @@ namespace Cosplay_Academy
                         return Result;
                     }
                     RandResult -= Settings.HStateWeight;
-                }
             }
 
             var temp = new List<CardData>();
 
-            for (var i = 0; i < level; i++)
-            {
-                if (Part_of_Set[i] || !Match)
-                    temp.AddRange(Outfits_Per_State[i].Where(x => Filter(x, unrestricted, personality, trait, breast, height)));
+                if (Part_of_Set[0] || !Match)
+                    temp.AddRange(Outfits_Per_State[0].Where(x => Filter(x, unrestricted, personality, trait, breast, height)));
                 else
-                    temp.Add(Match_Outfit_Paths[i]);
-            }
+                    temp.Add(Match_Outfit_Paths[0]);
+
             CardData LastResult;
             var tries = 0;
             do

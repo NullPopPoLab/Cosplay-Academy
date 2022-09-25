@@ -20,7 +20,7 @@ namespace Cosplay_Academy
 
         private static void SpecialProcess()
         {
-            ThisOutfitData.KoiOutfitpath = outfitData[9].RandomSet(HExperience, Settings.MatchGeneric[9].Value, false, ThisOutfitData.ChaControl.fileParam.personality, ThisOutfitData.Chafile.parameter.attribute, ThisOutfitData.ChaControl.GetBustCategory(), ThisOutfitData.ChaControl.GetHeightCategory()).GetFullPath();
+            ThisOutfitData.KoiOutfitpath = outfitData[9].RandomSet(Settings.MatchGeneric[9].Value, false, ThisOutfitData.ChaControl.fileParam.personality, ThisOutfitData.Chafile.parameter.attribute, ThisOutfitData.ChaControl.GetBustCategory(), ThisOutfitData.ChaControl.GetHeightCategory()).GetFullPath();
 
             if (!Settings.MatchGeneric[1].Value)
             {

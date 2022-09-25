@@ -23,8 +23,6 @@ namespace Cosplay_Academy
 
         internal ChaFileParameter Parameter;
 
-        internal int Hvalue = 0;
-
         internal SaveData.Heroine heroine;
 
 #if KK
@@ -156,7 +154,7 @@ namespace Cosplay_Academy
                     {
                         if (count == 1)
                         {
-                            var cards = SimpleStruct[datanum].FolderData[Hvalue].GetAllCards();
+                            var cards = SimpleStruct[datanum].FolderData[0].GetAllCards();
                             if (cards.Count > 0)
                             {
                                 outfitpaths[i] = cards[UnityEngine.Random.RandomRangeInt(0, cards.Count)].GetFullPath();
@@ -184,7 +182,7 @@ namespace Cosplay_Academy
 
                             if (ADVStruct != null)
                             {
-                                var cards = ADVStruct.FolderData[Hvalue].GetAllCards();
+                                var cards = ADVStruct.FolderData[0].GetAllCards();
                                 if (cards.Count > 0)
                                 {
                                     outfitpaths[i] = cards[UnityEngine.Random.RandomRangeInt(0, cards.Count)].GetFullPath();
