@@ -201,19 +201,6 @@ namespace Cosplay_Academy
         #endif
         };
 
-        public static readonly string[] AllCoordinatePaths =
-        {
-            $"{sep}School Uniform", //0
-            $"{sep}AfterSchool", //1
-            $"{sep}Gym" ,//2
-            $"{sep}Swimsuit" , //3
-            $"{sep}Club" , //4
-            $"{sep}Casual" , //5
-            $"{sep}Nightwear", //6
-            $"{sep}Underwear",//7                 
-            $"{sep}Bathroom", //8
-        };
-
         public static readonly string[] ClubPaths =
         {
                     $"{sep}Home" , //0

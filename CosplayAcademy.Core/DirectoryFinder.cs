@@ -79,8 +79,7 @@ namespace Cosplay_Academy
                     var SetNames = coordiante.SetNames;
                     var SubSetNames = coordiante.SubSetNames;
                     string Result;
-                    var ClubResult = "";
-                    var SubPath = $"{sep}";
+                    var SubPath = "" + sep;
                     if (SetNames.Length > 0)
                     {
                         SubPath += SetNames;
@@ -89,26 +88,16 @@ namespace Cosplay_Academy
                     {
                         if (!SubPath.EndsWith($"{sep}"))
                         {
-                            SubPath += $"{sep}";
+                            SubPath += sep;
                         }
                         SubPath += SubSetNames;
                     }
-                    var FileName = $"{sep}" + Coordinate.Split(sep).Last();
-                    if (CoordinateSubType == 10)
-                    {
-                        Result = coordinatepath + Constants.InputStrings[7] + SubPath;
-                        if (!Directory.Exists(Result))
-                            Directory.CreateDirectory(Result);
-                        Result += FileName;
-                        File.Copy(Coordinate, Result, true);
-                        File.Delete(Coordinate);
-                        continue;
-                    }
+                    var FileName = "" + sep + Coordinate.Split(sep).Last();
                     if (CoordinateType > 0)
                     {
                         CoordinateType++;
                     }
-                    Result = coordinatepath + Constants.AllCoordinatePaths[CoordinateType] + SubPath;
+                    Result = coordinatepath + sep + SubPath;
                     if (!Directory.Exists(Result))
                         Directory.CreateDirectory(Result);
                     Result += FileName;
