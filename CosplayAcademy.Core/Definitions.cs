@@ -157,6 +157,12 @@ namespace Cosplay_Academy
             }
         }
 
+        public static readonly string[] CoordinateRoles =
+        {
+            $"{sep}outer",
+            $"{sep}inner",
+        };
+
         //Increasing this will not break the code but the code isn't written in a way in which it can scale to increase readbility
         //I'd imagine it's possible to scale clubs easily
         public static readonly string[] InputStrings =

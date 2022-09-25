@@ -119,22 +119,11 @@ namespace Cosplay_Academy
                 list = FullStructures[coordinatepath] = new List<FolderStruct>();
             }
 
-            while (list.Count < Constants.InputStrings.Length + Constants.ExtraInputStrings.Length)
-            {
-                list.Add(new FolderStruct());
-            }
+            while (list.Count < Constants.CoordinateRoles.Length) list.Add(new FolderStruct());
 
-            var set = 0;
-            foreach (var coordinatetype in Constants.InputStrings)
+            for (var i = 0; i < Constants.CoordinateRoles.Length; ++i)
             {
-                list[set].Populate(coordinatepath + coordinatetype);
-                set++;
-            }
-
-            foreach (var coordinatetype in Constants.ExtraInputStrings)
-            {
-                list[set].Populate(coordinatepath + coordinatetype);
-                set++;
+                list[i].Populate(coordinatepath + Constants.CoordinateRoles[i]);
             }
             SaveFile();
             return list;

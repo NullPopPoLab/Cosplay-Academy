@@ -45,7 +45,7 @@ namespace Cosplay_Academy
 
         public void Populate(string folderpath)
         {
-                FolderData[0].Populate(folderpath);
+            FolderData[0].Populate(folderpath);
         }
 
         public void Update()
