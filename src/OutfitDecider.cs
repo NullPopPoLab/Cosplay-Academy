@@ -6,6 +6,7 @@ namespace Cosplay_Academy
     {
         private static void Grabber(ref List<FolderData> temp2, int set, int exp)
         {
+#if false // 再検討 
             if (set == 1 && Settings.GrabUniform.Value)
             {
                 temp2.AddRange(DataStruct.DefaultFolder[set].FolderData[exp].GetAllFolders());
@@ -16,6 +17,7 @@ namespace Cosplay_Academy
                 temp2.AddRange(DataStruct.DefaultFolder[set].FolderData[exp].GetAllFolders());
                 return;
             }
+#endif
         }
 
         private static void SpecialProcess()

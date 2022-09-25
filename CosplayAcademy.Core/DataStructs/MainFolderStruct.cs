@@ -9,16 +9,15 @@ namespace Cosplay_Academy
     public class FolderStruct
     {
         [Key("_hstruct")]
-        public HFolderStruct[] FolderData { get; private set; }
+        public HFolderStruct FolderData { get; private set; }
 
         public FolderStruct()
         {
-            FolderData = new HFolderStruct[1];
-            FolderData[0] = new HFolderStruct();
+            FolderData = new HFolderStruct();
         }
 
         [SerializationConstructor]
-        public FolderStruct(HFolderStruct[] _hstruct)
+        public FolderStruct(HFolderStruct _hstruct)
         {
             FolderData = _hstruct;
         }
@@ -26,42 +25,30 @@ namespace Cosplay_Academy
         public List<CardData> GetAllCards()
         {
             var list = new List<CardData>();
-            foreach (var hstates in FolderData)
-            {
-                list.AddRange(hstates.GetAllCards());
-            }
+            list.AddRange(FolderData.GetAllCards());
             return list;
         }
 
         public List<FolderData> GetAllFolders()
         {
             var list = new List<FolderData>();
-            foreach (var hstates in FolderData)
-            {
-                list.AddRange(hstates.GetAllFolders());
-            }
+            list.AddRange(FolderData.GetAllFolders());
             return list;
         }
 
         public void Populate(string folderpath)
         {
-            FolderData[0].Populate(folderpath);
+            FolderData.Populate(folderpath);
         }
 
         public void Update()
         {
-            foreach (var item in FolderData)
-            {
-                item.Update();
-            }
+            FolderData.Update();
         }
 
         public void CleanUp()
         {
-            foreach (var item in FolderData)
-            {
-                item.CleanUp();
-            }
+            FolderData.CleanUp();
         }
     }
 }

@@ -34,22 +34,6 @@ namespace Cosplay_Academy
 
         internal static void ExpandedOutfit()
         {
-            for (var i = 0; i < GameCoordinateSize; i++)
-            {
-                if (OutfitnumPairs.ContainsKey(i))
-                {
-                    continue;
-                }
-#if KK
-                if (i == 4)
-                {
-                    OutfitnumPairs.Add(i, 6);
-                    continue;
-                }
-#endif
-                OutfitnumPairs.Add(i, 1);
-            }
-
             var IgnoredTops_Original_A = new Dictionary<int, List<ResolveInfo>>()
             {
                 [1] = new List<ResolveInfo>() { ResolveInfo("yu000.ShirtlessUniform", 200, 100), },
@@ -237,8 +221,6 @@ namespace Cosplay_Academy
             }
         }
 
-        public static SortedDictionary<int, int> OutfitnumPairs = new SortedDictionary<int, int>();
-
         public static readonly List<int> IgnoredTopIDs_Main = new List<int>() { 0, 31, 53, 59, 60, 222 };
 
         public static readonly List<int> IgnoredBotsIDs_Main = new List<int>() { 0, 38, 40, };
@@ -254,17 +236,17 @@ namespace Cosplay_Academy
 
 #if KK
         public static string[] SpecificCategories = new string[]{
-            "", // in school 
-            "", // after school 
+            "School", // in school 
+            "School", // after school 
             "_gym",
             "_swim",
-            "", // club 
-            "", // casual 
+            "Fantasy", // club 
+            "Casual", // casual 
             "_nighty",
         };
 #elif KKS
         public static string[] SpecificCategories = new string[]{
-            "", // casual 
+            "Fantasy", // casual 
             "_swim",
             "_nighty",
             "_bath",
@@ -272,25 +254,6 @@ namespace Cosplay_Academy
 #endif
         public static readonly int GameCoordinateSize = SpecificCategories.Length;
 
-        public static string[] SimplifiedCoordinateTypes = new string[]
-#if KK
-        {
-            "School Uniform",
-            "AfterSchool",
-            "Gym",
-            "Swimsuit",
-            "Club",
-            "Casual",
-            "Nightwear",
-        };
-#elif KKS
-        {
-            "Casual",
-            "Swimsuit",
-            "Nightwear",
-            "Bathroom"
-        };
-#endif
         private class PluginCheckData
         {
             public string GUID;

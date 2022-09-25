@@ -103,23 +103,10 @@ namespace Cosplay_Academy
 
         public void FillOutfitpaths()
         {
-            var datanum = 0;
             for (var i = 0; i < Constants.GameCoordinateSize; i++)
             {
-                if (!Constants.OutfitnumPairs.TryGetValue(i, out var count))
-                {
-                    break;
-                }
-                if (count == 1)
-                {
-                    outfitpaths[i] = alloutfitpaths[datanum].GetFullPath();
+                    outfitpaths[i] = alloutfitpaths[i].GetFullPath();
                     //Settings.Logger.LogWarning($"{(ChaFileDefine.CoordinateType)i} assigning " + outfitpaths[i]);
-                }
-                else
-                {
-                    SpecialCondition(i, outfitpaths, datanum);
-                }
-                datanum += count;
             }
             var simpledirectory = ClothingLoader.CardInfo.SimpleFolderDirectory;
             var simplenull = simpledirectory.IsNullOrEmpty();
@@ -143,32 +130,20 @@ namespace Cosplay_Academy
                         SimpleStruct = DataStruct.LoadFullStructure(simplepath);
                     }
                 }
-                datanum = 0;
                 for (var i = 0; i < Constants.GameCoordinateSize; i++)
                 {
-                    if (!Constants.OutfitnumPairs.TryGetValue(i, out var count))
-                    {
-                        break;
-                    }
                     if (SimpleStruct != null)
                     {
-                        if (count == 1)
-                        {
-                            var cards = SimpleStruct[datanum].FolderData[0].GetAllCards();
+                            var cards = SimpleStruct[i].FolderData.GetAllCards();
                             if (cards.Count > 0)
                             {
                                 outfitpaths[i] = cards[UnityEngine.Random.RandomRangeInt(0, cards.Count)].GetFullPath();
                             }
-                        }
-                        else
-                        {
-                            SpecialCondition(i, outfitpaths, datanum);
-                        }
                     }
 
                     if (advanced)
                     {
-                        if (adv.TryGetValue(Constants.SimplifiedCoordinateTypes[i], out var advdirectory) && !advdirectory.IsNullOrEmpty())
+                        if (adv.TryGetValue(Constants.SpecificCategories[i], out var advdirectory) && !advdirectory.IsNullOrEmpty())
                         {
                             var advpath = defaultpath + sep + advdirectory;
 
@@ -182,7 +157,7 @@ namespace Cosplay_Academy
 
                             if (ADVStruct != null)
                             {
-                                var cards = ADVStruct.FolderData[0].GetAllCards();
+                                var cards = ADVStruct.FolderData.GetAllCards();
                                 if (cards.Count > 0)
                                 {
                                     outfitpaths[i] = cards[UnityEngine.Random.RandomRangeInt(0, cards.Count)].GetFullPath();
@@ -191,7 +166,6 @@ namespace Cosplay_Academy
                         }
                         ADVStruct = null;
                     }
-                    datanum += count;
                 }
             }
         }

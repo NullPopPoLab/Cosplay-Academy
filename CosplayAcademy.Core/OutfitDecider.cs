@@ -42,7 +42,7 @@ namespace Cosplay_Academy
         {
             for (int sets = 0, setslen = Constants.GameCoordinateSize; sets < setslen; sets++)
             {
-                    var hstatefolder = DataStruct.DefaultFolder[sets].FolderData[0];
+                    var hstatefolder = DataStruct.DefaultFolder[0].FolderData;
 
                     if (outfitData[sets].IsSet(0))//Skip set items
                     {
@@ -71,20 +71,21 @@ namespace Cosplay_Academy
                         continue;
                     }
                     var cards = hstatefolder.GetAllCards();
-                    cards.AddRange(Grabber(sets, 0));
+                    cards.AddRange(Grabber(sets));
                     outfitData[sets].Insert(cards, false);
             }
         }
-        private static List<CardData> Grabber(int sets, int hstate)
+        private static List<CardData> Grabber(int sets)
         {
+        #if false // 再検討 
 #if KK
             if (Settings.GrabSwimsuits.Value && sets == 4)
             {
-                return DataStruct.DefaultFolder[3].FolderData[hstate].GetAllCards();
+                return DataStruct.DefaultFolder[3].FolderData[0].GetAllCards();
             }
             if (Settings.GrabUniform.Value && sets == 1)
             {
-                return DataStruct.DefaultFolder[0].FolderData[hstate].GetAllCards();
+                return DataStruct.DefaultFolder[0].FolderData[0].GetAllCards();
             }
 
 #endif
@@ -93,6 +94,7 @@ namespace Cosplay_Academy
             {
                 return DataStruct.DefaultFolder[8].FolderData[hstate].GetAllCards();
             }
+#endif
 #endif
 
             return new List<CardData>();
