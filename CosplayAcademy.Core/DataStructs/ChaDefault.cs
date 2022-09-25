@@ -135,7 +135,7 @@ namespace Cosplay_Academy
                 {
                     if (SimpleStruct != null)
                     {
-                            var cards = SimpleStruct[i].FolderData.GetAllCards();
+                            var cards = SimpleStruct[i].GetAllCards();
                             if (cards.Count > 0)
                             {
                                 outfitpaths[i] = cards[UnityEngine.Random.RandomRangeInt(0, cards.Count)].GetFullPath();
@@ -158,7 +158,7 @@ namespace Cosplay_Academy
 
                             if (ADVStruct != null)
                             {
-                                var cards = ADVStruct.FolderData.GetAllCards();
+                                var cards = ADVStruct.GetAllCards();
                                 if (cards.Count > 0)
                                 {
                                     outfitpaths[i] = cards[UnityEngine.Random.RandomRangeInt(0, cards.Count)].GetFullPath();

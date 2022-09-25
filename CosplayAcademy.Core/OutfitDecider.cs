@@ -42,7 +42,7 @@ namespace Cosplay_Academy
         {
             for (int sets = 0, setslen = Constants.GameCoordinateSize; sets < setslen; sets++)
             {
-                    var hstatefolder = DataStruct.DefaultFolder[0].FolderData;
+                    var hstatefolder = DataStruct.DefaultFolder[0];
 
                     if (outfitData[sets].IsSet())//Skip set items
                     {
@@ -63,7 +63,7 @@ namespace Cosplay_Academy
 
                         var selectedfolder = AllFolder[UnityEngine.Random.Range(0, AllFolder.Count)];
 
-                        //Settings.Logger.LogWarning($"Selected folder for {Constants.InputStrings[sets]}/{Constants.InputStrings2[hstate]}: {selectedfolder.FolderPath}");
+//                        Settings.Logger.LogWarning($"Selected folder for set {sets}: {selectedfolder.FolderPath}");
 
                         var isset = false;
 
@@ -129,16 +129,20 @@ namespace Cosplay_Academy
         private static void Generalized_Assignment(bool uniform_type, int Path_Num, int Data_Num)
         {
             var status = ThisOutfitData.ChaControl.fileParam;
+            var bust = ThisOutfitData.ChaControl.GetBustCategory();
+            var height = ThisOutfitData.ChaControl.GetBustCategory();
+            Settings.Logger.LogDebug($"Generalized_Assignment: uniform={uniform_type} pn={Path_Num} dn={Data_Num} bust={bust} height={height}");
+
             switch (Settings.H_EXP_Choice.Value)
             {
                 case Hexp.RandConstant:
-                    ThisOutfitData.alloutfitpaths[Path_Num] = outfitData[Data_Num].Random(uniform_type, false, status.personality, status.attribute, ThisOutfitData.ChaControl.GetBustCategory(), ThisOutfitData.ChaControl.GetHeightCategory());
+                    ThisOutfitData.alloutfitpaths[Path_Num] = outfitData[Data_Num].Random(uniform_type, false, status.personality, status.attribute, bust, height);
                     break;
                 case Hexp.Maximize:
-                    ThisOutfitData.alloutfitpaths[Path_Num] = outfitData[Data_Num].Random(uniform_type, false, status.personality, status.attribute, ThisOutfitData.ChaControl.GetBustCategory(), ThisOutfitData.ChaControl.GetHeightCategory());
+                    ThisOutfitData.alloutfitpaths[Path_Num] = outfitData[Data_Num].Random(uniform_type, false, status.personality, status.attribute, bust, height);
                     break;
                 default:
-                    ThisOutfitData.alloutfitpaths[Path_Num] = outfitData[Data_Num].RandomSet(uniform_type, false, status.personality, status.attribute, ThisOutfitData.ChaControl.GetBustCategory(), ThisOutfitData.ChaControl.GetHeightCategory());
+                    ThisOutfitData.alloutfitpaths[Path_Num] = outfitData[Data_Num].RandomSet(uniform_type, false, status.personality, status.attribute, bust, height);
                     break;
             }
         }

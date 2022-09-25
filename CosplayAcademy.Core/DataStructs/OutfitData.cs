@@ -82,16 +82,8 @@ namespace Cosplay_Academy
 
         public CardData RandomSet(bool Match, bool unrestricted, int personality = 0, ChaFileParameter.Attribute trait = null, int breast = 0, int height = 0)//if set exists add its items to pool along with any coordinated outfit and other choices
         {
-            var Weight = 0;
-
-            Weight += Settings.HStateWeight;
-
             IEnumerable<CardData> applicable;
-            if (Weight > 0)
-            {
-                var RandResult = UnityEngine.Random.Range(0, Weight);
-                    if (RandResult < Settings.HStateWeight)
-                    {
+
                         var EXP = 0;
                         var Tries = 0;
                         var Result = Defaultcard;
@@ -105,6 +97,7 @@ namespace Cosplay_Academy
                             }
                             else
                                 Result = Match_Outfit_Paths;
+
                             var isdefault = Result.Filepath == defaultstring;
                             if (Settings.EnableDefaults.Value && isdefault || !isdefault)
                             {
@@ -121,9 +114,6 @@ namespace Cosplay_Academy
                             }
                         } while (EXP > -1);
                         return Result;
-                    }
-                    RandResult -= Settings.HStateWeight;
-            }
 
             var temp = new List<CardData>();
 

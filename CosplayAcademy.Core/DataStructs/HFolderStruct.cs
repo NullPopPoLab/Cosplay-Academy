@@ -1,4 +1,5 @@
-﻿using MessagePack;
+﻿#if false
+using MessagePack;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -21,9 +22,9 @@ namespace Cosplay_Academy
         public List<FolderData> GetAllFolders()
         {
             var result = new List<FolderData>();
-            foreach (var item in FolderData)
+            for (var i = 0; i < FolderData.Count; ++i)
             {
-                result.AddRange(item.GetAllFolders());
+                result.AddRange(FolderData[i].GetAllFolders());
             }
             return result;
         }
@@ -31,9 +32,9 @@ namespace Cosplay_Academy
         internal List<CardData> GetAllCards()
         {
             var result = new List<CardData>();
-            foreach (var folder in FolderData)
+            for (var i = 0; i < FolderData.Count; ++i)
             {
-                result.AddRange(folder.GetAllCards());
+                result.AddRange(FolderData[i].GetAllCards());
             }
             return result;
         }
@@ -79,3 +80,4 @@ namespace Cosplay_Academy
         }
     }
 }
+#endif
