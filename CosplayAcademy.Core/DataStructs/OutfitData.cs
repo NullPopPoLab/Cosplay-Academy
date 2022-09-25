@@ -10,9 +10,9 @@ namespace Cosplay_Academy
         const string defaultstring = "Default";
         private readonly static CardData Defaultcard = new CardData(defaultstring);
 
-        private readonly bool[] Part_of_Set = new bool[Enum.GetValues(typeof(HStates)).Length];
-        public readonly List<CardData>[] Outfits_Per_State = new List<CardData>[Enum.GetValues(typeof(HStates)).Length];
-        private readonly CardData[] Match_Outfit_Paths = new CardData[Enum.GetValues(typeof(HStates)).Length];
+        private readonly bool[] Part_of_Set = new bool[1];
+        public readonly List<CardData>[] Outfits_Per_State = new List<CardData>[1];
+        private readonly CardData[] Match_Outfit_Paths = new CardData[1];
         public static bool Anger = false;
 
         public OutfitData()
