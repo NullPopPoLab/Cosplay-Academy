@@ -105,8 +105,10 @@ namespace Cosplay_Academy
         {
             for (var i = 0; i < Constants.GameCoordinateSize; i++)
             {
-                    outfitpaths[i] = alloutfitpaths[i].GetFullPath();
-                    //Settings.Logger.LogWarning($"{(ChaFileDefine.CoordinateType)i} assigning " + outfitpaths[i]);
+                outfitpaths[i] = alloutfitpaths[i].GetFullPath();
+                Settings.Logger.LogDebug($"outfitpaths[{i}]: {outfitpaths[i]}");
+
+                //Settings.Logger.LogWarning($"{(ChaFileDefine.CoordinateType)i} assigning " + outfitpaths[i]);
             }
             var simpledirectory = ClothingLoader.CardInfo.SimpleFolderDirectory;
             var simplenull = simpledirectory.IsNullOrEmpty();
