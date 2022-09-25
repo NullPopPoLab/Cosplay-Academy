@@ -67,7 +67,7 @@ namespace Cosplay_Academy
                         continue;
                     }
 
-                    if (Settings.EnableSets.Value && Settings.MatchGeneric[sets].Value)
+                    if (Settings.EnableSets.Value)
                     {
                         var AllFolder = hstatefolder.GetAllFolders();
 
@@ -133,7 +133,7 @@ namespace Cosplay_Academy
             }
             for (var i = 0; i < Constants.InputStrings.Length; i++)
             {
-                Generalized_Assignment(Settings.MatchGeneric[i].Value, i, i);
+                Generalized_Assignment(false, i, i);
             }
 
             SpecialProcess();

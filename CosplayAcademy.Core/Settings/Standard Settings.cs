@@ -25,8 +25,6 @@ namespace Cosplay_Academy
         public static Settings Instance;
         internal static new ManualLogSource Logger { get; private set; }
 
-        public static ConfigEntry<bool>[] MatchGeneric = new ConfigEntry<bool>[Constants.InputStrings.Length];
-
         public static ConfigEntry<bool> UpdateCache { get; private set; }
         public static ConfigEntry<bool> UpdateFolders { get; private set; }
 
