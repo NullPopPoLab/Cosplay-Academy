@@ -59,9 +59,6 @@ namespace Cosplay_Academy
         public static ConfigEntry<bool> UnderwearStates { get; private set; }
         public static ConfigEntry<bool> ExtremeAccKeeper { get; private set; }
 
-        public static ConfigEntry<string>[] ListOverride { get; private set; } = new ConfigEntry<string>[Constants.InputStrings.Length];
-        public static ConfigEntry<bool>[] ListOverrideBool { get; private set; } = new ConfigEntry<bool>[Constants.InputStrings.Length];
-
         private static ConfigEntry<string> Lastversion { get; set; }
 
 
@@ -119,12 +116,6 @@ namespace Cosplay_Academy
 
             CoordinatePath = Config.Bind("Coordinate Location", "Path to coordinate folder", new DirectoryInfo(UserData.Path).FullName + "Coordinate" + sep + "CosplayParty", "Coordinate Path");
             UpdateFolders = Config.Bind("Coordinate Location", "Folder Options", false, new ConfigDescription("", null, new ConfigurationManagerAttributes() { HideSettingName = true, HideDefaultButton = true, CustomDrawer = new Action<ConfigEntryBase>(FolderUpdateGUI) }));
-
-            //Overrides
-            for (var i = 0; i < ListOverride.Length; i++)
-            {
-                ListOverridecreate(i);
-            }
 
             DirectoryFinder.CheckMissingFiles();
             StartCoroutine(Wait());
@@ -186,20 +177,6 @@ namespace Cosplay_Academy
             MakerAPI.RegisterCustomSubCategories += CharaEvent.RegisterCustomSubCategories;
             MakerAPI.MakerExiting += (s, e) => CharaEvent.MakerAPI_MakerExiting();
             MakerAPI.MakerStartedLoading += (s, e) => CharaEvent.Firstpass = 0;
-        }
-
-        private void ListOverridecreate(int index)
-        {
-            var _manager = GetComponent<ConfigurationManager.ConfigurationManager>();
-            var sep = Path.DirectorySeparatorChar;
-            ListOverrideBool[index] = Config.Bind("Outfit Folder Override", Constants.InputStrings[index].Trim(sep).Replace(sep, ' ') + " Enable override", false, new ConfigDescription("Enables the above folder override", null, new ConfigurationManagerAttributes { IsAdvanced = true, Order = (ListOverride.Length - index) * 2, HideDefaultButton = true }));
-            ListOverride[index] = Config.Bind("Outfit Folder Override", Constants.InputStrings[index].Trim(sep).Replace(sep, ' '), CoordinatePath.Value + Constants.InputStrings[index], new ConfigDescription("Choose a particular folder you wish to see used, this will be prioritzed and treated as a set\nThere is no lewd experience suport here", null, new ConfigurationManagerAttributes { IsAdvanced = true, Order = (ListOverride.Length - index) * 2 - 1, Browsable = ListOverrideBool[index].Value }));
-            var configattribute = (ConfigurationManagerAttributes)ListOverride[index].Description.Tags[0];
-            ListOverrideBool[index].SettingChanged += (s, e) =>
-            {
-                configattribute.Browsable = ListOverrideBool[index].Value;
-                _manager.BuildSettingList();
-            };
         }
 
         private readonly static GUIContent FindNewCards = new GUIContent("Find New Cards", "Only Find New cards");

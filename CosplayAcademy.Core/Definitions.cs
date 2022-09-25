@@ -34,7 +34,7 @@ namespace Cosplay_Academy
 
         internal static void ExpandedOutfit()
         {
-            for (var i = 0; i < InputStrings.Length; i++)
+            for (var i = 0; i < GameCoordinateSize; i++)
             {
                 if (OutfitnumPairs.ContainsKey(i))
                 {
@@ -163,61 +163,6 @@ namespace Cosplay_Academy
             $"{sep}inner",
         };
 
-        //Increasing this will not break the code but the code isn't written in a way in which it can scale to increase readbility
-        //I'd imagine it's possible to scale clubs easily
-        public static readonly string[] InputStrings =
-        {
-#if KK
-            $"{sep}School Uniform", //0
-            $"{sep}AfterSchool", //1
-            $"{sep}Gym" ,//2
-            $"{sep}Swimsuit" , //3
-            $"{sep}Club{sep}Swim" , //4
-            $"{sep}Club{sep}Manga", //5
-            $"{sep}Club{sep}Cheer", //6
-            $"{sep}Club{sep}Tea", //7
-            $"{sep}Club{sep}Track", //8
-            $"{sep}Club{sep}Koi", //9
-            $"{sep}Casual" , //10
-            $"{sep}Nightwear", //11
-            $"{sep}Underwear"//12                 
-#elif KKS
-            $"{sep}Casual", //0
-            $"{sep}Swimsuit", //1
-            $"{sep}Nightwear", //2
-            $"{sep}Bathroom", //3
-            $"{sep}Underwear"//4
-#endif
-        };
-
-        public static readonly string[] ExtraInputStrings =
-        {
-        #if KKS
-            $"{sep}School Uniform", //5
-            $"{sep}AfterSchool", //6
-            $"{sep}Gym" ,//7
-            $"{sep}Club{sep}Swim" , //8
-            $"{sep}Club{sep}Manga", //9
-            $"{sep}Club{sep}Cheer", //10
-            $"{sep}Club{sep}Tea", //11
-            $"{sep}Club{sep}Track", //12
-            $"{sep}Club{sep}Koi", //13
-        #elif KK
-            $"{sep}Bathroom", //13
-        #endif
-        };
-
-        public static readonly string[] ClubPaths =
-        {
-                    $"{sep}Home" , //0
-                    $"{sep}Swim" , //1
-                    $"{sep}Manga", //2
-                    $"{sep}Cheer", //3
-                    $"{sep}Tea", //4
-                    $"{sep}Track", //5
-                    $"{sep}Koi", //6
-        };
-
         public static readonly string[] Generic_Inclusion =
         {
             "a_n_headtop",//0
@@ -308,10 +253,24 @@ namespace Cosplay_Academy
         }
 
 #if KK
-        public const int GameCoordinateSize = 7;
+        public static string[] SpecificCategories = new string[]{
+            "", // in school 
+            "", // after school 
+            "_gym",
+            "_swim",
+            "", // club 
+            "", // casual 
+            "_nighty",
+        };
 #elif KKS
-        public const int GameCoordinateSize = 4;
+        public static string[] SpecificCategories = new string[]{
+            "", // casual 
+            "_swim",
+            "_nighty",
+            "_bath",
+        };
 #endif
+        public static readonly int GameCoordinateSize = SpecificCategories.Length;
 
         public static string[] SimplifiedCoordinateTypes = new string[]
 #if KK

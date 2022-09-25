@@ -19,7 +19,9 @@ namespace Cosplay_Academy
         private readonly ChaDefault ThisOutfitData;
         private ChaControl ChaControl;
         private ChaFile ChaFile;
+#if false // 再検討; 下着可換 
         private static readonly int underwearindex = Constants.InputStrings.ToList().IndexOf($"{sep}Underwear");
+#endif
         private static bool InsideMaker = false;
 
         #region Underwear stuff
@@ -79,8 +81,10 @@ namespace Cosplay_Academy
             ThisOutfitData.FillOutfitpaths();
             var holdoutfitstate = ChaControl.fileStatus.coordinateType;
 
+#if false // 再検討; 下着可換 
             Underwear.LoadFile(ThisOutfitData.alloutfitpaths[underwearindex].GetFullPath());
             Settings.Logger.LogDebug($"loaded underwear " + ThisOutfitData.alloutfitpaths[underwearindex]);
+#endif
 
             Underwear_ME_Data = new ME_Coordinate(ExtendedSave.GetExtendedDataById(Underwear, "com.deathweasel.bepinex.materialeditor"), ThisOutfitData, 0);
 

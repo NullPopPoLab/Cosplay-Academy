@@ -13,7 +13,7 @@ namespace Cosplay_Academy
 
         static OutfitDecider()
         {
-            outfitData = new OutfitData[Constants.InputStrings.Length];
+            outfitData = new OutfitData[Constants.GameCoordinateSize];
             for (int i = 0, n = outfitData.Length; i < n; i++)
             {
                 outfitData[i] = new OutfitData();
@@ -40,27 +40,9 @@ namespace Cosplay_Academy
 
         public static void Get_Outfits()
         {
-            for (int sets = 0, setslen = Constants.InputStrings.Length; sets < setslen; sets++)
+            for (int sets = 0, setslen = Constants.GameCoordinateSize; sets < setslen; sets++)
             {
-                FolderData overridefolder = null;
                     var hstatefolder = DataStruct.DefaultFolder[sets].FolderData[0];
-
-                    if (Settings.ListOverrideBool[sets].Value)
-                    {
-                        var overridepath = Settings.ListOverride[sets].Value;
-                        var find = hstatefolder.GetAllFolders().Find(x => x.FolderPath == overridepath);
-                        if (find == null)
-                        {
-                            if (overridefolder == null)
-                            {
-                                overridefolder = new FolderData(overridepath);
-                            }
-                            find = overridefolder;
-                        }
-                        var Overridecards = find.GetAllCards();
-                        outfitData[sets].Insert(Overridecards, Overridecards.Count > 0);//assign "is" set and store data
-                        continue;
-                    }
 
                     if (outfitData[sets].IsSet(0))//Skip set items
                     {
@@ -91,7 +73,6 @@ namespace Cosplay_Academy
                     var cards = hstatefolder.GetAllCards();
                     cards.AddRange(Grabber(sets, 0));
                     outfitData[sets].Insert(cards, false);
-                overridefolder = null;
             }
         }
         private static List<CardData> Grabber(int sets, int hstate)
@@ -131,7 +112,7 @@ namespace Cosplay_Academy
             {
                 OutfitData.Anger = false;
             }
-            for (var i = 0; i < Constants.InputStrings.Length; i++)
+            for (var i = 0; i < Constants.GameCoordinateSize; i++)
             {
                 Generalized_Assignment(false, i, i);
             }
