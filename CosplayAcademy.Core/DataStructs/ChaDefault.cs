@@ -25,7 +25,6 @@ namespace Cosplay_Academy
 
         internal int Hvalue = 0;
 
-        internal static int LastClub = -1;
         internal SaveData.Heroine heroine;
 
 #if KK
@@ -204,17 +203,6 @@ namespace Cosplay_Academy
 #if KK
             if (coordinate == 4)
             {
-                var club = 0;
-                var heroinenull = heroine == null;
-                if (!heroinenull)
-                    club = heroine.clubActivities;
-                else if (heroinenull && LastClub != -1)
-                    club = LastClub;
-                else
-                    club = (int)Settings.ClubChoice.Value;
-
-                LastClub = club;
-
                 if (heroine == null ? Settings.KoiClub.Value : heroine.isStaff && Settings.KeepOldBehavior.Value)
                 {
                     if (UnityEngine.Random.Range(1, 101) <= Settings.KoiChance.Value)
@@ -223,13 +211,7 @@ namespace Cosplay_Academy
                     }
                 }
 
-                if (club == 0)
-                {
-                    outfitpath[coordinate] = outfitpath[0];
-                    return;
-                }
-
-                outfitpath[coordinate] = alloutfitpaths[datanum + club].GetFullPath();
+                outfitpath[coordinate] = alloutfitpaths[datanum].GetFullPath();
             }
 #endif
         }

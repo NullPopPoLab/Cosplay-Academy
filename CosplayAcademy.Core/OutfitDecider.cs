@@ -32,9 +32,6 @@ namespace Cosplay_Academy
             {
                 item.processed = false;
             }
-#if KK
-            ChaDefault.LastClub = -1;
-#endif
             OutfitData.Anger = false;
             Get_Outfits();
             foreach (var data in outfitData)
