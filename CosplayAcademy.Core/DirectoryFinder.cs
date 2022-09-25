@@ -118,11 +118,6 @@ namespace Cosplay_Academy
             }
             for (var i = 0; i < FoldersPath.Count; i++)
             {
-                if (FoldersPath[i].EndsWith($"{sep}Sets"))
-                {
-                    FoldersPath.RemoveAt(i--);
-                    continue;
-                }
                 if (Directory.GetFiles(FoldersPath[i], "*.png").Length == 0)
                 {
                     FoldersPath.RemoveAt(i--);
@@ -173,10 +168,6 @@ namespace Cosplay_Academy
             //step through each folder and grab files
             foreach (var path in Paths)
             {
-                if (RemoveSets && path.Contains($"{sep}Sets"))
-                {
-                    continue;
-                }
                 var files = Directory.GetFiles(path, "*.png");
                 Choosen.AddRange(files);
             }

@@ -40,7 +40,7 @@ namespace Cosplay_Academy
             Cards = new List<CardData>();
             FolderPath = path;
             var sep = Path.DirectorySeparatorChar;
-            PartofSet = path.Contains(sep + "Sets" + sep);
+            PartofSet = false;
             if (Directory.Exists(path))
             {
                 FindCards();

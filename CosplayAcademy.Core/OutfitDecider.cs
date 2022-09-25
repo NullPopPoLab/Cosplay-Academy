@@ -85,14 +85,9 @@ namespace Cosplay_Academy
 
                         //Settings.Logger.LogWarning($"Selected folder for {Constants.InputStrings[sets]}/{Constants.InputStrings2[hstate]}: {selectedfolder.FolderPath}");
 
-                        var isset = selectedfolder.FolderPath.Contains($"{sep}Sets{sep}");
+                        var isset = false;
 
                         outfitData[sets].Insert(selectedfolder.GetAllCards(), isset);
-
-                        if (!Settings.IndividualSets.Value && isset)
-                        {
-                            Setsfunction(selectedfolder);
-                        }
                         continue;
                     }
                     var cards = hstatefolder.GetAllCards();
@@ -150,29 +145,6 @@ namespace Cosplay_Academy
             if (person != null)
             {
                 Settings.Logger.LogDebug(name + " is processed.");
-            }
-        }
-
-        private static void Setsfunction(FolderData folderData)
-        {
-            var sep = Path.DirectorySeparatorChar;
-            var split = sep + folderData.FolderPath.Split(new string[] { sep + "Sets" + sep }, System.StringSplitOptions.RemoveEmptyEntries).Last();
-            for (int sets = 0, n = outfitData.Length; sets < n; sets++)
-            {
-                for (var hexp = 0; hexp < 4; hexp++)
-                {
-                    if (Settings.FullSet.Value && outfitData[sets].IsSet(hexp) || Settings.ListOverrideBool[sets].Value)
-                    {
-                        continue;
-                    }
-                    var find = DataStruct.DefaultFolder[sets].FolderData[hexp].GetAllFolders().Find(x => x.FolderPath.EndsWith(split));
-                    if (find == null)
-                    {
-                        continue;
-                    }
-                    var temp = find.GetAllCards();
-                    outfitData[sets].Insert(find.GetAllCards(), true);
-                }
             }
         }
 

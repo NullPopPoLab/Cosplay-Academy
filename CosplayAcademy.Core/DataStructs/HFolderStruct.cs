@@ -71,20 +71,6 @@ namespace Cosplay_Academy
             var subdirectories = DirectoryFinder.Grab_Folder_Directories(path, true);
             foreach (var directory in subdirectories)
             {
-                var endsinsets = directory.EndsWith(sep + "Sets");
-                if (endsinsets)
-                {
-                    var setdirectories = DirectoryFinder.Grab_Folder_Directories(directory, false);
-                    foreach (var set in setdirectories)
-                    {
-                        if (FolderData.Any(x => x.FolderPath == set))
-                            continue;
-
-                        FolderData.Add(new FolderData(set));
-                    }
-                    continue;
-                }
-
                 if (FolderData.Any(x => x.FolderPath == directory))
                     continue;
 
