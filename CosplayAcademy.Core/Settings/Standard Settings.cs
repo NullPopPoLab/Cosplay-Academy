@@ -61,8 +61,6 @@ namespace Cosplay_Academy
         public static ConfigEntry<bool> UnderwearStates { get; private set; }
         public static ConfigEntry<bool> ExtremeAccKeeper { get; private set; }
 
-        public static ConfigEntry<HStates> MakerHstate { get; private set; }
-
         public static ConfigEntry<string>[] ListOverride { get; private set; } = new ConfigEntry<string>[Constants.InputStrings.Length];
         public static ConfigEntry<bool>[] ListOverrideBool { get; private set; } = new ConfigEntry<bool>[Constants.InputStrings.Length];
 
@@ -115,7 +113,6 @@ namespace Cosplay_Academy
 
             //Maker
             Makerview = Config.Bind("Maker", "Enable Maker Mode", false, new ConfigDescription("", null, AdvancedConfig));
-            MakerHstate = Config.Bind("Maker", "H state", HStates.FirstTime, "Maximum outfit category to roll");
             ResetMaker = Config.Bind("Maker", "Reset Sets", false, new ConfigDescription("Will overwrite current day outfit in storymode if you wanted to view that version.", null, AdvancedConfig));
             ChangeOutfit = Config.Bind("Maker", "Change generated outfit", false, new ConfigDescription("Pick new coordinates in maker", null, AdvancedConfig));
 
