@@ -12,28 +12,16 @@ namespace Cosplay_Academy
 
         public static void CheckMissingFiles()
         {
-            string[] InputStrings3 = { $"{sep}Sets", "" };
-            var coordinatepath = Settings.CoordinatePath.Value;
-            foreach (var input in Constants.InputStrings)
+            // 規定のフォルダ準備 
+            string[] names = { "inner", "outer" };
+            for (var i = 0; i < names.Length; ++i)
             {
-                foreach (var input2 in Constants.InputStrings2)
+                var path = Settings.CoordinatePath.Value + sep + names[i];
+                if (!Directory.Exists(path))
                 {
-                    foreach (var input3 in InputStrings3)
-                    {
-                        var path = coordinatepath + input + input2 + input3;
-                        if (!Directory.Exists(path))
-                        {
-                            Settings.Logger.LogWarning("Folder not found, creating directory at " + path);
-                            Directory.CreateDirectory(path);
-                        }
-                    }
+                    Settings.Logger.LogWarning("Folder not found, creating directory at " + path);
+                    Directory.CreateDirectory(path);
                 }
-            }
-            var path2 = coordinatepath + $"{sep}Unorganized";
-            if (!Directory.Exists(path2))
-            {
-                Settings.Logger.LogWarning("Folder not found, creating directory at " + path2);
-                Directory.CreateDirectory(path2);
             }
         }
 
@@ -95,7 +83,7 @@ namespace Cosplay_Academy
                     var SubPath = $"{sep}";
                     if (SetNames.Length > 0)
                     {
-                        SubPath += @"Sets{sep}" + SetNames;
+                        SubPath += SetNames;
                     }
                     if (SubSetNames.Length > 0)
                     {
@@ -108,7 +96,7 @@ namespace Cosplay_Academy
                     var FileName = $"{sep}" + Coordinate.Split(sep).Last();
                     if (CoordinateSubType == 10)
                     {
-                        Result = coordinatepath + Constants.InputStrings[7] + Constants.InputStrings2[HstateType_Restriction] + SubPath;
+                        Result = coordinatepath + Constants.InputStrings[7] + SubPath;
                         if (!Directory.Exists(Result))
                             Directory.CreateDirectory(Result);
                         Result += FileName;
@@ -130,7 +118,7 @@ namespace Cosplay_Academy
                         }
                         ClubResult = Constants.ClubPaths[club];
                     }
-                    Result = coordinatepath + Constants.AllCoordinatePaths[CoordinateType] + ClubResult + Constants.InputStrings2[HstateType_Restriction] + SubPath;
+                    Result = coordinatepath + Constants.AllCoordinatePaths[CoordinateType] + ClubResult + SubPath;
                     if (!Directory.Exists(Result))
                         Directory.CreateDirectory(Result);
                     Result += FileName;

@@ -13,11 +13,8 @@ namespace Cosplay_Academy
 
         public FolderStruct()
         {
-            FolderData = new HFolderStruct[Constants.InputStrings2.Length];
-            for (var i = 0; i < FolderData.Length; i++)
-            {
-                FolderData[i] = new HFolderStruct();
-            }
+            FolderData = new HFolderStruct[1];
+            FolderData[0] = new HFolderStruct();
         }
 
         [SerializationConstructor]
@@ -48,12 +45,7 @@ namespace Cosplay_Academy
 
         public void Populate(string folderpath)
         {
-            var exp = 0;
-            foreach (var hstate in Constants.InputStrings2)
-            {
-                FolderData[exp].Populate(folderpath + hstate);
-                exp++;
-            }
+                FolderData[0].Populate(folderpath);
         }
 
         public void Update()

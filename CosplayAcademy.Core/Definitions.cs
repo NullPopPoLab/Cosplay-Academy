@@ -225,13 +225,6 @@ namespace Cosplay_Academy
                     $"{sep}Koi", //6
         };
 
-        public static readonly string[] InputStrings2 = {
-            $"{sep}FirstTime", //0
-            $"{sep}Amateur", //1
-            $"{sep}Pro", //2
-            $"{sep}Lewd" //3
-        };//Experience States; easy to make scale with size
-
         public static readonly string[] Generic_Inclusion =
         {
             "a_n_headtop",//0

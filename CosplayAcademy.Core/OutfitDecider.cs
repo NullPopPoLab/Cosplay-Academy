@@ -45,13 +45,10 @@ namespace Cosplay_Academy
 
         public static void Get_Outfits()
         {
-            var hstatelen = Constants.InputStrings2.Length;
             for (int sets = 0, setslen = Constants.InputStrings.Length; sets < setslen; sets++)
             {
                 FolderData overridefolder = null;
-                for (var hstate = 0; hstate < hstatelen; hstate++)
-                {
-                    var hstatefolder = DataStruct.DefaultFolder[sets].FolderData[hstate];
+                    var hstatefolder = DataStruct.DefaultFolder[sets].FolderData[0];
 
                     if (Settings.ListOverrideBool[sets].Value)
                     {
@@ -79,7 +76,7 @@ namespace Cosplay_Academy
                     {
                         var AllFolder = hstatefolder.GetAllFolders();
 
-                        Grabber(ref AllFolder, sets, hstate);
+                        Grabber(ref AllFolder, sets, 0);
 
                         if (AllFolder.Count == 0)
                         {
@@ -102,9 +99,8 @@ namespace Cosplay_Academy
                         continue;
                     }
                     var cards = hstatefolder.GetAllCards();
-                    cards.AddRange(Grabber(sets, hstate));
+                    cards.AddRange(Grabber(sets, 0));
                     outfitData[sets].Insert(cards, false);
-                }
                 overridefolder = null;
             }
         }
