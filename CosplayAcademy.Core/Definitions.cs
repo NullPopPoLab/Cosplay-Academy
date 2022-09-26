@@ -235,7 +235,7 @@ namespace Cosplay_Academy
         }
 
 #if KK
-        public static string[] SpecificCategories = new string[]{
+        public static string[] DefaultSpecificCategories = new string[]{
             "", // in school 
             "", // after school 
             "!gym",
@@ -245,14 +245,14 @@ namespace Cosplay_Academy
             "!nighty",
         };
 #elif KKS
-        public static string[] SpecificCategories = new string[]{
+        public static string[] DefaultSpecificCategories = new string[]{
             "", // casual 
             "!swim",
             "!nighty",
             "!bath",
         };
 #endif
-        public static readonly int GameCoordinateSize = SpecificCategories.Length;
+        public static readonly int GameCoordinateSize = DefaultSpecificCategories.Length;
 
         private class PluginCheckData
         {
@@ -285,16 +285,4 @@ namespace Cosplay_Academy
         [Description("Update every period")]
         EveryPeriod
     }
-#if !KKS
-
-    public enum Club
-    {
-        HomeClub, //0
-        SwimClub, //1
-        MangaClub, //2
-        CheerClub, //3
-        TeaClub, //4
-        TrackClub //5
-    }
-#endif
 }

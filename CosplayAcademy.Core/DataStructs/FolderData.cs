@@ -94,7 +94,7 @@ namespace Cosplay_Academy
                     Cards.Add(new CardData(name, this, data.RestrictionInfo));
                 }
             }
-            Settings.Logger.LogDebug($"{FolderPath} found {Cards.Count} cards");
+//            Settings.Logger.LogDebug($"{FolderPath} found {Cards.Count} cards");
         }
 
         public void FindSubFolders()

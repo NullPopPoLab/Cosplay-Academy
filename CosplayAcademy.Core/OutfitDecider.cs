@@ -76,7 +76,7 @@ namespace Cosplay_Academy
 
             for (int sets = 0, setslen = Constants.GameCoordinateSize; sets < setslen; sets++)
             {
-                var order = Constants.SpecificCategories[sets];
+                var order = Settings.SpecificCategories[sets].Value;
                 if(order==""){
                     // ランダムカテゴリから選択 
                     order = folders[UnityEngine.Random.Range(0, folders.Count)];

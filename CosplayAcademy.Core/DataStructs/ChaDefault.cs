@@ -150,7 +150,7 @@ namespace Cosplay_Academy
 
                     if (advanced)
                     {
-                        if (adv.TryGetValue(Constants.SpecificCategories[i], out var advdirectory) && !advdirectory.IsNullOrEmpty())
+                        if (adv.TryGetValue(Settings.SpecificCategories[i].Value, out var advdirectory) && !advdirectory.IsNullOrEmpty())
                         {
                             var advpath = defaultpath + sep + advdirectory;
 

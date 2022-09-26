@@ -2,6 +2,8 @@
 using BepInEx.Configuration;
 using KKAPI.MainGame;
 using KKAPI.Studio;
+using System.Collections.Generic;
+
 namespace Cosplay_Academy
 {
     [BepInProcess("Koikatu")]
@@ -15,6 +17,8 @@ namespace Cosplay_Academy
         public static ConfigEntry<bool> GrabUniform { get; private set; }
 
         public static ConfigEntry<bool> AfterSchoolCasual { get; private set; }
+
+        public static ConfigEntry<string>[] SpecificCategories = new ConfigEntry<string>[Constants.GameCoordinateSize];
 
         public void Awake()
         {
@@ -36,6 +40,15 @@ namespace Cosplay_Academy
             //Additional Outfit
             GrabUniform = Config.Bind("Additional Outfits", "Grab Normal uniforms for afterschool", true, new ConfigDescription("", null, AdvancedConfig));
             AfterSchoolCasual = Config.Bind("Additional Outfits", "After School Casual", true, new ConfigDescription("Everyone can be in casual wear after school", null));
+
+            //Dresscode
+            SpecificCategories[0] = Config.Bind("Dresscode", "In school", "", "specified coordinate subfolder name or randomize");
+            SpecificCategories[1] = Config.Bind("Dresscode", "After school", "", "specified coordinate subfolder name or randomize");
+            SpecificCategories[2] = Config.Bind("Dresscode", "Gym", "!gym", "specified coordinate subfolder name or randomize");
+            SpecificCategories[3] = Config.Bind("Dresscode", "Swimwear", "!swim", "specified coordinate subfolder name or randomize");
+            SpecificCategories[4] = Config.Bind("Dresscode", "Club", "", "specified coordinate subfolder name or randomize");
+            SpecificCategories[5] = Config.Bind("Dresscode", "Casual", "", "specified coordinate subfolder name or randomize");
+            SpecificCategories[6] = Config.Bind("Dresscode", "Night", "!nighty", "specified coordinate subfolder name or randomize");
         }
     }
 }
