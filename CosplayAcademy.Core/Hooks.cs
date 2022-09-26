@@ -148,10 +148,12 @@ namespace Cosplay_Academy
                             //ThisOutfitData.heroine.isDresses = tempdress.ToArray();
                             //actCtrl.SetDesire(0, ThisOutfitData.heroine, 100);
                             //ExpandedOutfit.Logger.LogWarning($"{_npc.chaCtrl.fileParam.fullname} is heading to club room...probably");
+#if false // おそらく廃止 
                             if (UnityEngine.Random.Range(1, 101) <= Settings.KoiChance.Value)
                             {
                                 ThisOutfitData.ChangeClubToKoi = true;
                             }
+#endif
                         }
                         else if (_npc.mapNo == 22 && wp.MapNo == 46)
                         {
@@ -210,7 +212,6 @@ namespace Cosplay_Academy
                     }
                     return;
                 }
-#endif
                 ThisOutfitData.ChangeKoiToClub = false;
                 ThisOutfitData.ChangeClubToKoi = false;
                 if (__instance.mapNo == 22 && UnityEngine.Random.Range(1, 101) <= Settings.KoiChance.Value)
@@ -225,7 +226,7 @@ namespace Cosplay_Academy
                     //__instance.chaCtrl.SetAccessoryStateAll(true);
                     //ExpandedOutfit.Logger.LogError(__instance.chaCtrl.fileParam.fullname + " Action NO: " + __instance.AI.actionNo + " " + ThisOutfitData.heroine.clubActivities + " " + ThisOutfitData.heroine.coordinates.Length);
                 }
-
+#endif
             }
             catch (Exception ex)
             {

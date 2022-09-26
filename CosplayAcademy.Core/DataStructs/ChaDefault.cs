@@ -180,7 +180,7 @@ namespace Cosplay_Academy
 
         private void SpecialCondition(int coordinate, Dictionary<int, string> outfitpath, int datanum)
         {
-#if KK
+#if false // KK ; おそらく廃止
             if (coordinate == 4)
             {
                 if (heroine == null ? Settings.KoiClub.Value : heroine.isStaff && Settings.KeepOldBehavior.Value)

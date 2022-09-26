@@ -15,7 +15,6 @@ namespace Cosplay_Academy
         public static ConfigEntry<bool> GrabUniform { get; private set; }
         public static ConfigEntry<bool> KoiClub { get; private set; }
 
-        public static ConfigEntry<int> KoiChance { get; private set; }
         public static ConfigEntry<int> AfterSchoolcasualchance { get; private set; }
 
         public static ConfigEntry<bool> AfterSchoolCasual { get; private set; }
@@ -43,7 +42,6 @@ namespace Cosplay_Academy
             AfterSchoolCasual = Config.Bind("Additional Outfits", "After School Casual", true, new ConfigDescription("Everyone can be in casual wear after school", null));
 
             //Probability
-            KoiChance = Config.Bind("Probability", "Koikatsu outfit for club", 50, new ConfigDescription("Chance of wearing a koikatsu club outfit instead of normal club outfit", new AcceptableValueRange<int>(0, 100)));
             AfterSchoolcasualchance = Config.Bind("Probability", "Casual getup afterschool", 50, new ConfigDescription("Chance of wearing casual clothing after school", new AcceptableValueRange<int>(0, 100)));
 
             //Maker
