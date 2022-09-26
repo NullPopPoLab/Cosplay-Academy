@@ -41,7 +41,6 @@ namespace Cosplay_Academy
             TeacherDress = Config.Bind("Story Mode", "Teachers dress up", true, new ConfigDescription("Teachers probably would like to dress up if everyone does it.", null, AdvancedConfig));
 
             //Additional Outfit
-            GrabSwimsuits = Config.Bind("Additional Outfits", "Grab Swimsuits for Swim club", true, new ConfigDescription("", null, AdvancedConfig));
             GrabUniform = Config.Bind("Additional Outfits", "Grab Normal uniforms for afterschool", true, new ConfigDescription("", null, AdvancedConfig));
             AfterSchoolCasual = Config.Bind("Additional Outfits", "After School Casual", true, new ConfigDescription("Everyone can be in casual wear after school", null));
 
