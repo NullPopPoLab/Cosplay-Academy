@@ -40,16 +40,38 @@ namespace Cosplay_Academy
 
         public static void Get_Outfits()
         {
+            var path = Settings.CoordinatePath.Value + Constants.CoordinateRoles[0];
+            var plen = path.Length;
+
+            var folders = new List<string>();
+            var f1 = DataStruct.DefaultFolder[0];
+            var l1 = f1.GetSubFolders();
+            for (var i = 0; i < l1.Count; ++i)
+            {
+                var fn = l1[i].FolderPath.Substring(plen+1);
+                switch(fn[0]){
+                    case '_': case '!': break;
+
+                    default:
+                        folders.Add(fn);
+                        break;
+				}
+            }
+
             for (int sets = 0, setslen = Constants.GameCoordinateSize; sets < setslen; sets++)
             {
                 var order = Constants.SpecificCategories[sets];
                 if(order==""){
                     // ランダムカテゴリから選択 
+                    order = folders[UnityEngine.Random.Range(0, folders.Count)];
 				}
 
-                var f1 = DataStruct.DefaultFolder[0];
-                var f2 = f1.SelectSubFolder(Settings.CoordinatePath.Value + Constants.CoordinateRoles[0] + sep + order);
-                if (f2 == null) continue;
+                var f2 = f1.SelectSubFolder(path + sep + order);
+                if (f2 == null)
+                {
+                    Settings.Logger.LogDebug($"Selected folder for set {sets}: {order}: -- not found --");
+                    continue;
+                }
 
                     if (outfitData[sets].IsSet())//Skip set items
                     {

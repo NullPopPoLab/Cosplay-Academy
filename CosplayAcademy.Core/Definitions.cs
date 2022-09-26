@@ -236,20 +236,20 @@ namespace Cosplay_Academy
 
 #if KK
         public static string[] SpecificCategories = new string[]{
-            "School", // in school 
-            "School", // after school 
-            "_gym",
-            "_swim",
-            "Fantasy", // club 
-            "Casual", // casual 
-            "_nighty",
+            "", // in school 
+            "", // after school 
+            "!gym",
+            "!swim",
+            "", // club 
+            "", // casual 
+            "!nighty",
         };
 #elif KKS
         public static string[] SpecificCategories = new string[]{
-            "Fantasy", // casual 
-            "_swim",
-            "_nighty",
-            "_bath",
+            "", // casual 
+            "!swim",
+            "!nighty",
+            "!bath",
         };
 #endif
         public static readonly int GameCoordinateSize = SpecificCategories.Length;

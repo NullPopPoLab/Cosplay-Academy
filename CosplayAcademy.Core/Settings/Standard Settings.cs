@@ -21,7 +21,7 @@ namespace Cosplay_Academy
     public partial class Settings : BaseUnityPlugin
     {
         public const string GUID = "CosplayParty";
-        public const string Version = "0.9.0.1";
+        public const string Version = "0.1";
         public static Settings Instance;
         internal static new ManualLogSource Logger { get; private set; }
 
@@ -46,7 +46,6 @@ namespace Cosplay_Academy
 
         public static ConfigEntry<bool> ChangeOutfit { get; set; }
 
-        public const int HStateWeight = 50;
         public static ConfigEntry<Hexp> H_EXP_Choice { get; private set; }
 
         public static ConfigEntry<OutfitUpdate> UpdateFrequency { get; private set; }
