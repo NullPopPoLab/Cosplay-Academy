@@ -63,7 +63,7 @@ namespace Cosplay_Academy
                     }
                     else
                     {
-                        Settings.Logger.LogWarning("New version Detected please update Cosplay Academy");
+                        Settings.Logger.LogWarning("New version Detected please update Cosplay Party");
                         continue;
                     }
                     var restriction = coordiante.RestrictionInfo;

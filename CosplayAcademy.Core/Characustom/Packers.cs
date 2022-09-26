@@ -613,7 +613,7 @@ namespace Cosplay_Academy
                             break;
 
                         case 1:
-                            Settings.Logger.LogDebug($"[Cosplay Academy][KKABMX] Loading legacy embedded ABM data from card: {ChaFile.parameter?.fullname}");
+                            Settings.Logger.LogDebug($"[Cosplay Party][KKABMX] Loading legacy embedded ABM data from card: {ChaFile.parameter?.fullname}");
                             Modifiers = ABMX.MigrateOldExtData(SavedData);
                             break;
 
@@ -624,7 +624,7 @@ namespace Cosplay_Academy
                 }
                 catch (Exception ex)
                 {
-                    Settings.Logger.LogError("[Cosplay Academy][KKABMX] Failed to load extended data - " + ex);
+                    Settings.Logger.LogError("[Cosplay Party][KKABMX] Failed to load extended data - " + ex);
                 }
                 if (Modifiers == null)
                 {
@@ -666,7 +666,7 @@ namespace Cosplay_Academy
                     }
                     catch (Exception ex)
                     {
-                        Settings.Logger.LogError("[Cosplay Academy] =>[KKABMX] Failed to load extended data - " + ex);
+                        Settings.Logger.LogError("[Cosplay Party] =>[KKABMX] Failed to load extended data - " + ex);
                     }
                 }
             }
@@ -1609,7 +1609,7 @@ namespace Cosplay_Academy
 
         internal static void OutdatedMessage(string pluginname, bool telldev)
         {
-            var outdatedstring = $"Cosplay Academy: {pluginname} support is outdated. Please check for an update.";
+            var outdatedstring = $"Cosplay Party: {pluginname} support is outdated. Please check for an update.";
             if (telldev)
             {
                 outdatedstring += "if no updates is available, Please tell dev";

@@ -87,11 +87,11 @@ namespace Cosplay_Academy
             HairMatch = Config.Bind("Accessories", "Force Hair Color on accessories", false, "Match items with Custom Hair Component to Character's Hair Color.");
 
             //Main Game
-            AccKeeper = Config.Bind("Main Game", "On Coordinate Load Support", true, new ConfigDescription("Keep head and tail accessories\nUsed for characters who have accessory based hair and avoid them going bald\nWorks best with a Cosplay Academy Ready character marked by Additional Card Info", null, new ConfigurationManagerAttributes() { IsAdvanced = true, Order = 4 }));
+            AccKeeper = Config.Bind("Main Game", "On Coordinate Load Support", true, new ConfigDescription("Keep head and tail accessories\nUsed for characters who have accessory based hair and avoid them going bald\nWorks best with a Cosplay Party Ready character marked by Additional Card Info", null, new ConfigurationManagerAttributes() { IsAdvanced = true, Order = 4 }));
             RandomizeUnderwear = Config.Bind("Main Game", "Randomize Underwear", false, "Loads underwear from Underwear folder (Does not apply to Gym/Swim outfits)\nWill probably break some outfits that depends on underwear outside of Gym/Swim if not set up with Additional Card Info plugin");
             RandomizeUnderwearOnly = Config.Bind("Main Game", "Randomize Underwear Only", false, "Its an option");
             ForceRandomUnderwear = Config.Bind("Main Game", "Force underwear parts", false, "Doesn't force Top or Bottom");
-            EnableSetting = Config.Bind("Main Game", "Enable Cosplay Academy", true, new ConfigDescription("Doesn't require Restart\nDoesn't Disable On Coordinate Load Support or Force Hair Color", null, new ConfigurationManagerAttributes() { Order = 5 }));
+            EnableSetting = Config.Bind("Main Game", "Enable Cosplay Party", true, new ConfigDescription("Doesn't require Restart\nDoesn't Disable On Coordinate Load Support or Force Hair Color", null, new ConfigurationManagerAttributes() { Order = 5 }));
 
             //Sets
             EnableSets = Config.Bind("Outfit Sets", "Enable Outfit Sets", true, new ConfigDescription("Outfits in set folders can be pulled from a group for themed sets", null, new ConfigurationManagerAttributes() { Order = 3 }));
@@ -144,7 +144,7 @@ namespace Cosplay_Academy
 
                 yield return null;
 
-                Logger.LogMessage($"Following warnings/errors are related to coordinates Cosplay Academy has cached");
+                Logger.LogMessage($"Following warnings/errors are related to coordinates Cosplay Party has cached");
 
                 DirectoryFinder.Organize();
 
