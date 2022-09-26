@@ -19,7 +19,6 @@ namespace Cosplay_Academy
         public static ConfigEntry<int> AfterSchoolcasualchance { get; private set; }
 
         public static ConfigEntry<bool> AfterSchoolCasual { get; private set; }
-        public static ConfigEntry<bool> ChangeToClubatKoi { get; private set; }
         public static ConfigEntry<Club> ClubChoice { get; private set; }
 
         public void Awake()
@@ -37,7 +36,6 @@ namespace Cosplay_Academy
             //StoryMode
             StoryModeChange = Config.Bind("Story Mode", "Koikatsu Outfit Change", false, "Experimental: probably has a performance impact when reloading the character when they enter/leave the club\nKoikatsu Club Members will change when entering the club room and have a chance of not changing depending on experience and lewdness");
             KeepOldBehavior = Config.Bind("Story Mode", "Koikatsu Probability behavior", true, "Old Behavior: Koikatsu Club Members have a chance (Probabilty slider) of spawning with a koikatsu outfit rather than reloading");
-            ChangeToClubatKoi = Config.Bind("Story Mode", "Change at Koikatsu Start", false, "Change Heroine to club outfit when they start in Koikatsu room");
             TeacherDress = Config.Bind("Story Mode", "Teachers dress up", true, new ConfigDescription("Teachers probably would like to dress up if everyone does it.", null, AdvancedConfig));
 
             //Additional Outfit

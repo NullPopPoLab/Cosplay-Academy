@@ -200,6 +200,7 @@ namespace Cosplay_Academy
             try
             {
                 var ThisOutfitData = CharaEvent.ChaDefaults.Find(x => x.Parameter.Compare(__instance.chaCtrl.fileParam));
+#if false // おそらく廃止 
                 if (ThisOutfitData == null || ThisOutfitData.processed || __instance.heroine.isTeacher || !Settings.StoryModeChange.Value)
                 {
                     if (Settings.StoryModeChange.Value && Settings.ChangeToClubatKoi.Value && __instance.mapNo == 22)
@@ -209,6 +210,7 @@ namespace Cosplay_Academy
                     }
                     return;
                 }
+#endif
                 ThisOutfitData.ChangeKoiToClub = false;
                 ThisOutfitData.ChangeClubToKoi = false;
                 if (__instance.mapNo == 22 && UnityEngine.Random.Range(1, 101) <= Settings.KoiChance.Value)
