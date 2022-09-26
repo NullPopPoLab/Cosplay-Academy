@@ -14,7 +14,7 @@ using System.Diagnostics;
 
 namespace Cosplay_Academy
 {
-    [BepInPlugin(GUID, "CosplayParty", Version)]
+    [BepInPlugin(GUID, "Cosplay Party", Version)]
     [BepInDependency(KKAPI.KoikatuAPI.GUID, KKAPI.KoikatuAPI.VersionConst)]
     [BepInDependency(MoreAccessoriesKOI.MoreAccessories.GUID, MoreAccessoriesKOI.MoreAccessories.versionNum)]
     [BepInDependency(Sideloader.Sideloader.GUID)]

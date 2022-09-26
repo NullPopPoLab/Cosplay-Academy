@@ -56,15 +56,12 @@ namespace Cosplay_Academy
 
         public FolderData SelectSubFolder(string path)
         {
-            Settings.Logger.LogDebug($"SelectSubFolder: {path}");
-
             var sep = Path.DirectorySeparatorChar;
 
             for (var i = 0; i < FolderData.Count; ++i)
             {
                 var f2 = FolderData[i];
                 var p2 = f2.FolderPath;
-                Settings.Logger.LogDebug($"SelectSubFolder to: {p2}");
                 var l1 = path.Length;
                 var l2 = p2.Length;
                 if (l1 < l2) continue;
@@ -109,7 +106,7 @@ namespace Cosplay_Academy
                     continue;
                 }
                 folder.CleanUp();
-                if (folder.Cards.Count == 0)
+                if (folder.GetCardCount() < 1)
                 {
                     FolderData.RemoveAt(j);
                 }

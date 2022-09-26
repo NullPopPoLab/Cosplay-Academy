@@ -48,6 +48,16 @@ namespace Cosplay_Academy
             }
         }
 
+        public int GetCardCount()
+        {
+            var n = Cards.Count;
+            for (var i = 0; i < Subfolderdata.Count; ++i)
+            {
+                n += Subfolderdata[i].GetCardCount();
+            }
+            return n;
+        }
+
         public void FindCards()
         {
             var files = Directory.GetFiles(FolderPath, "*.png");
@@ -179,6 +189,15 @@ namespace Cosplay_Academy
             foreach (var item in Subfolderdata)
             {
                 result.AddRange(item.GetAllFolders());
+            }
+            return result;
+        }
+        public List<FolderData> GetSubFolders()
+        {
+            var result = new List<FolderData> { this };
+            foreach (var item in Subfolderdata)
+            {
+                result.Add(item);
             }
             return result;
         }

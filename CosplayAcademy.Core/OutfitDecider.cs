@@ -43,19 +43,35 @@ namespace Cosplay_Academy
             var path = Settings.CoordinatePath.Value + Constants.CoordinateRoles[0];
             var plen = path.Length;
 
+            if(DataStruct.DefaultFolder.Count<1){
+                Settings.Logger.LogDebug($"{Settings.CoordinatePath.Value} not found");
+                return;
+            }
+
+            var f0 = DataStruct.DefaultFolder[0];
+            var f1 = f0.SelectSubFolder(path);
+            if (f1 == null)
+            {
+                Settings.Logger.LogDebug($"{path} not found");
+                return;
+            }
+
             var folders = new List<string>();
-            var f1 = DataStruct.DefaultFolder[0];
             var l1 = f1.GetSubFolders();
             for (var i = 0; i < l1.Count; ++i)
             {
-                var fn = l1[i].FolderPath.Substring(plen+1);
-                switch(fn[0]){
-                    case '_': case '!': break;
+                if (l1[i].FolderPath.Length > plen)
+                {
+                    var fn = l1[i].FolderPath.Substring(plen + 1);
+                    switch (fn[0])
+                    {
+                        case '_': case '!': break;
 
-                    default:
-                        folders.Add(fn);
-                        break;
-				}
+                        default:
+                            folders.Add(fn);
+                            break;
+                    }
+                }
             }
 
             for (int sets = 0, setslen = Constants.GameCoordinateSize; sets < setslen; sets++)
