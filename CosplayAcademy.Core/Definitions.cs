@@ -246,7 +246,7 @@ namespace Cosplay_Academy
         };
 #elif KKS
         public static string[] SpecificCategories = new string[]{
-            "Oriental", // casual 
+            "", // casual 
             "!swim",
             "!nighty",
             "!bath",
