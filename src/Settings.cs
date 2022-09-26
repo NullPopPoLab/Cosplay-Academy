@@ -13,12 +13,10 @@ namespace Cosplay_Academy
         public static ConfigEntry<bool> TeacherDress { get; private set; }
 
         public static ConfigEntry<bool> GrabUniform { get; private set; }
-        public static ConfigEntry<bool> KoiClub { get; private set; }
 
         public static ConfigEntry<int> AfterSchoolcasualchance { get; private set; }
 
         public static ConfigEntry<bool> AfterSchoolCasual { get; private set; }
-        public static ConfigEntry<Club> ClubChoice { get; private set; }
 
         public void Awake()
         {
@@ -43,10 +41,6 @@ namespace Cosplay_Academy
 
             //Probability
             AfterSchoolcasualchance = Config.Bind("Probability", "Casual getup afterschool", 50, new ConfigDescription("Chance of wearing casual clothing after school", new AcceptableValueRange<int>(0, 100)));
-
-            //Maker
-            KoiClub = Config.Bind("Maker", "Is member of Koikatsu club", false, new ConfigDescription("Adds possibilty of choosing Koi outfit"));
-            ClubChoice = Config.Bind("Maker", "Club choice", Club.HomeClub, new ConfigDescription("Affects club outfit in FreeH and cutscene non-heroine NPCs in story mode"));
         }
     }
 }
