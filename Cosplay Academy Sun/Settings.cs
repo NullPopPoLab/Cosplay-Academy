@@ -15,8 +15,6 @@ namespace Cosplay_Academy
             }
 
             StandardSettings();
-
-            GrabSwimsuits = Config.Bind("Additional Outfits", "Grab Swim club outfits for Swimsuits", true, new ConfigDescription("", null, new ConfigurationManagerAttributes { IsAdvanced = true }));
         }
     }
 }

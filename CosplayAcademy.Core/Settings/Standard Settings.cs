@@ -36,7 +36,6 @@ namespace Cosplay_Academy
         public static ConfigEntry<bool> EnableDefaults { get; private set; }
         public static ConfigEntry<bool> StoryModeChange { get; private set; }
         public static ConfigEntry<bool> KeepOldBehavior { get; private set; }
-        public static ConfigEntry<bool> GrabSwimsuits { get; private set; }
 
         public static ConfigEntry<bool> HairMatch { get; private set; }
 
