@@ -14,8 +14,6 @@ namespace Cosplay_Academy
 
         public static ConfigEntry<bool> GrabUniform { get; private set; }
 
-        public static ConfigEntry<int> AfterSchoolcasualchance { get; private set; }
-
         public static ConfigEntry<bool> AfterSchoolCasual { get; private set; }
 
         public void Awake()
@@ -38,9 +36,6 @@ namespace Cosplay_Academy
             //Additional Outfit
             GrabUniform = Config.Bind("Additional Outfits", "Grab Normal uniforms for afterschool", true, new ConfigDescription("", null, AdvancedConfig));
             AfterSchoolCasual = Config.Bind("Additional Outfits", "After School Casual", true, new ConfigDescription("Everyone can be in casual wear after school", null));
-
-            //Probability
-            AfterSchoolcasualchance = Config.Bind("Probability", "Casual getup afterschool", 50, new ConfigDescription("Chance of wearing casual clothing after school", new AcceptableValueRange<int>(0, 100)));
         }
     }
 }
