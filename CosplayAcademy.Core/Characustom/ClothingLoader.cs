@@ -102,7 +102,7 @@ namespace Cosplay_Academy
                 if (!UnderwearProcessed.ContainsKey(i)) UnderwearProcessed[i] = new bool[9];
 
                 ValidOutfits[i] = ThisOutfitData.outfitpaths.TryGetValue(i, out var path) && path.EndsWith(".png");
-                if (ValidOutfits[i] || Settings.RandomizeUnderwear.Value && Underwear.GetLastErrorCode() == 0)
+                if (ValidOutfits[i] /*|| Settings.RandomizeUnderwear.Value && Underwear.GetLastErrorCode() == 0 再検討*/)
                 {
                     GeneralizedLoad(i, ValidOutfits[i]);
                     if (ValidOutfits[i])
@@ -264,6 +264,7 @@ namespace Cosplay_Academy
             #endregion
             var parts = ThisCoordinate.accessory.parts.ToList();
 
+#if false // 再検討; 下着可換 
             if (Settings.RandomizeUnderwear.Value && Underwear.GetLastErrorCode() == 0)
             {
                 var underwearbools = Underwearbools[outfitnum];
@@ -359,6 +360,8 @@ namespace Cosplay_Academy
                     }
                 }
             }
+#endif
+
             var haircolor = new Color[] { ChaControl.fileHair.parts[1].baseColor, ChaControl.fileHair.parts[1].startColor, ChaControl.fileHair.parts[1].endColor, ChaControl.fileHair.parts[1].outlineColor };
             if (Settings.HairMatch.Value && !MakerAPI.InsideMaker)
             {

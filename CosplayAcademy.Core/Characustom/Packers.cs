@@ -416,6 +416,7 @@ namespace Cosplay_Academy
                     }
                 }
 
+#if false // 再検討; 下着可換 
                 if (Settings.RandomizeUnderwear.Value && outfitnum != 3 && Underwear.GetLastErrorCode() == 0)
                 {
                     for (var i = 2; i < 7; i++)
@@ -434,6 +435,7 @@ namespace Cosplay_Academy
                         Clothdict[(CoordinateType)outfitnum].Remove(Constants.KCOX_Cat[i]);
                     }
                 }
+#endif
 
                 for (var i = 0; i < PersonalClothingBools.Length; i++)
                 {
@@ -886,6 +888,7 @@ namespace Cosplay_Academy
                     }
                 }
 
+#if false // 再検討; 下着可換 
                 if (Settings.RandomizeUnderwear.Value && Settings.UnderwearStates.Value && UnderwearAccessoriesLocations[outfitnum].Count > 0)
                 {
                     var postion = 0;
@@ -1036,6 +1039,7 @@ namespace Cosplay_Academy
                     TriggerPropertyList.AddRange(SubUnderwearTrigger);
                     TriggerGroupList.AddRange(SubUnderwearGroups);
                 }
+#endif
             }
             var SavedData = new PluginData() { version = 6 };
 
@@ -1377,6 +1381,7 @@ namespace Cosplay_Academy
                     }
                 }
 
+#if false // 再検討; 下着可換 
                 if (Settings.RandomizeUnderwear.Value && Settings.UnderwearStates.Value && UnderwearAccessoriesLocations[outfitnum].Count > 0)
                 {
                     var clothes = ChaControl.chaFile.coordinate[outfitnum].clothes.parts;
@@ -1552,6 +1557,7 @@ namespace Cosplay_Academy
                         }
                     }
                 }
+#endif
             }
 
             foreach (var item in Coordinate)

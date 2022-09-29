@@ -38,6 +38,7 @@ namespace Cosplay_Academy
         public static ConfigEntry<bool> KeepOldBehavior { get; private set; }
 
         public static ConfigEntry<bool> HairMatch { get; private set; }
+        public static ConfigEntry<bool> DestinationHairstyle { get; private set; }
 
         public static ConfigEntry<bool> Makerview { get; private set; }
         public static ConfigEntry<bool> FullSet { get; private set; }
@@ -85,6 +86,7 @@ namespace Cosplay_Academy
             //Accessories
             ExtremeAccKeeper = Config.Bind("Accessories", "KEEP ALL ACCESSORIES", false, new ConfigDescription("Keep all accessories a character starts with\nUsed for Characters whos bodies require accessories such as amputee types\nNot Recommended for use with characters wth unnecessary accessories", null, AdvancedConfig));
             HairMatch = Config.Bind("Accessories", "Force Hair Color on accessories", false, "Match items with Custom Hair Component to Character's Hair Color.");
+            DestinationHairstyle = Config.Bind("Accessories", "Destination Hairstyle", false, "Remove source hair or coordinating hair.");
 
             //Main Game
             AccKeeper = Config.Bind("Main Game", "On Coordinate Load Support", true, new ConfigDescription("Keep head and tail accessories\nUsed for characters who have accessory based hair and avoid them going bald\nWorks best with a Cosplay Party Ready character marked by Additional Card Info", null, new ConfigurationManagerAttributes() { IsAdvanced = true, Order = 4 }));
