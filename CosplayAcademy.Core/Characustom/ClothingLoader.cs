@@ -262,7 +262,14 @@ namespace Cosplay_Academy
             ThisOutfitData.Finished.LoadCoordinate(MaterialEditorData, ThisOutfitData, outfitnum);
             var Import_ME_Data = new MaterialEditorProperties();
             #endregion
-            var parts = ThisCoordinate.accessory.parts.ToList();
+            var parts = new List<ChaFileAccessory.PartsInfo>();
+            // ロード対象アクセのみ選択 
+            var dsthair = Settings.DestinationHairstyle.Value;
+            for (var i=0;i< ThisCoordinate.accessory.parts.Length;++i){
+                var p = ThisCoordinate.accessory.parts[i];
+                if (!dsthair && Constants.Generic_Inclusion.Contains(p.parentKey)) continue;
+                parts.Add(p);
+            }
 
 #if false // 再検討; 下着可換 
             if (Settings.RandomizeUnderwear.Value && Underwear.GetLastErrorCode() == 0)
