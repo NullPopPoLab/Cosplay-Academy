@@ -252,11 +252,25 @@ namespace Cosplay_Academy
                     {
                         coord = new ME_Coordinate();
                     }
+
+                    // 強制的に保持するか 
+                    var dsthair = Settings.DestinationHairstyle.Value;
+                    var xkeep = (Settings.ExtremeAccKeeper.Value && !Cosplay_Academy_Ready);
+
                     var ME_ACC_Data = coord.AccessoryProperties;
                     for (var i = 0; i < Intermediate.Count; i++)
                     {
+                        // 頭と尻尾を残すか 
+                        var geneinc = !dsthair && Constants.Generic_Inclusion.Contains(Intermediate[i].parentKey) && !Cosplay_Academy_Ready;
+                        // CoordinateInfo.HairAcc 情報あり 
+                        var hkeep = HairKeep.Contains(i);
+                        // CoordinateInfo.AccKeep 情報あり 
+                        var akeep = ACCKeep.Contains(i);
+
+                        //Settings.Logger.LogDebug($"Process: Acc {outfitnum}-{i} XK={xkeep} GI={geneinc} HK={hkeep} AK={akeep}");
+
                         //ExpandedOutfit.Logger.LogWarning($"ACC :{i}\tID: {data.nowAccessories[i].id}\tParent: {data.nowAccessories[i].parentKey}");
-                        if (Settings.ExtremeAccKeeper.Value && !Cosplay_Academy_Ready || Constants.Generic_Inclusion.Contains(Intermediate[i].parentKey) && !Cosplay_Academy_Ready || HairKeep.Contains(i) || ACCKeep.Contains(i))
+                        if (xkeep || geneinc || hkeep || akeep)
                         {
                             if (!HairInfo.TryGetValue(i, out var ACCdata))
                             {
@@ -280,8 +294,8 @@ namespace Cosplay_Academy
                             ThisOutfitData.HairAccQueue[outfitnum].Add(ACCdata);
 
                             #region ACI_Data
-                            ThisOutfitData.HairKeepQueue[outfitnum].Add(HairKeep.Contains(i));
-                            ThisOutfitData.ACCKeepQueue[outfitnum].Add(ACCKeep.Contains(i));
+                            ThisOutfitData.HairKeepQueue[outfitnum].Add(hkeep);
+                            ThisOutfitData.ACCKeepQueue[outfitnum].Add(akeep);
                             #endregion
                         }
                     }

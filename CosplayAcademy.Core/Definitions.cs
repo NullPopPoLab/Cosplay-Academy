@@ -147,6 +147,7 @@ namespace Cosplay_Academy
             $"{sep}inner",
         };
 
+        // 髪型か尻尾かを判定するための親属性 
         public static readonly string[] Generic_Inclusion =
         {
             "a_n_headtop",//0
