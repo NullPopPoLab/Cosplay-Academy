@@ -237,7 +237,7 @@ namespace Cosplay_Academy
                 for (var i = 0; i < ThisCoordinate.accessory.parts.Length; ++i)
                 {
                     var p = ThisCoordinate.accessory.parts[i];
-                    if (!Constants.HeadAcceSet.Contains(p.parentKey)) continue;
+                    if (!Constants.HeadAcceSet.Contains(p.parentKey) && !Constants.HatAcceSet.Contains(p.parentKey)) continue;
                     HairToColor.Add(i);
                 }
             }
@@ -278,6 +278,7 @@ namespace Cosplay_Academy
             {
                 var p = ThisCoordinate.accessory.parts[i];
                 if (!Settings.DestinationHeadAccs.Value && Constants.HeadAcceSet.Contains(p.parentKey)) continue;
+                if (!Settings.DestinationHatAccs.Value && Constants.HatAcceSet.Contains(p.parentKey)) continue;
                 if (!Settings.DestinationEarAccs.Value && Constants.EarAcceSet.Contains(p.parentKey)) continue;
                 if (!Settings.DestinationEyeAccs.Value && Constants.EyeAcceSet.Contains(p.parentKey)) continue;
                 if (!Settings.DestinationNoseAccs.Value && Constants.NoseAcceSet.Contains(p.parentKey)) continue;

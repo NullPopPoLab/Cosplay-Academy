@@ -271,6 +271,7 @@ namespace Cosplay_Academy
                         if(!Cosplay_Academy_Ready)
                         {
                             if (!keep) keep = !Settings.DestinationHeadAccs.Value && Constants.HeadAcceSet.Contains(Intermediate[i].parentKey);
+                            if (!keep) keep = !Settings.DestinationHatAccs.Value && Constants.HatAcceSet.Contains(Intermediate[i].parentKey);
                             if (!keep) keep = !Settings.DestinationEarAccs.Value && Constants.EarAcceSet.Contains(Intermediate[i].parentKey);
                             if (!keep) keep = !Settings.DestinationEyeAccs.Value && Constants.EyeAcceSet.Contains(Intermediate[i].parentKey);
                             if (!keep) keep = !Settings.DestinationNoseAccs.Value && Constants.NoseAcceSet.Contains(Intermediate[i].parentKey);

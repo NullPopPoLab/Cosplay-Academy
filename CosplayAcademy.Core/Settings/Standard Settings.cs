@@ -39,6 +39,7 @@ namespace Cosplay_Academy
 
         public static ConfigEntry<bool> HairMatch { get; private set; }
         public static ConfigEntry<bool> DestinationHeadAccs { get; private set; }
+        public static ConfigEntry<bool> DestinationHatAccs { get; private set; }
         public static ConfigEntry<bool> DestinationEarAccs { get; private set; }
         public static ConfigEntry<bool> DestinationEyeAccs { get; private set; }
         public static ConfigEntry<bool> DestinationNoseAccs { get; private set; }
@@ -92,6 +93,7 @@ namespace Cosplay_Academy
             ExtremeAccKeeper = Config.Bind("Accessories", "KEEP ALL ACCESSORIES", false, new ConfigDescription("Keep all accessories a character starts with\nUsed for Characters whos bodies require accessories such as amputee types\nNot Recommended for use with characters wth unnecessary accessories", null, AdvancedConfig));
             HairMatch = Config.Bind("Accessories", "Force Hair Color on accessories", false, "Match items with Custom Hair Component to Character's Hair Color.");
             DestinationHeadAccs = Config.Bind("Accessories", "Destination Head Accessories", false, "Remove source head accessories or coordinating.");
+            DestinationHeadAccs = Config.Bind("Accessories", "Destination Hat Accessories", false, "Remove source hat accessories or coordinating.");
             DestinationEarAccs = Config.Bind("Accessories", "Destination Ear Accessories", true, "Remove source ear accessories or coordinating.");
             DestinationEyeAccs = Config.Bind("Accessories", "Destination Eye Accessories", true, "Remove source eye accessories or coordinating.");
             DestinationNoseAccs = Config.Bind("Accessories", "Destination Nose Accessories", true, "Remove source nose accessories or coordinating.");
