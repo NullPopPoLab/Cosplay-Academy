@@ -47,12 +47,14 @@ namespace Cosplay_Academy
 
         public static void RegisterCustomSubCategories(object sender, RegisterSubCategoriesEvent e)
         {
+#if false // たぶん廃止 
             var owner = Settings.Instance;
             e.AddSidebarControl(new SidebarToggle("Enable Cosplay Party", Settings.Makerview.Value, owner)).ValueChanged.Subscribe(value => Settings.Makerview.Value = value);
-            e.AddSidebarControl(new SidebarToggle("CA: Rand outfits", Settings.ChangeOutfit.Value, owner)).ValueChanged.Subscribe(value => Settings.ChangeOutfit.Value = value);
-            e.AddSidebarControl(new SidebarToggle("CA: Rand Underwear", Settings.RandomizeUnderwear.Value, owner)).ValueChanged.Subscribe(value => Settings.RandomizeUnderwear.Value = value);
-            e.AddSidebarControl(new SidebarToggle("CA: Reset Sets", Settings.ResetMaker.Value, owner)).ValueChanged.Subscribe(value => Settings.ResetMaker.Value = value);
-            e.AddSidebarControl(new SidebarToggle("CA: Only Underwear", Settings.RandomizeUnderwearOnly.Value, owner)).ValueChanged.Subscribe(value => Settings.RandomizeUnderwearOnly.Value = value);
+            e.AddSidebarControl(new SidebarToggle("CP: Rand outfits", Settings.ChangeOutfit.Value, owner)).ValueChanged.Subscribe(value => Settings.ChangeOutfit.Value = value);
+            e.AddSidebarControl(new SidebarToggle("CP: Rand Underwear", Settings.RandomizeUnderwear.Value, owner)).ValueChanged.Subscribe(value => Settings.RandomizeUnderwear.Value = value);
+            e.AddSidebarControl(new SidebarToggle("CP: Reset Sets", Settings.ResetMaker.Value, owner)).ValueChanged.Subscribe(value => Settings.ResetMaker.Value = value);
+            e.AddSidebarControl(new SidebarToggle("CP: Only Underwear", Settings.RandomizeUnderwearOnly.Value, owner)).ValueChanged.Subscribe(value => Settings.RandomizeUnderwearOnly.Value = value);
+#endif
         }
 
         protected override void OnReload(GameMode currentGameMode, bool MaintainState) //from KKAPI.Chara when characters enter reload state
