@@ -254,23 +254,32 @@ namespace Cosplay_Academy
                     }
 
                     // 強制的に保持するか 
-                    var dsthair = Settings.DestinationHairstyle.Value;
                     var xkeep = (Settings.ExtremeAccKeeper.Value && !Cosplay_Academy_Ready);
 
                     var ME_ACC_Data = coord.AccessoryProperties;
                     for (var i = 0; i < Intermediate.Count; i++)
                     {
-                        // 頭と尻尾を残すか 
-                        var geneinc = !dsthair && Constants.Generic_Inclusion.Contains(Intermediate[i].parentKey) && !Cosplay_Academy_Ready;
                         // CoordinateInfo.HairAcc 情報あり 
                         var hkeep = HairKeep.Contains(i);
                         // CoordinateInfo.AccKeep 情報あり 
                         var akeep = ACCKeep.Contains(i);
 
+                        // アクセを残すか 
+                        var keep = xkeep || hkeep || akeep;
+                        if(!Cosplay_Academy_Ready)
+                        {
+                            if (!keep) keep = !Settings.DestinationHeadAccs.Value && Constants.HeadAcceSet.Contains(Intermediate[i].parentKey);
+                            if (!keep) keep = !Settings.DestinationEarAccs.Value && Constants.EarAcceSet.Contains(Intermediate[i].parentKey);
+                            if (!keep) keep = !Settings.DestinationEyeAccs.Value && Constants.EyeAcceSet.Contains(Intermediate[i].parentKey);
+                            if (!keep) keep = !Settings.DestinationNoseAccs.Value && Constants.NoseAcceSet.Contains(Intermediate[i].parentKey);
+                            if (!keep) keep = !Settings.DestinationMouthAccs.Value && Constants.MouthAcceSet.Contains(Intermediate[i].parentKey);
+                            if (!keep) keep = !Settings.DestinationTailAccs.Value && Constants.TailAcceSet.Contains(Intermediate[i].parentKey);
+                        }
+
                         //Settings.Logger.LogDebug($"Process: Acc {outfitnum}-{i} XK={xkeep} GI={geneinc} HK={hkeep} AK={akeep}");
 
                         //ExpandedOutfit.Logger.LogWarning($"ACC :{i}\tID: {data.nowAccessories[i].id}\tParent: {data.nowAccessories[i].parentKey}");
-                        if (xkeep || geneinc || hkeep || akeep)
+                        if (keep)
                         {
                             if (!HairInfo.TryGetValue(i, out var ACCdata))
                             {
@@ -280,23 +289,17 @@ namespace Cosplay_Academy
                                 };
                             }
 
-                            #region ME_Data
-
-                            #region ME_Data
                             if (!ME_ACC_Data.TryGetValue(i, out var editorProperties))
                             {
                                 editorProperties = new MaterialEditorProperties();
                             }
                             ME_ACC_Storage.Add(editorProperties);
-                            #endregion
 
                             ThisOutfitData.CoordinatePartsQueue[outfitnum].Add(Intermediate[i]);
                             ThisOutfitData.HairAccQueue[outfitnum].Add(ACCdata);
 
-                            #region ACI_Data
                             ThisOutfitData.HairKeepQueue[outfitnum].Add(hkeep);
                             ThisOutfitData.ACCKeepQueue[outfitnum].Add(akeep);
-                            #endregion
                         }
                     }
                 }
@@ -344,5 +347,4 @@ namespace Cosplay_Academy
             }; ;
         }
     }
-    #endregion
 }

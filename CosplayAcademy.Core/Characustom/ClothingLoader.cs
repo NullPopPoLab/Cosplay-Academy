@@ -264,10 +264,14 @@ namespace Cosplay_Academy
             #endregion
             var parts = new List<ChaFileAccessory.PartsInfo>();
             // ロード対象アクセのみ選択 
-            var dsthair = Settings.DestinationHairstyle.Value;
             for (var i=0;i< ThisCoordinate.accessory.parts.Length;++i){
                 var p = ThisCoordinate.accessory.parts[i];
-                if (!dsthair && Constants.Generic_Inclusion.Contains(p.parentKey)) continue;
+                if (!Settings.DestinationHeadAccs.Value && Constants.HeadAcceSet.Contains(p.parentKey)) continue;
+                if (!Settings.DestinationEarAccs.Value && Constants.EarAcceSet.Contains(p.parentKey)) continue;
+                if (!Settings.DestinationEyeAccs.Value && Constants.EyeAcceSet.Contains(p.parentKey)) continue;
+                if (!Settings.DestinationNoseAccs.Value && Constants.NoseAcceSet.Contains(p.parentKey)) continue;
+                if (!Settings.DestinationMouthAccs.Value && Constants.MouthAcceSet.Contains(p.parentKey)) continue;
+                if (!Settings.DestinationTailAccs.Value && Constants.TailAcceSet.Contains(p.parentKey)) continue;
                 parts.Add(p);
             }
 

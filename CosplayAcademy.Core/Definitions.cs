@@ -148,23 +148,38 @@ namespace Cosplay_Academy
         };
 
         // 髪型か尻尾かを判定するための親属性 
-        public static readonly string[] Generic_Inclusion =
+        public static readonly string[] HeadAcceSet =
         {
             "a_n_headtop",//0
             "a_n_headflont",//1
             "a_n_head", //2
             "a_n_headside", //3
-            "a_n_waist_b", //4
-            "a_n_hair_pony", //5
-            "a_n_hair_twin_L", //6
-            "a_n_hair_twin_R", //7
-            "a_n_earrings_R", //8
-            "a_n_earrings_L", //9
-            "a_n_megane", //10
-            "a_n_nose", //11
-            "a_n_mouth", //12
-            "a_n_hair_pin", //13
-            "a_n_hair_pin_R" //14
+            "a_n_hair_pony",
+            "a_n_hair_twin_L",
+            "a_n_hair_twin_R",
+            "a_n_hair_pin",
+            "a_n_hair_pin_R"
+        };
+        public static readonly string[] EarAcceSet =
+        {
+            "a_n_earrings_R",
+            "a_n_earrings_L",
+        };
+        public static readonly string[] EyeAcceSet =
+        {
+            "a_n_megane",
+        };
+        public static readonly string[] NoseAcceSet =
+        {
+            "a_n_nose",
+        };
+        public static readonly string[] MouthAcceSet =
+        {
+            "a_n_mouth",
+        };
+        public static readonly string[] TailAcceSet =
+        {
+            "a_n_waist_b",
         };
 
         public static string[] KCOX_Cat = {
