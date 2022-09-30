@@ -62,10 +62,12 @@ namespace Cosplay_Academy
                     var rand = UnityEngine.Random.Range(0, ac);
                     Result = applicable.ElementAt(rand);
                     var isdefault = Result.Filepath == defaultstring;
+#if false // 廃止予定 
                     if (Settings.EnableDefaults.Value && isdefault || !isdefault)
                     {
                         break;
                     }
+#endif
                     if (Tries++ >= 10)
                     {
                         EXP--;
@@ -105,10 +107,12 @@ namespace Cosplay_Academy
                                 Result = Match_Outfit_Paths;
 
                             var isdefault = Result.Filepath == defaultstring;
+#if false // 廃止予定 
                             if (Settings.EnableDefaults.Value && isdefault || !isdefault)
                             {
                                 break;
                             }
+#endif
                             if ((Tries++ >= 3 || Match))
                             {
                                 EXP--;

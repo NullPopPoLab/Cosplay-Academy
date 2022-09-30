@@ -172,12 +172,14 @@ namespace Cosplay_Academy
                 Choosen.AddRange(files);
             }
             var choosenempty = Choosen.Count == 0;
+#if false // 廃止予定 
             if ((choosenempty || Settings.EnableDefaults.Value) && !OriginalPath.Contains($"{sep}Unorganized"))
             {
                 Choosen.Add("Default");
                 if (choosenempty)
                     Settings.Logger.LogWarning("No files found in :" + OriginalPath);
             }
+#endif
             Settings.Logger.LogDebug($"Files found in : {OriginalPath} + {Choosen.Count}");
             return Choosen;
         }
