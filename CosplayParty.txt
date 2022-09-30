@@ -1,0 +1,76 @@
+﻿+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+コイカツ系プラグイン
+Cosplay Party
+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
+
+* これって何ぞや
+
+jalil49様作 Cosplay-Academy
+https://github.com/jalil49/Cosplay-Academy
+の魔改造版で、コイカツ初代～サンシャインのインゲームに出てくる女の子ごっそり
+強制的にコーデカードを適用するものです。
+(元実装ではエディタも対象になってましたが、いろいろ問題あるので封印)
+
+
+* ファイル内容
+
+KK_CosplayParty.dll: コイカツ版プラグイン
+KKS_CosplayParty.dll: コイカツサンシャイン版プラグイン
+CosplayParty.txt: このファイル
+
+* 使い方
+
+予め、BepInEx(バージョン5系)の導入が要ります。
+また、KoikatuAPI,Sideloader,MoreAccessoriesが必須とされてるようで
+他にはMaterialEditorやAccStateSyncへの参照があるみたい。
+よくわかんなかったらHF Patchでも入れとくよろし。
+
+で、 *_CosplayParty.dll を BepInEx/plugins/ にぶっ込む。
+起動してみてPlugin SettingsにCosplay Partyがあったらたぶん成功。
+
+初期構造として、
+UserData/coordinate/CosplayParty フォルダが追加されてます。
+この中のouter内に各自でフォルダ掘ってコーデカードを分類していくと、
+outer直下のフォルダからランダムで選ばれたものがドレスコードとなって
+その選ばれたフォルダ内にあるコーデカードからランダムで
+インゲームの全員に適用されます。
+
+フォルダ名の先頭が _ になっているものはランダム選択から外れます。
+また、 ! になっているものもランダム選択対象外で、これについては
+システム予約として特殊な扱いになります。
+
+	!none	定義しない
+	!gym	体操着用
+	!swim	水着用
+	!nighty	お泊り用
+	!bath	風呂場用
+
+それで、Plugin Settingsでの設定により、ランダム選択ではなく
+コーデスロット毎に特定のフォルダに固定することができます。
+
+なお、inner側は下着のカテゴライズを行っていくのですが
+まだ仕様検討中で無反応。
+(ドレスコード制ではなくキャラ毎の属性で決めていく想定)
+
+その他、詳細はWiki参照。
+https://github.com/NullPopPoLab/Cosplay-Academy/wiki
+
+
+* 著作権等
+
+Cosplay-Academy と一緒で。
+…って GPL-3.0 っすか。
+流用するときは要注意なやつ。
+
+
+* 更新履歴
+
+(v1.0)
+作った。
+
+===============================================================================
+NullPopPo Lab.
+
+(Twitter) https://twitter.com/NullPopPoLab
+(Pixiv) https://www.pixiv.net/member.php?id=42819339
+(GitHub) https://github.com/NullPopPoLab
