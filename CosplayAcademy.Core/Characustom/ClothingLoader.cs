@@ -231,6 +231,16 @@ namespace Cosplay_Academy
                         break;
                 }
             }
+            else if (Settings.HairMatch.Value && !MakerAPI.InsideMaker && Settings.DestinationHeadAccs.Value)
+            {
+                // 頭に載っている髪パーツのみ対象とする 
+                for (var i = 0; i < ThisCoordinate.accessory.parts.Length; ++i)
+                {
+                    var p = ThisCoordinate.accessory.parts[i];
+                    if (!Constants.HeadAcceSet.Contains(p.parentKey)) continue;
+                    HairToColor.Add(i);
+                }
+            }
             if (UnderClothingKeep == null) UnderClothingKeep = new bool[9];
             if (HairToColor == null) HairToColor = new List<int>();
             if (Underwearbools[outfitnum] == null) Underwearbools[outfitnum] = new bool[3];
@@ -264,7 +274,8 @@ namespace Cosplay_Academy
             #endregion
             var parts = new List<ChaFileAccessory.PartsInfo>();
             // ロード対象アクセのみ選択 
-            for (var i=0;i< ThisCoordinate.accessory.parts.Length;++i){
+            for (var i = 0; i < ThisCoordinate.accessory.parts.Length; ++i)
+            {
                 var p = ThisCoordinate.accessory.parts[i];
                 if (!Settings.DestinationHeadAccs.Value && Constants.HeadAcceSet.Contains(p.parentKey)) continue;
                 if (!Settings.DestinationEarAccs.Value && Constants.EarAcceSet.Contains(p.parentKey)) continue;
@@ -447,12 +458,13 @@ namespace Cosplay_Academy
                 if (HairQueue.Peek() != null && HairQueue.Peek().HairLength > -998)
                 {
                     var HairInfo = HairQueue.Dequeue();
+#if false // たぶん無意味どころか変える必要ないところまで変わる 
                     if (Settings.HairMatch.Value)
                     {
                         HairInfo.ColorMatch = true;
-
                         HairMatchProcess(outfitnum, ACCpostion, haircolor, parts);
                     }
+#endif
                     HairAccInfo[ACCpostion] = HairInfo;
                 }
                 else
