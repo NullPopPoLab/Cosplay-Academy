@@ -150,9 +150,9 @@ namespace Cosplay_Academy
         // 髪型か尻尾かを判定するための親属性 
         public static readonly string[] HeadAcceSet =
         {
-            "a_n_headflont",
-            "a_n_head",
-            "a_n_headside",
+            "a_n_headflont", // 額 
+            "a_n_head", // 頭上 
+            "a_n_headside", // 頭中心 
             "a_n_hair_pony",
             "a_n_hair_twin_L",
             "a_n_hair_twin_R",
