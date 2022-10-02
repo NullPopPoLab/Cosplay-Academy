@@ -278,6 +278,7 @@ namespace Cosplay_Academy
             {
                 var p = ThisCoordinate.accessory.parts[i];
                 if (!Settings.DestinationHeadAccs.Value && Constants.HeadAcceSet.Contains(p.parentKey)) continue;
+                if (!Settings.DestinationForeheadAccs.Value && Constants.ForeheadAcceSet.Contains(p.parentKey)) continue;
                 if (!Settings.DestinationHatAccs.Value && Constants.HatAcceSet.Contains(p.parentKey)) continue;
                 if (!Settings.DestinationEarAccs.Value && Constants.EarAcceSet.Contains(p.parentKey)) continue;
                 if (!Settings.DestinationEyeAccs.Value && Constants.EyeAcceSet.Contains(p.parentKey)) continue;
