@@ -14,9 +14,6 @@ namespace Cosplay_Academy
         [Key("_folder")]
         public string FolderPath { get; private set; }
 
-        [Key("_set")]
-        public bool PartofSet { get; private set; }
-
         [Key("_sub")]
         public List<FolderData> Subfolderdata { get; private set; }
 
@@ -24,11 +21,10 @@ namespace Cosplay_Academy
         public List<CardData> Cards { get; private set; }
 
         [SerializationConstructor]
-        public FolderData(string _folder, bool _set, List<CardData> _cards, List<FolderData> _sub)
+        public FolderData(string _folder, List<CardData> _cards, List<FolderData> _sub)
         {
             FolderPath = _folder;
             Subfolderdata = _sub;
-            PartofSet = _set;
             Cards = _cards;
             CleanUp();
             SetParent();
@@ -40,7 +36,6 @@ namespace Cosplay_Academy
             Cards = new List<CardData>();
             FolderPath = path;
             var sep = Path.DirectorySeparatorChar;
-            PartofSet = false;
             if (Directory.Exists(path))
             {
                 FindCards();
