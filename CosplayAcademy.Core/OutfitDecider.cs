@@ -94,6 +94,7 @@ namespace Cosplay_Academy
                         continue;
                     }
 
+#if false // 廃止予定 
                     if (Settings.EnableSets.Value)
                     {
                         var AllFolder = f2.GetAllFolders();
@@ -115,14 +116,25 @@ namespace Cosplay_Academy
                         outfitData[sets].Insert(selectedfolder.GetAllCards(), isset);
                         continue;
                     }
-                    var cards = f2.GetAllCards();
-                    cards.AddRange(Grabber(sets));
-                    outfitData[sets].Insert(cards, false);
+#endif
+
+#if KK
+                var cards = f2.GetAvailableCards("kk");
+#elif KKS
+                var cards = f2.GetAvailableCards("kks");
+#else
+                var cards = f2.GetAvailableCards("none");
+#endif
+                //Settings.Logger.LogDebug($"{cards.Count} available cards found");
+#if false // 廃止予定 
+                cards.AddRange(Grabber(sets));
+#endif
+                outfitData[sets].Replace(cards, false);
             }
         }
         private static List<CardData> Grabber(int sets)
         {
-        #if false // 再検討 
+#if false // 廃止予定 
 #if KK
             if (Settings.GrabSwimsuits.Value && sets == 4)
             {
@@ -179,13 +191,15 @@ namespace Cosplay_Academy
             var src = outfitData[Data_Num];
             if (src == null)
             {
-                Settings.Logger.LogWarning($"Generalized_Assignment: uniform={uniform_type} pn={Path_Num} dn={Data_Num} is null");
+                //Settings.Logger.LogWarning($"Generalized_Assignment: uniform={uniform_type} pn={Path_Num} dn={Data_Num} is null");
                 ThisOutfitData.alloutfitpaths[Path_Num] = null;
                 return;
             }
 
-            Settings.Logger.LogDebug($"Generalized_Assignment: uniform={uniform_type} pn={Path_Num} dn={Data_Num} bust={bust} height={height}");
+            //Settings.Logger.LogDebug($"Generalized_Assignment: uniform={uniform_type} pn={Path_Num} dn={Data_Num} bust={bust} height={height}");
 
+            ThisOutfitData.alloutfitpaths[Path_Num] = src.Random(uniform_type, false, status.personality, status.attribute, bust, height);
+#if false // 廃止予定 
             switch (Settings.H_EXP_Choice.Value)
             {
                 case Hexp.RandConstant:
@@ -198,6 +212,7 @@ namespace Cosplay_Academy
                     ThisOutfitData.alloutfitpaths[Path_Num] = src.RandomSet(uniform_type, false, status.personality, status.attribute, bust, height);
                     break;
             }
+#endif
         }
     }
 }

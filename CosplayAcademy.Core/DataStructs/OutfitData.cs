@@ -35,19 +35,23 @@ namespace Cosplay_Academy
             return temp;
         }
 
-        public void Insert(List<CardData> Data, bool IsSet)//Insert data according to Outfits_Per_State[3] state and confirm if it is a setitem.
+        public void Replace(List<CardData> Data, bool IsSet)//Insert data according to Outfits_Per_State[3] state and confirm if it is a setitem.
         {
-            Data.Add(Defaultcard);
+// 廃止 
+//            Data.Add(Defaultcard);
             Outfits_Per_State = Data;
             Part_of_Set = IsSet;
         }
 
         public CardData Random(bool Match, bool unrestricted, int personality = 0, ChaFileParameter.Attribute trait = null, int breast = 0, int height = 0)//get any random outfit according to experience
         {
+
+#if false // 廃止予定 
             if (Match)
             {
                 return Match_Outfit_Paths;
             }
+
             IEnumerable<CardData> applicable;
             if (!Anger)
             {
@@ -86,8 +90,14 @@ namespace Cosplay_Academy
                 if (ac < 1) return null;
                 return applicable.ElementAt(UnityEngine.Random.Range(0, ac));
             }
+#endif
+            var applicable = Outfits_Per_State.Where(x => Filter(x, unrestricted, personality, trait, breast, height));
+            var ac = applicable.Count();
+            if (ac < 1) return null;
+            return applicable.ElementAt(UnityEngine.Random.Range(0, ac));
         }
 
+#if false // 廃止予定 
         public CardData RandomSet(bool Match, bool unrestricted, int personality = 0, ChaFileParameter.Attribute trait = null, int breast = 0, int height = 0)//if set exists add its items to pool along with any coordinated outfit and other choices
         {
             IEnumerable<CardData> applicable;
@@ -142,6 +152,7 @@ namespace Cosplay_Academy
             return LastResult;
 #endif
         }
+#endif
 
         public List<CardData> Exportarray()
         {
