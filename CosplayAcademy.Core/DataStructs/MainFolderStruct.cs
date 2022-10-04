@@ -34,6 +34,16 @@ namespace Cosplay_Academy
             return result;
         }
 
+        public List<CardData> GetAvailableCards(string attr)
+        {
+            var result = new List<CardData>();
+            for (var i = 0; i < FolderData.Count; ++i)
+            {
+                result.AddRange(FolderData[i].GetAvailableCards(attr));
+            }
+            return result;
+        }
+
         public List<FolderData> GetAllFolders()
         {
             var result = new List<FolderData>();
@@ -106,7 +116,13 @@ namespace Cosplay_Academy
                     continue;
                 }
                 folder.CleanUp();
-                if (folder.GetCardCount() < 1)
+#if KK
+                if (folder.GetAvailableCardCount("kk") < 1)
+#elif KKS
+                if (folder.GetAvailableCardCount("kks") < 1)
+#else
+                if (folder.GetAvailableCardCount("none") < 1)
+#endif
                 {
                     FolderData.RemoveAt(j);
                 }

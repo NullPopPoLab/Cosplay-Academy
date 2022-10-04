@@ -20,12 +20,17 @@ namespace Cosplay_Academy
         [Key("_cards")]
         public List<CardData> Cards { get; private set; }
 
+
+        private string _foldername = "";
+
+
         [SerializationConstructor]
         public FolderData(string _folder, List<CardData> _cards, List<FolderData> _sub)
         {
             FolderPath = _folder;
             Subfolderdata = _sub;
             Cards = _cards;
+            _init();
             CleanUp();
             SetParent();
         }
@@ -35,6 +40,7 @@ namespace Cosplay_Academy
             Subfolderdata = new List<FolderData>();
             Cards = new List<CardData>();
             FolderPath = path;
+            _init();
             var sep = Path.DirectorySeparatorChar;
             if (Directory.Exists(path))
             {
@@ -43,12 +49,42 @@ namespace Cosplay_Academy
             }
         }
 
+        private void _init(){
+            var di = new DirectoryInfo(FolderPath);
+            _foldername = (di == null) ? "" : di.Name;
+
+            //Settings.Logger.LogDebug($"{_foldername} <= {FolderPath}");
+        }
+
         public int GetCardCount()
         {
             var n = Cards.Count;
             for (var i = 0; i < Subfolderdata.Count; ++i)
             {
                 n += Subfolderdata[i].GetCardCount();
+            }
+            return n;
+        }
+
+        public int GetAvailableCardCount(string attr,bool sub = false)
+        {
+            if (!sub) { }
+            else if (_foldername.Length > 0)
+            {
+                if (_foldername[0] == '_') return 0;
+                if (_foldername[0] == '!')
+                {
+                    if (_foldername != "!" + attr) return 0;
+                }
+            }
+            else{
+                Settings.Logger.LogWarning($"no name by {FolderPath}");
+            }
+
+            var n = Cards.Count;
+            for (var i = 0; i < Subfolderdata.Count; ++i)
+            {
+                n += Subfolderdata[i].GetAvailableCardCount(attr, true);
             }
             return n;
         }
@@ -137,6 +173,34 @@ namespace Cosplay_Academy
 
             return list;
         }
+
+        public List<CardData> GetAvailableCards(string attr, bool sub = false)
+        {
+            var list = new List<CardData>();
+
+            if (!sub) { }
+            else if (_foldername.Length > 0){
+                if (_foldername[0] == '_') return list;
+                if (_foldername[0] == '!')
+                {
+                    if (_foldername != "!" + attr) return list;
+                }
+            }
+            else
+            {
+                Settings.Logger.LogWarning($"no name by {FolderPath}");
+            }
+
+            list.AddRange(Cards);
+
+            foreach (var item in Subfolderdata)
+            {
+                list.AddRange(item.GetAvailableCards(attr,true));
+            }
+
+            return list;
+        }
+
 
         public void Update()
         {

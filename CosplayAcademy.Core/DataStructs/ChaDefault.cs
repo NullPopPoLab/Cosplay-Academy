@@ -140,8 +140,14 @@ namespace Cosplay_Academy
                 {
                     if (SimpleStruct != null)
                     {
-                            var cards = SimpleStruct[i].GetAllCards();
-                            if (cards.Count > 0)
+#if KK
+                        var cards = SimpleStruct[i].GetAvailableCards("kk");
+#elif KKS
+                        var cards = SimpleStruct[i].GetAvailableCards("kks");
+#else
+                        var cards = SimpleStruct[i].GetAvailableCards("none");
+#endif
+                        if (cards.Count > 0)
                             {
                                 outfitpaths[i] = cards[UnityEngine.Random.RandomRangeInt(0, cards.Count)].GetFullPath();
                                 Settings.Logger.LogDebug($"{(ChaFileDefine.CoordinateType)i} assigning " + outfitpaths[i]);
@@ -164,7 +170,13 @@ namespace Cosplay_Academy
 
                             if (ADVStruct != null)
                             {
-                                var cards = ADVStruct.GetAllCards();
+#if KK
+                                var cards = ADVStruct.GetAvailableCards("kk");
+#elif KKS
+                                var cards = ADVStruct.GetAvailableCards("kks");
+#else
+                                var cards = ADVStruct.GetAvailableCards("none");
+#endif
                                 if (cards.Count > 0)
                                 {
                                     outfitpaths[i] = cards[UnityEngine.Random.RandomRangeInt(0, cards.Count)].GetFullPath();
