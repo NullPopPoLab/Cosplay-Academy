@@ -17,7 +17,9 @@ namespace Cosplay_Academy
 
         public static Dictionary<string, List<FolderStruct>> FullStructures = new Dictionary<string, List<FolderStruct>>();
 
+#if false // 廃止予定 
         public static Dictionary<string, FolderStruct> IndividualStructures = new Dictionary<string, FolderStruct>();
+#endif
         public static List<FolderStruct> DefaultFolder => FullStructures.ElementAt(Defaultint).Value;
 
         internal static int Defaultint = 0;
@@ -32,10 +34,12 @@ namespace Cosplay_Academy
                     result.AddRange(folder.GetAllCards());
                 }
             }
+#if false // 廃止予定 
             foreach (var folder in IndividualStructures.Values)
             {
                 result.AddRange(folder.GetAllCards());
             }
+#endif
 
             return result;
         }
@@ -50,10 +54,12 @@ namespace Cosplay_Academy
                     result.AddRange(folder.GetAllFolders());
                 }
             }
+#if false // 廃止予定 
             foreach (var folder in IndividualStructures.Values)
             {
                 result.AddRange(folder.GetAllFolders());
             }
+#endif
             return result;
         }
 
@@ -106,10 +112,12 @@ namespace Cosplay_Academy
                     folder.CleanUp();
                 }
             }
+#if false // 廃止予定 
             foreach (var folder in IndividualStructures.Values)
             {
                 folder.CleanUp();
             }
+#endif
         }
 
         public static List<FolderStruct> LoadFullStructure(string coordinatepath)
@@ -129,6 +137,8 @@ namespace Cosplay_Academy
             SaveFile();
             return list;
         }
+
+#if false // 廃止予定 
         public static FolderStruct LoadSingleStructure(string coordinatepath)
         {
             if (!IndividualStructures.TryGetValue(coordinatepath, out var folderstruct))
@@ -141,6 +151,7 @@ namespace Cosplay_Academy
             SaveFile();
             return folderstruct;
         }
+#endif
 
         public static void Update()
         {
@@ -176,7 +187,9 @@ namespace Cosplay_Academy
             {
                 var serializeddict = MessagePackSerializer.Deserialize<Dictionary<string, byte[]>>(data);
                 FullStructures = MessagePackSerializer.Deserialize<Dictionary<string, List<FolderStruct>>>(serializeddict["FullStruct"]);
+#if false // 廃止予定 
                 IndividualStructures = MessagePackSerializer.Deserialize<Dictionary<string, FolderStruct>>(serializeddict["IndividualStructures"]);
+#endif
 
 #if TRACE
                 Settings.Logger.LogWarning($"Took {Stopwatch.ElapsedMilliseconds} ms to deserialize data");
@@ -196,7 +209,9 @@ namespace Cosplay_Academy
             var serializedict = new Dictionary<string, byte[]>
             {
                 ["FullStruct"] = MessagePackSerializer.Serialize(FullStructures),
+#if false // 廃止予定 
                 ["IndividualStructures"] = MessagePackSerializer.Serialize(IndividualStructures)
+#endif
             };
             File.WriteAllBytes(SavePath, MessagePackSerializer.Serialize(serializedict));
         }

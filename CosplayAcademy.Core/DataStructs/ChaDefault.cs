@@ -160,6 +160,7 @@ namespace Cosplay_Academy
                         {
                             var advpath = defaultpath + sep + advdirectory;
 
+#if false // 廃止予定 
                             if (!DataStruct.IndividualStructures.TryGetValue(advdirectory, out ADVStruct))
                             {
                                 if (Directory.Exists(advpath))
@@ -167,6 +168,7 @@ namespace Cosplay_Academy
                                     ADVStruct = DataStruct.LoadSingleStructure(advpath);
                                 }
                             }
+#endif
 
                             if (ADVStruct != null)
                             {

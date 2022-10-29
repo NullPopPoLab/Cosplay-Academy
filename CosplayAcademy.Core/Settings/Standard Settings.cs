@@ -21,7 +21,7 @@ namespace Cosplay_Academy
     public partial class Settings : BaseUnityPlugin
     {
         public const string GUID = "CosplayParty";
-        public const string Version = "0.1";
+        public const string Version = "0.21";
         public static Settings Instance;
         internal static new ManualLogSource Logger { get; private set; }
 
@@ -83,6 +83,15 @@ namespace Cosplay_Academy
             CharacterApi.RegisterExtraBehaviour<CharaEvent>(GUID, 900);
             var AdvancedConfig = new ConfigurationManagerAttributes { IsAdvanced = true };
 
+            //General
+            EnableSetting = Config.Bind("General", "Enable Cosplay Party", true, new ConfigDescription("Doesn't require Restart\nDoesn't Disable On Coordinate Load Support or Force Hair Color", null, new ConfigurationManagerAttributes() { Order = 5 }));
+
+            //Main Game
+//            AccKeeper = Config.Bind("Main Game", "On Coordinate Load Support", true, new ConfigDescription("Keep head and tail accessories\nUsed for characters who have accessory based hair and avoid them going bald\nWorks best with a Cosplay Party Ready character marked by Additional Card Info", null, new ConfigurationManagerAttributes() { IsAdvanced = true, Order = 4 }));
+            RandomizeUnderwear = Config.Bind("Main Game", "Randomize Underwear", false, "Loads underwear from Underwear folder (Does not apply to Gym/Swim outfits)\nWill probably break some outfits that depends on underwear outside of Gym/Swim if not set up with Additional Card Info plugin");
+//            RandomizeUnderwearOnly = Config.Bind("Main Game", "Randomize Underwear Only", false, "Its an option");
+//            ForceRandomUnderwear = Config.Bind("Main Game", "Force underwear parts", false, "Doesn't force Top or Bottom");
+
             UpdateFrequency = Config.Bind("Story Mode", "Update Frequency", OutfitUpdate.Daily);
             SundayDate = Config.Bind("Story Mode", "Sunday Date Special", true, "Date will wear something different on Sunday, not really useful unless Update Frequency is not daily/period ");
 
@@ -101,13 +110,6 @@ namespace Cosplay_Academy
             DestinationNoseAccs = Config.Bind("Accessories", "Destination Nose Accessories", true, "Remove source nose accessories or coordinating.");
             DestinationMouthAccs = Config.Bind("Accessories", "Destination Mouth Accessories", true, "Remove source mouth accessories or coordinating.");
             DestinationTailAccs = Config.Bind("Accessories", "Destination Tail Accessories", true, "Remove source tail accessories or coordinating.");
-
-            //Main Game
-            AccKeeper = Config.Bind("Main Game", "On Coordinate Load Support", true, new ConfigDescription("Keep head and tail accessories\nUsed for characters who have accessory based hair and avoid them going bald\nWorks best with a Cosplay Party Ready character marked by Additional Card Info", null, new ConfigurationManagerAttributes() { IsAdvanced = true, Order = 4 }));
-            RandomizeUnderwear = Config.Bind("Main Game", "Randomize Underwear", false, "Loads underwear from Underwear folder (Does not apply to Gym/Swim outfits)\nWill probably break some outfits that depends on underwear outside of Gym/Swim if not set up with Additional Card Info plugin");
-            RandomizeUnderwearOnly = Config.Bind("Main Game", "Randomize Underwear Only", false, "Its an option");
-            ForceRandomUnderwear = Config.Bind("Main Game", "Force underwear parts", false, "Doesn't force Top or Bottom");
-            EnableSetting = Config.Bind("Main Game", "Enable Cosplay Party", true, new ConfigDescription("Doesn't require Restart\nDoesn't Disable On Coordinate Load Support or Force Hair Color", null, new ConfigurationManagerAttributes() { Order = 5 }));
 
             //Sets
             EnableSets = Config.Bind("Outfit Sets", "Enable Outfit Sets", true, new ConfigDescription("Outfits in set folders can be pulled from a group for themed sets", null, new ConfigurationManagerAttributes() { Order = 3 }));

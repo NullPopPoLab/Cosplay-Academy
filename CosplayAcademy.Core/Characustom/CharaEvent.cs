@@ -334,10 +334,12 @@ namespace Cosplay_Academy
 
         protected override void OnCoordinateBeingLoaded(ChaFileCoordinate coordinate)
         {
+#if false
             if (!Settings.AccKeeper.Value)
             {
                 return;
             }//if disabled don't run
+#endif
             ClothingLoader.CoordinateLoad(coordinate, ChaControl);
         }
 
