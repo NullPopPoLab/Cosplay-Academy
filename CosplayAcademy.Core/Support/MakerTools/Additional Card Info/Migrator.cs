@@ -4,6 +4,8 @@ using System.Collections.Generic;
 
 namespace Cosplay_Academy
 {
+#if false // Additional_Card_Info 廃止予定 
+
     public static partial class Additional_Card_Info
     {
         public static class Migrator
@@ -291,4 +293,5 @@ namespace Cosplay_Academy
             }
         }
     }
+#endif
 }

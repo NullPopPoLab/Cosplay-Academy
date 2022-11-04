@@ -6,6 +6,7 @@ using System.Linq;
 
 namespace Cosplay_Academy
 {
+#if false // Additional_Card_Info 廃止予定 
     public static partial class Additional_Card_Info
     {
         public class DataStruct
@@ -115,7 +116,7 @@ namespace Cosplay_Academy
         [MessagePackObject]
         public class CoordinateInfo
         {
-            #region fields
+    #region fields
             [Key("_makeup")]
             public bool MakeUpKeep;
 
@@ -142,7 +143,7 @@ namespace Cosplay_Academy
 
             [Key("_restrictioninfo")]
             public RestrictionInfo RestrictionInfo;
-            #endregion
+    #endregion
 
             public CoordinateInfo() { NullCheck(); }
 
@@ -207,7 +208,7 @@ namespace Cosplay_Academy
         [MessagePackObject]
         public class RestrictionInfo
         {
-            #region fields
+    #region fields
             [Key("_personality")]
             public Dictionary<int, int> PersonalityType_Restriction;
 
@@ -237,7 +238,7 @@ namespace Cosplay_Academy
 
             [Key("_coordsubtype")]
             public int CoordinateSubType;
-            #endregion
+    #endregion
 
             public RestrictionInfo() { NullCheck(); }
 
@@ -322,4 +323,5 @@ namespace Cosplay_Academy
             }
         }
     }
+#endif
 }

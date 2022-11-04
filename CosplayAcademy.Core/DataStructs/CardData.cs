@@ -46,6 +46,7 @@ namespace Cosplay_Academy
             SetParent(parent);
         }
 
+#if false // Additional_Card_Info 廃止予定 
         public CardData(string _name, FolderData parent, Additional_Card_Info.RestrictionInfo coordinfo)
         {
             Filepath = _name;
@@ -237,6 +238,7 @@ namespace Cosplay_Academy
             RestrictedInterest = coordinfo.Interest_Restriction;
 #endif
         }
+#endif
 
         [SerializationConstructor]
 #if KK

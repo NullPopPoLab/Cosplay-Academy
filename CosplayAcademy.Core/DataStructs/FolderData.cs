@@ -98,6 +98,7 @@ namespace Cosplay_Academy
                 var name = Path.GetFileName(file);
                 if (!Cards.Any(x => x.Filepath == name) && chafilecoordinate.LoadFile(file))
                 {
+#if false // Additional_Card_Info 廃止予定 
                     var ACI_Data = ExtendedSave.GetExtendedDataById(chafilecoordinate, "Additional_Card_Info");
                     if (ACI_Data == null)
                     {
@@ -123,6 +124,9 @@ namespace Cosplay_Academy
                             break;
                     }
                     Cards.Add(new CardData(name, this, data.RestrictionInfo));
+#else
+                    Cards.Add(new CardData(name, this));
+#endif
                 }
             }
 //            Settings.Logger.LogDebug($"{FolderPath} found {Cards.Count} cards");

@@ -37,6 +37,7 @@ namespace Cosplay_Academy
                 {
                     var Organizer = new ChaFileCoordinate();
                     Organizer.LoadFile(Coordinate);
+#if false // Additional_Card_Info 廃止予定 
                     var ACI_Data = ExtendedSave.GetExtendedDataById(Organizer, "Additional_Card_Info");
 
                     if (ACI_Data == null)
@@ -103,6 +104,7 @@ namespace Cosplay_Academy
                     Result += FileName;
                     File.Copy(Coordinate, Result, true);
                     File.Delete(Coordinate);
+#endif
                 }
             }
         }

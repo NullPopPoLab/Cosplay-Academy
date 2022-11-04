@@ -191,6 +191,7 @@ namespace Cosplay_Academy
                 #region Queue accessories to keep
 
                 #region ACI Data
+#if false // Additional_Card_Info 廃止予定 
                 var ACI_data = new Additional_Card_Info.DataStruct();
 
                 for (int i = 0, n = ThisOutfitData.Outfit_Size; i < n; i++)
@@ -229,6 +230,7 @@ namespace Cosplay_Academy
                 Cosplay_Academy_Ready = CardInfo.CosplayReady;
                 ClothingLoader.MakeUpKeep = CoordinateInfo.ToDictionary(x => x.Key, x => x.Value.MakeUpKeep);
                 ClothingLoader.CharacterClothingKeep_Coordinate = CoordinateInfo.ToDictionary(x => x.Key, x => x.Value.CoordinateSaveBools);
+#endif
                 #endregion
 
                 for (int outfitnum = 0, n = ThisOutfitData.Outfit_Size; outfitnum < n; outfitnum++)
@@ -236,11 +238,13 @@ namespace Cosplay_Academy
                     ThisOutfitData.Original_Coordinates[outfitnum] = CloneCoordinate(ChaFileControl.coordinate[outfitnum]);
                     var HairKeep = new List<int>();
                     var ACCKeep = new List<int>();
+#if false // Additional_Card_Info 廃止予定 
                     if (CoordinateInfo.ContainsKey(outfitnum))
                     {
                         HairKeep = CoordinateInfo[outfitnum].HairAcc;
                         ACCKeep = CoordinateInfo[outfitnum].AccKeep;
                     }
+#endif
                     if (CharaHair.TryGetValue(outfitnum, out var HairInfo) == false)
                     {
                         HairInfo = new Dictionary<int, HairSupport.HairAccessoryInfo>();
@@ -256,7 +260,11 @@ namespace Cosplay_Academy
                     }
 
                     // 強制的に保持するか 
-                    var xkeep = (Settings.ExtremeAccKeeper.Value && !Cosplay_Academy_Ready);
+                    var xkeep = (Settings.ExtremeAccKeeper.Value
+#if false // Additional_Card_Info 廃止予定 
+                    && !Cosplay_Academy_Ready
+#endif
+                    );
 
                     var ME_ACC_Data = coord.AccessoryProperties;
                     for (var i = 0; i < Intermediate.Count; i++)
@@ -268,7 +276,9 @@ namespace Cosplay_Academy
 
                         // アクセを残すか 
                         var keep = xkeep || hkeep || akeep;
+#if false // Additional_Card_Info 廃止予定 
                         if(!Cosplay_Academy_Ready)
+#endif
                         {
                             if (!keep) keep = !Settings.DestinationHeadAccs.Value && Constants.HeadAcceSet.Contains(Intermediate[i].parentKey);
                             if (!keep) keep = !Settings.DestinationForeheadAccs.Value && Constants.ForeheadAcceSet.Contains(Intermediate[i].parentKey);
@@ -308,7 +318,7 @@ namespace Cosplay_Academy
                     }
                 }
 
-                #endregion
+#endregion
                 ThisOutfitData.firstpass = false;
             }
 

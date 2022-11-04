@@ -112,6 +112,7 @@ namespace Cosplay_Academy
                 Settings.Logger.LogDebug($"{(ChaFileDefine.CoordinateType)i} assigning " + outfitpaths[i]);
             }
 
+#if false // Additional_Card_Info 廃止予定 
             var simpledirectory = ClothingLoader.CardInfo.SimpleFolderDirectory;
             var simplenull = simpledirectory.IsNullOrEmpty();
             var advanced = ClothingLoader.CardInfo.AdvancedDirectory;
@@ -190,6 +191,7 @@ namespace Cosplay_Academy
                     }
                 }
             }
+#endif
         }
 
         private void SpecialCondition(int coordinate, Dictionary<int, string> outfitpath, int datanum)

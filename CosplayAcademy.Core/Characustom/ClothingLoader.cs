@@ -35,9 +35,11 @@ namespace Cosplay_Academy
         #endregion
 
         #region ACI_Data
+#if false // Additional_Card_Info 廃止予定 
         public Additional_Card_Info.Cardinfo CardInfo { get; internal set; }
         internal bool[] PersonalClothingBools => CardInfo.PersonalClothingBools;
         public bool Character_Cosplay_Ready => CardInfo.CosplayReady;
+#endif
 
         internal Dictionary<int, bool[]> CharacterClothingKeep_Coordinate = new Dictionary<int, bool[]>();
         internal Dictionary<int, bool> MakeUpKeep = new Dictionary<int, bool>();
@@ -175,7 +177,11 @@ namespace Cosplay_Academy
             ValidOutfits[outfitnum] = load;
             if (load)
             {
+#if false // Additional_Card_Info 廃止予定 
                 ME_coord.SoftClear(PersonalClothingBools);
+#else
+                ME_coord.SoftClear(new bool[9]);
+#endif
                 //only requeue items if a new file is loaded as they are unloaded.
                 PartsQueue = new Queue<ChaFileAccessory.PartsInfo>(ThisOutfitData.CoordinatePartsQueue[outfitnum]);
                 HairQueue = new Queue<HairSupport.HairAccessoryInfo>(ThisOutfitData.HairAccQueue[outfitnum]);
@@ -187,16 +193,17 @@ namespace Cosplay_Academy
             }
 
             var UnderwearAccessoryStart = PartsQueue.Count();
-            #region MakeUp
+#region MakeUp
             if (MakeUpKeep[outfitnum])
             {
                 ThisCoordinate.enableMakeup = ThisOutfitData.Original_Coordinates[outfitnum].enableMakeup;
                 ThisCoordinate.makeup = ThisOutfitData.Original_Coordinates[outfitnum].makeup;
             }
-            #endregion
+#endregion
             var HairToColor = new List<int>();
             #region Reassign Existing Accessories
 
+#if false // Additional_Card_Info 廃止予定 
             var ExpandedData = ExtendedSave.GetExtendedDataById(ThisCoordinate, "Additional_Card_Info");
             if (ExpandedData != null)
             {
@@ -231,7 +238,9 @@ namespace Cosplay_Academy
                         break;
                 }
             }
-            else if (Settings.HairMatch.Value && !MakerAPI.InsideMaker && Settings.DestinationHeadAccs.Value)
+            else
+#endif
+            if (Settings.HairMatch.Value && !MakerAPI.InsideMaker && Settings.DestinationHeadAccs.Value)
             {
                 // 頭に載っている髪パーツのみ対象とする 
                 for (var i = 0; i < ThisCoordinate.accessory.parts.Length; ++i)
@@ -244,6 +253,7 @@ namespace Cosplay_Academy
             if (UnderClothingKeep == null) UnderClothingKeep = new bool[9];
             if (HairToColor == null) HairToColor = new List<int>();
             if (Underwearbools[outfitnum] == null) Underwearbools[outfitnum] = new bool[3];
+#if false // Additional_Card_Info 廃止予定 
             for (var i = 0; i < 9; i++)
             {
                 if (PersonalClothingBools[i])
@@ -251,6 +261,7 @@ namespace Cosplay_Academy
                     UnderClothingKeep[i] = true;
                 }
             }
+#endif
             this.UnderClothingKeep[outfitnum] = UnderClothingKeep;
 
             var Inputdata = ExtendedSave.GetExtendedDataById(ThisCoordinate, "com.deathweasel.bepinex.hairaccessorycustomizer");
@@ -267,11 +278,11 @@ namespace Cosplay_Academy
                     OutdatedMessage("hairaccessorycustomizer", true);
                 }
             }
-            #region ME Acc Import
+#region ME Acc Import
             var MaterialEditorData = ExtendedSave.GetExtendedDataById(ThisCoordinate, "com.deathweasel.bepinex.materialeditor");
             ThisOutfitData.Finished.LoadCoordinate(MaterialEditorData, ThisOutfitData, outfitnum);
             var Import_ME_Data = new MaterialEditorProperties();
-            #endregion
+#endregion
             var parts = new List<ChaFileAccessory.PartsInfo>();
             // ロード対象アクセのみ選択 
             for (var i = 0; i < ThisCoordinate.accessory.parts.Length; ++i)
@@ -492,7 +503,7 @@ namespace Cosplay_Academy
             ThisCoordinate.accessory.parts = parts.ToArray();
 
             HairAccessories.Add(outfitnum, HairAccInfo);
-            #endregion
+#endregion
 
 #if TRACE
             TimeWatch[1].Stop();
@@ -509,7 +520,7 @@ namespace Cosplay_Academy
             InsideMaker = MakerAPI.InsideMaker;
 
 
-            #region Queue accessories to keep
+#region Queue accessories to keep
 
             var outfitnum = chacontrol.fileStatus.coordinateType;
 
@@ -523,19 +534,19 @@ namespace Cosplay_Academy
 
             var ME_Queue = new Queue<MaterialEditorProperties>(ThisOutfitData.Original_Accessory_Data[outfitnum]);
 
-            #region ME Acc Import
+#region ME Acc Import
             var MaterialEditorData = ExtendedSave.GetExtendedDataById(coordinate, "com.deathweasel.bepinex.materialeditor");
 
             var Coordinate_ME_Data = new ME_Coordinate(MaterialEditorData, ThisOutfitData, outfitnum);
-            #endregion
+#endregion
 
-            #endregion
+#endregion
 
             //Apply pre-existing Accessories in any open slot or final slots.
 
             var OriginalData = chacontrol.nowCoordinate.accessory.parts.ToList();
 
-            #region Reassign Existing Accessories
+#region Reassign Existing Accessories
 
             var Inputdata = ExtendedSave.GetExtendedDataById(coordinate, "com.deathweasel.bepinex.hairaccessorycustomizer");
             var HairACCDictionary = new Dictionary<int, HairSupport.HairAccessoryInfo>();
@@ -621,9 +632,9 @@ namespace Cosplay_Academy
             chacontrol.nowCoordinate.accessory.parts = OriginalData.ToArray();
 
             MoreAccessoriesKOI.MoreAccessories.ArraySync(chacontrol);
-            #endregion
+#endregion
 
-            #region Pack
+#region Pack
             var SaveData = new PluginData();
 
             Coordinate_ME_Data.AllProperties(out var rendererProperties, out var materialFloatProperties, out var materialColorProperties, out var materialShaders, out var materialTextureProperties);
@@ -661,6 +672,7 @@ namespace Cosplay_Academy
 
             ExtendedSave.SetExtendedDataById(coordinate, "com.deathweasel.bepinex.materialeditor", SaveData);
 
+#if false // Additional_Card_Info 廃止予定 
             if (InsideMaker && Constants.PluginResults["Additional_Card_Info"])
             {
                 SaveData = new PluginData() { version = 1 };
@@ -705,8 +717,9 @@ namespace Cosplay_Academy
                 ExtendedSave.SetExtendedDataById(coordinate, "Additional_Card_Info", SaveData);
                 //ControllerCoordReload_Loop(Type.GetType("Additional_Card_Info.CharaEvent, Additional_Card_Info", false), ChaControl, coordinate);
             }
+#endif
 
-            #endregion
+#endregion
 
             //ControllerCoordReload_Loop(typeof(KK_Plugins.MaterialEditor.MaterialEditorCharaController), ChaControl, coordinate);
 

@@ -145,7 +145,9 @@ namespace Cosplay_Academy
             RepacksStop[j].Start();
 
 #endif
+#if false // Additional_Card_Info 廃止予定 
             Additional_Card_Info_Repack(character);
+#endif
 #if TRACE
             RepacksStop[j].Stop();
             RepackAverage[j].Add(RepacksStop[j].ElapsedMilliseconds - start);
@@ -437,6 +439,7 @@ namespace Cosplay_Academy
                 }
 #endif
 
+#if false // Additional_Card_Info 廃止予定 
                 for (var i = 0; i < PersonalClothingBools.Length; i++)
                 {
                     if (!PersonalClothingBools[i])
@@ -452,6 +455,7 @@ namespace Cosplay_Academy
 
                     Clothdict[(CoordinateType)outfitnum].Remove(Constants.KCOX_Cat[i]);
                 }
+#endif
             }
             var data = new PluginData { version = 1 };
             data.data.Add("Overlays", MessagePackSerializer.Serialize(Clothdict));
@@ -1131,6 +1135,7 @@ namespace Cosplay_Academy
             SetExtendedData("Accessory_Themes", (nulldata) ? null : SavedData, ChaControl);
         }
 
+#if false // Additional_Card_Info 廃止予定 
         private void Additional_Card_Info_Repack(ChaControl ChaControl)
         {
             var data = new Additional_Card_Info.DataStruct();
@@ -1214,7 +1219,8 @@ namespace Cosplay_Academy
             SavedData.data.Add("CoordinateInfo", MessagePackSerializer.Serialize(CoordinateInfo));
 
             SetExtendedData("Additional_Card_Info", SavedData, ChaControl);
-        }
+    }
+#endif
 
         private void Accessory_Parents_Repack(ChaControl ChaControl)
         {
