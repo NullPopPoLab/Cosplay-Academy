@@ -14,9 +14,9 @@ namespace Cosplay_Academy
     {
         public static ConfigEntry<bool> TeacherDress { get; private set; }
 
-        public static ConfigEntry<bool> GrabUniform { get; private set; }
+//        public static ConfigEntry<bool> GrabUniform { get; private set; }
 
-        public static ConfigEntry<bool> AfterSchoolCasual { get; private set; }
+//        public static ConfigEntry<bool> AfterSchoolCasual { get; private set; }
 
         public static ConfigEntry<string>[] SpecificCategories = new ConfigEntry<string>[Constants.GameCoordinateSize];
 

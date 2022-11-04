@@ -31,9 +31,9 @@ namespace Cosplay_Academy
         public static ConfigEntry<bool> UseAlternativePath { get; private set; }
         public static ConfigEntry<string> CoordinatePath { get; private set; }
         public static ConfigEntry<bool> EnableSetting { get; private set; }
-        public static ConfigEntry<bool> EnableSets { get; private set; }
-        public static ConfigEntry<bool> IndividualSets { get; private set; }
-        public static ConfigEntry<bool> EnableDefaults { get; private set; }
+//        public static ConfigEntry<bool> EnableSets { get; private set; }
+//        public static ConfigEntry<bool> IndividualSets { get; private set; }
+//        public static ConfigEntry<bool> EnableDefaults { get; private set; }
         public static ConfigEntry<bool> StoryModeChange { get; private set; }
         public static ConfigEntry<bool> KeepOldBehavior { get; private set; }
 
@@ -48,20 +48,20 @@ namespace Cosplay_Academy
         public static ConfigEntry<bool> DestinationTailAccs { get; private set; }
 
         public static ConfigEntry<bool> Makerview { get; private set; }
-        public static ConfigEntry<bool> FullSet { get; private set; }
-        public static ConfigEntry<bool> ResetMaker { get; set; }
+//        public static ConfigEntry<bool> FullSet { get; private set; }
+//        public static ConfigEntry<bool> ResetMaker { get; set; }
 
         public static ConfigEntry<bool> ChangeOutfit { get; set; }
 
-        public static ConfigEntry<Hexp> H_EXP_Choice { get; private set; }
+//        public static ConfigEntry<Hexp> H_EXP_Choice { get; private set; }
 
         public static ConfigEntry<OutfitUpdate> UpdateFrequency { get; private set; }
         public static ConfigEntry<bool> SundayDate { get; private set; }
 
-        public static ConfigEntry<bool> AccKeeper { get; private set; }
+//        public static ConfigEntry<bool> AccKeeper { get; private set; }
         public static ConfigEntry<bool> RandomizeUnderwear { get; private set; }
-        public static ConfigEntry<bool> RandomizeUnderwearOnly { get; private set; }
-        public static ConfigEntry<bool> ForceRandomUnderwear { get; private set; }
+//        public static ConfigEntry<bool> RandomizeUnderwearOnly { get; private set; }
+//        public static ConfigEntry<bool> ForceRandomUnderwear { get; private set; }
         public static ConfigEntry<bool> UnderwearStates { get; private set; }
         public static ConfigEntry<bool> ExtremeAccKeeper { get; private set; }
 
@@ -112,19 +112,19 @@ namespace Cosplay_Academy
             DestinationTailAccs = Config.Bind("Accessories", "Destination Tail Accessories", true, "Remove source tail accessories or coordinating.");
 
             //Sets
-            EnableSets = Config.Bind("Outfit Sets", "Enable Outfit Sets", true, new ConfigDescription("Outfits in set folders can be pulled from a group for themed sets", null, new ConfigurationManagerAttributes() { Order = 3 }));
-            IndividualSets = Config.Bind("Outfit Sets", "Do not Find Matching Sets", false, new ConfigDescription("Don't look for other sets that are shared per coordinate type", null, AdvancedConfig));
-            FullSet = Config.Bind("Outfit Sets", "Assign available sets only", false, new ConfigDescription("Prioritize sets in order: Uniform > Gym > Swim > Club > Casual > Nightwear\nDisabled priority reversed: example Nightwear set will overwrite all clothes if same folder is found", null, AdvancedConfig));
+//            EnableSets = Config.Bind("Outfit Sets", "Enable Outfit Sets", true, new ConfigDescription("Outfits in set folders can be pulled from a group for themed sets", null, new ConfigurationManagerAttributes() { Order = 3 }));
+//            IndividualSets = Config.Bind("Outfit Sets", "Do not Find Matching Sets", false, new ConfigDescription("Don't look for other sets that are shared per coordinate type", null, AdvancedConfig));
+//            FullSet = Config.Bind("Outfit Sets", "Assign available sets only", false, new ConfigDescription("Prioritize sets in order: Uniform > Gym > Swim > Club > Casual > Nightwear\nDisabled priority reversed: example Nightwear set will overwrite all clothes if same folder is found", null, AdvancedConfig));
 
             //Additional Outfit
-            EnableDefaults = Config.Bind("Additional Outfits", "Enable Default in rolls", false, new ConfigDescription("Adds default outfit to roll tables", null, AdvancedConfig));
+//            EnableDefaults = Config.Bind("Additional Outfits", "Enable Default in rolls", false, new ConfigDescription("Adds default outfit to roll tables", null, AdvancedConfig));
 
             //prob
-            H_EXP_Choice = Config.Bind("Probability", "Outfit Picker logic", Hexp.RandConstant, new ConfigDescription("Randomize: Each outfit can be from different H States\nRandConstant: Randomizes H State, but will choose the same level if outfit is found (will get next highest if Enable Default is not enabled)\nMaximize: Do I really gotta say?", null, AdvancedConfig));
+//            H_EXP_Choice = Config.Bind("Probability", "Outfit Picker logic", Hexp.RandConstant, new ConfigDescription("Randomize: Each outfit can be from different H States\nRandConstant: Randomizes H State, but will choose the same level if outfit is found (will get next highest if Enable Default is not enabled)\nMaximize: Do I really gotta say?", null, AdvancedConfig));
 
             //Maker
             Makerview = Config.Bind("Maker", "Enable Maker Mode", false, new ConfigDescription("", null, AdvancedConfig));
-            ResetMaker = Config.Bind("Maker", "Reset Sets", false, new ConfigDescription("Will overwrite current day outfit in storymode if you wanted to view that version.", null, AdvancedConfig));
+//            ResetMaker = Config.Bind("Maker", "Reset Sets", false, new ConfigDescription("Will overwrite current day outfit in storymode if you wanted to view that version.", null, AdvancedConfig));
             ChangeOutfit = Config.Bind("Maker", "Change generated outfit", false, new ConfigDescription("Pick new coordinates in maker", null, AdvancedConfig));
 
             //Other Mods
