@@ -360,5 +360,7 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
-/KK_KKP/Game
-/Cosplay Academy Sun/Game
+**/bin/*
+**/obj/*
+/KK/Game
+/KKS/Game
