@@ -20,7 +20,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>..\bin\KKS_CosplayParty\BepInEx\plugins\!myworks\</OutputPath>
+    <OutputPath>Game\BepInEx\plugins\!myworks\</OutputPath>
     <DefineConstants>DEBUG;KKS</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -30,7 +30,7 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>..\bin\KKS_CosplayParty\BepInEx\plugins\!myworks\</OutputPath>
+    <OutputPath>Game\BepInEx\plugins\!myworks\</OutputPath>
     <DefineConstants>KKS</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -38,7 +38,7 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup>
-    <RunPostBuildEvent>Always</RunPostBuildEvent>
+    <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="0Harmony, Version=2.5.4.0, Culture=neutral, processorArchitecture=MSIL">
