@@ -21,7 +21,7 @@ namespace CosplayParty
     public partial class Settings : BaseUnityPlugin
     {
         public const string GUID = "CosplayParty";
-        public const string Version = "0.22";
+        public const string Version = "0.23";
         public static Settings Instance;
         internal static new ManualLogSource Logger { get; private set; }
 

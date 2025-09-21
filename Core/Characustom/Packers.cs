@@ -76,8 +76,8 @@ namespace CosplayParty
             {
 #if TRACE
                 TimeWatch[2].Stop();
-                var temp = TimeWatch[2].ElapsedMilliseconds - Start;
-                Average[2].Add(temp);
+                var temp2 = TimeWatch[2].ElapsedMilliseconds - Start;
+                Average[2].Add(temp2);
 #endif
                 return;
             }

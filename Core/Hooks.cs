@@ -254,6 +254,7 @@ namespace CosplayParty
             //change NPC's who start at club room to a koi outfit
         }
 
+#if false // おそらく廃止 
         [HarmonyPostfix]
         [HarmonyPatch(typeof(HSceneProc), nameof(HSceneProc.SetState))]
         internal static void LoadSethook(HSceneProc __instance)
@@ -261,6 +262,7 @@ namespace CosplayParty
             if (__instance.flags.isFreeH)
                 CharaEvent.FreeHHeroines = __instance.flags.lstHeroine;
         }
+#endif
     }
 }
 #endif

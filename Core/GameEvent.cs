@@ -41,11 +41,7 @@ namespace CosplayParty
             CharaEvent.ChaDefaults.Clear();
             OutfitDecider.ResetDecider();
         }
-#if KK
-        protected override void OnStartH(BaseLoader proc, HFlag hFlag, bool vr)
-#elif KKS
         protected override void OnStartH(MonoBehaviour proc, HFlag hFlag, bool vr)
-#endif
         {
             if (Settings.EnableSetting.Value)
             {
@@ -59,11 +55,7 @@ namespace CosplayParty
             base.OnStartH(proc, hFlag, vr);
         }
 
-#if KK
-        protected override void OnEndH(BaseLoader proc, HFlag hFlag, bool vr)
-#elif KKS
         protected override void OnEndH(MonoBehaviour proc, HFlag hFlag, bool vr)
-#endif
         {
             if (hFlag.isFreeH)
             {
