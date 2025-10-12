@@ -24,10 +24,12 @@ namespace CosplayParty
 
         protected override void OnDayChange(Cycle.Week day)
         {
+#if KK
             if ((Cycle.Week.Monday == day && Settings.UpdateFrequency.Value == OutfitUpdate.Weekly) || Cycle.Week.Holiday == day && Settings.SundayDate.Value)
             {
                 OutfitDecider.ResetDecider();
             }
+#endif
         }
 
         protected override void OnGameLoad(GameSaveLoadEventArgs args)

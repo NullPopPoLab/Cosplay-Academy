@@ -56,7 +56,9 @@ namespace CosplayParty
 //        public static ConfigEntry<Hexp> H_EXP_Choice { get; private set; }
 
         public static ConfigEntry<OutfitUpdate> UpdateFrequency { get; private set; }
+#if KK
         public static ConfigEntry<bool> SundayDate { get; private set; }
+#endif
 
 //        public static ConfigEntry<bool> AccKeeper { get; private set; }
         public static ConfigEntry<bool> RandomizeUnderwear { get; private set; }
@@ -93,7 +95,9 @@ namespace CosplayParty
 //            ForceRandomUnderwear = Config.Bind("Main Game", "Force underwear parts", false, "Doesn't force Top or Bottom");
 
             UpdateFrequency = Config.Bind("Story Mode", "Update Frequency", OutfitUpdate.Daily);
+#if KK
             SundayDate = Config.Bind("Story Mode", "Sunday Date Special", true, "Date will wear something different on Sunday, not really useful unless Update Frequency is not daily/period ");
+#endif
 
             //Cache
             UpdateCache = Config.Bind("Cache", "Update Cache Buttons", false, new ConfigDescription("", null, new ConfigurationManagerAttributes() { HideSettingName = true, HideDefaultButton = true, CustomDrawer = new Action<ConfigEntryBase>(UpdateCacheData) }));

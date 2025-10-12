@@ -71,7 +71,8 @@
       <HintPath>Game\BepInEx\plugins\KK_BepisPlugins\ExtensibleSaveFormat.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="KKAPI">
+    <Reference Include="KKAPI, Version=1.41.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>Game\Koikatsu\BepInEx\plugins\KKAPI.dll</HintPath>
     </Reference>
     <Reference Include="MonoMod.RuntimeDetour">
