@@ -67,6 +67,15 @@ Cosplay-Academy と一緒で。
 
 * 更新履歴
 
+(v0.23)
+- HF Patch 更新追跡 (KK:3.33 KKS:1.25) 
+- KKS版に残ってたKK専用設定除去
+
+(v0.22)
+- namespace を CosplayParty に変更
+- …ぐらいしか変更点なかったり
+	- 実験的にMoreOutfitsランダム選択なんぞ試してたけどうまくいかなくて結局ボツ
+
 (v0.21)
 - 不要な機能除去
 
