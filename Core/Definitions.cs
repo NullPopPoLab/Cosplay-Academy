@@ -11,6 +11,7 @@ namespace CosplayParty
 
         internal static void PluginCheck()
         {
+#if false // たぶん不要 
             var PluginList = new string[] { "Additional_Card_Info", "Accessory_Themes", "Accessory_Parents", "Accessory_States", "madevil.kk.ass" };
 
             foreach (var item in PluginList)
@@ -30,10 +31,12 @@ namespace CosplayParty
             {
                 PluginVersionCheck(item);
             }
+#endif
         }
 
         internal static void ExpandedOutfit()
         {
+#if false // たぶん不要 
             var IgnoredTops_Original_A = new Dictionary<int, List<ResolveInfo>>()
             {
                 [1] = new List<ResolveInfo>() { ResolveInfo("yu000.ShirtlessUniform", 200, 100), },
@@ -139,6 +142,7 @@ namespace CosplayParty
                 }
                 IgnoredBotsIDs_Main.Add(main.LocalSlot);
             }
+#endif
         }
 
         public static readonly string[] CoordinateRoles =
@@ -243,9 +247,11 @@ namespace CosplayParty
             }
         }
 
+#if false // たぶん不要 
         public static readonly List<int> IgnoredTopIDs_Main = new List<int>() { 0, 31, 53, 59, 60, 222 };
 
         public static readonly List<int> IgnoredBotsIDs_Main = new List<int>() { 0, 38, 40, };
+#endif
 
         public static readonly Dictionary<int, List<int>> IgnoredTopIDs_A = new Dictionary<int, List<int>>();
 
