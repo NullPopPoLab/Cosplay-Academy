@@ -354,7 +354,7 @@ namespace CosplayParty
             var ExtendedCharacterData = ExtendedSave.GetExtendedDataById(ThisOutfitData.Chafile, "KCOX");
             if (ExtendedCharacterData != null)
             {
-                if (ExtendedCharacterData.version == 1)
+                if (KCOX_Version.IsAvailable(ExtendedCharacterData.version))
                 {
                     if (ExtendedCharacterData.data.TryGetValue("Overlays", out var coordinatedata) && coordinatedata != null)
                     {
@@ -373,7 +373,7 @@ namespace CosplayParty
 
             if (UnderwearSavedData != null)
             {
-                if (UnderwearSavedData.version == 1)
+                if (KCOX_Version.IsAvailable(ExtendedCharacterData.version))
                 {
                     if (UnderwearSavedData.data.TryGetValue("Overlays", out var underbyteArr) && underbyteArr != null)
                     {
@@ -400,7 +400,7 @@ namespace CosplayParty
                     SavedData = ExtendedSave.GetExtendedDataById(ChaControl.chaFile.coordinate[outfitnum], "KCOX");
                     if (SavedData != null)
                     {
-                        if (SavedData.version == 1)
+                        if (KCOX_Version.IsAvailable(ExtendedCharacterData.version))
                         {
                             if (SavedData.data.TryGetValue("Overlays", out var bytes))
                             {
@@ -457,7 +457,7 @@ namespace CosplayParty
                 }
 #endif
             }
-            var data = new PluginData { version = 1 };
+            var data = new PluginData { version = KCOX_Version.Save };
             data.data.Add("Overlays", MessagePackSerializer.Serialize(Clothdict));
             SetExtendedData("KCOX", data, ChaControl);
         }
