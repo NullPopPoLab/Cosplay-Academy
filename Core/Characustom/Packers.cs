@@ -614,7 +614,6 @@ namespace CosplayParty
                 {
                     switch (SavedData.version)
                     {
-                        case 3:
                         case 2:
                             Modifiers = LZ4MessagePackSerializer.Deserialize<List<ABMX.BoneModifier>>((byte[])bytes);
                             break;
@@ -682,7 +681,7 @@ namespace CosplayParty
                 return;
             }
 
-            var data = new PluginData { version = 3 };
+            var data = new PluginData { version = 2 };
             data.data.Add("boneData", LZ4MessagePackSerializer.Serialize(Modifiers));
             SetExtendedData("KKABMPlugin.ABMData", data, ChaControl);
         }
