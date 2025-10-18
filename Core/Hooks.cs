@@ -20,11 +20,11 @@ namespace CosplayParty
 
         //private static void ShowTypeInfo(Type t)
         //{
-        //    Settings.Logger.LogWarning($"Name: {t.Name}");
-        //    Settings.Logger.LogWarning($"Full Name: {t.FullName}");
-        //    Settings.Logger.LogWarning($"ToString:  {t}");
-        //    Settings.Logger.LogWarning($"Assembly Qualified Name: {t.AssemblyQualifiedName}");
-        //    Settings.Logger.LogWarning("");
+        //    Settings.Logger.LogDebug($"Name: {t.Name}");
+        //    Settings.Logger.LogDebug($"Full Name: {t.FullName}");
+        //    Settings.Logger.LogDebug($"ToString:  {t}");
+        //    Settings.Logger.LogDebug($"Assembly Qualified Name: {t.AssemblyQualifiedName}");
+        //    Settings.Logger.LogDebug("");
         //}
 
         [HarmonyPostfix]
@@ -108,7 +108,7 @@ namespace CosplayParty
                     }
                     ThisOutfitData.ChangeKoiToClub = false;
                 }
-                //ExpandedOutfit.Logger.LogWarning($"SetWait2 success: {Chara.chaCtrl.fileParam.fullname} is waiting at {Chara.mapNo}");
+                //ExpandedOutfit.Logger.LogDebug($"SetWait2 success: {Chara.chaCtrl.fileParam.fullname} is waiting at {Chara.mapNo}");
 
             }
             catch (Exception ex)

@@ -192,7 +192,7 @@ namespace CosplayParty
 #endif
 
 #if TRACE
-                Settings.Logger.LogWarning($"Took {Stopwatch.ElapsedMilliseconds} ms to deserialize data");
+                Settings.Logger.LogDebug($"Took {Stopwatch.ElapsedMilliseconds} ms to deserialize data");
 #endif
                 CleanUp();
                 FindNewCards();

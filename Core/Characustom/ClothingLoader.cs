@@ -127,7 +127,7 @@ namespace CosplayParty
             TimeWatch[0].Stop();
             var temp = TimeWatch[0].ElapsedMilliseconds - Start;
             Average[0].Add(temp);
-            Settings.Logger.LogWarning($"\tFullLoad: Total elapsed time {TimeWatch[0].ElapsedMilliseconds}ms\n\tRun {Average[0].Count}: {temp}ms\n\tAverage: {Average[0].Average()}ms");
+            Settings.Logger.LogDebug($"\tFullLoad: Total elapsed time {TimeWatch[0].ElapsedMilliseconds}ms\n\tRun {Average[0].Count}: {temp}ms\n\tAverage: {Average[0].Average()}ms");
 #endif
             Run_Repacks(character);
         }
@@ -503,13 +503,13 @@ namespace CosplayParty
             ThisCoordinate.accessory.parts = parts.ToArray();
 
             HairAccessories.Add(outfitnum, HairAccInfo);
-#endregion
+            #endregion
 
 #if TRACE
             TimeWatch[1].Stop();
             var temp = TimeWatch[1].ElapsedMilliseconds - Start;
             Average[1].Add(temp);
-            Settings.Logger.LogWarning($"\t{(ChaFileDefine.CoordinateType)outfitnum} GeneralLoad: Total elapsed time {TimeWatch[1].ElapsedMilliseconds}ms\n\tRun {Average[1].Count}: {temp}ms\n\tAverage: {Average[1].Average()}ms");
+            Settings.Logger.LogDebug($"\t{(ChaFileDefine.CoordinateType)outfitnum} GeneralLoad: Total elapsed time {TimeWatch[1].ElapsedMilliseconds}ms\n\tRun {Average[1].Count}: {temp}ms\n\tAverage: {Average[1].Average()}ms");
 #endif
         }
 

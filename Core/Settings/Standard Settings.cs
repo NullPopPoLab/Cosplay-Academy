@@ -193,7 +193,7 @@ namespace CosplayParty
             Constants.ExpandedOutfit();
 #if TRACE
             Stopwatch.Stop();
-            Logger.LogWarning($"Took {Stopwatch.ElapsedMilliseconds} ms for Constants.ExpandedOutfit()");
+            Logger.LogDebug($"Took {Stopwatch.ElapsedMilliseconds} ms for Constants.ExpandedOutfit()");
 #endif
 
             MakerAPI.RegisterCustomSubCategories += CharaEvent.RegisterCustomSubCategories;

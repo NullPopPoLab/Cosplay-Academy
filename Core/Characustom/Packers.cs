@@ -205,11 +205,11 @@ namespace CosplayParty
             print += $"parents {j} last: {RepackAverage[j].Last()} average: {RepackAverage[j].Average()} Total:{RepacksStop[j++].ElapsedMilliseconds}\n";
             print += $"themse {j} last: {RepackAverage[j].Last()} average: {RepackAverage[j].Average()} Total:{RepacksStop[j++].ElapsedMilliseconds}\n";
             print += $"ASS {j} last: {RepackAverage[j].Last()} average: {RepackAverage[j].Average()} Total:{RepacksStop[j].ElapsedMilliseconds}\n";
-            Settings.Logger.LogWarning(print);
+            Settings.Logger.LogDebug(print);
             TimeWatch[2].Stop();
             var temp = TimeWatch[2].ElapsedMilliseconds - Start;
             Average[2].Add(temp);
-            Settings.Logger.LogWarning($"\t\tRun_Repacks: Total elapsed time {TimeWatch[2].ElapsedMilliseconds}ms\n\t\tRun {Average[2].Count}: {temp}ms\n\t\tAverage: {Average[2].Average()}ms");
+            Settings.Logger.LogDebug($"\t\tRun_Repacks: Total elapsed time {TimeWatch[2].ElapsedMilliseconds}ms\n\t\tRun {Average[2].Count}: {temp}ms\n\t\tAverage: {Average[2].Average()}ms");
 #endif
         }
 
@@ -225,7 +225,7 @@ namespace CosplayParty
                 TimeWatch[3].Stop();
                 var temp = TimeWatch[3].ElapsedMilliseconds - Start;
                 Average[3].Add(temp);
-                Settings.Logger.LogWarning($"\t\tReload_Repacks: Total elapsed time {TimeWatch[3].ElapsedMilliseconds}ms\n\t\tRun {Average[3].Count}: {temp}ms\n\t\tAverage: {Average[3].Average()}ms");
+                Settings.Logger.LogDebug($"\t\tReload_Repacks: Total elapsed time {TimeWatch[3].ElapsedMilliseconds}ms\n\t\tRun {Average[3].Count}: {temp}ms\n\t\tAverage: {Average[3].Average()}ms");
 #endif
                 return;
             }
@@ -262,7 +262,7 @@ namespace CosplayParty
             TimeWatch[3].Stop();
             var temp2 = TimeWatch[3].ElapsedMilliseconds - Start;
             Average[3].Add(temp2);
-            Settings.Logger.LogWarning($"\t\tReload_Repacks: Total elapsed time {TimeWatch[3].ElapsedMilliseconds}ms\n\t\tRun {Average[3].Count}: {temp2}ms\n\t\tAverage: {Average[3].Average()}ms");
+            Settings.Logger.LogDebug($"\t\tReload_Repacks: Total elapsed time {TimeWatch[3].ElapsedMilliseconds}ms\n\t\tRun {Average[3].Count}: {temp2}ms\n\t\tAverage: {Average[3].Average()}ms");
 #endif
         }
 

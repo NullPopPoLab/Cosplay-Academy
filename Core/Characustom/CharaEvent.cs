@@ -64,7 +64,7 @@ namespace CosplayParty
                 return;
             }
 #if DEBUG
-            Settings.Logger.LogWarning($"Processing {ChaControl.chaFile.parameter.fullname} {Firstpass}");
+            Settings.Logger.LogDebug($"Processing {ChaControl.chaFile.parameter.fullname} {Firstpass}");
 #endif
             var IsMaker = currentGameMode == GameMode.Maker;
             // エディット中は作用させない 
@@ -108,7 +108,7 @@ namespace CosplayParty
                 Time.Stop();
                 var temp = Time.ElapsedMilliseconds - Start;
                 Average.Add(temp);
-                Settings.Logger.LogWarning($"Total elapsed time {Time.ElapsedMilliseconds}ms\nRun {Average.Count}: {temp}ms\nAverage: {Average.Average()}ms");
+                Settings.Logger.LogDebug($"Total elapsed time {Time.ElapsedMilliseconds}ms\nRun {Average.Count}: {temp}ms\nAverage: {Average.Average()}ms");
             }
 #endif
         }
@@ -143,7 +143,7 @@ namespace CosplayParty
                     heroine = heroine
                 };
 #if DEBUG
-                Settings.Logger.LogWarning($"Heroine null? {heroine == null}\nInH? {inH}");
+                Settings.Logger.LogDebug($"Heroine null? {heroine == null}\nInH? {inH}");
 #endif
                 ChaDefaults.Add(ThisOutfitData);
                 return;
@@ -292,7 +292,7 @@ namespace CosplayParty
 
                         //Settings.Logger.LogDebug($"Process: Acc {outfitnum}-{i} XK={xkeep} GI={geneinc} HK={hkeep} AK={akeep}");
 
-                        //ExpandedOutfit.Logger.LogWarning($"ACC :{i}\tID: {data.nowAccessories[i].id}\tParent: {data.nowAccessories[i].parentKey}");
+                        //ExpandedOutfit.Logger.LogDebug($"ACC :{i}\tID: {data.nowAccessories[i].id}\tParent: {data.nowAccessories[i].parentKey}");
                         if (keep)
                         {
                             if (!HairInfo.TryGetValue(i, out var ACCdata))
