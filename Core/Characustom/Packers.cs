@@ -650,29 +650,24 @@ namespace CosplayParty
                 SavedData = ExtendedSave.GetExtendedDataById(ChaControl.chaFile.coordinate[i], "KKABMPlugin.ABMData");
                 if (SavedData != null && SavedData.data.TryGetValue("boneData", out bytes) && bytes != null)
                 {
-                    Dictionary<string, ABMX.BoneModifierData> import;
+                    List<ABMX.BoneModifier> import;
                     try
                     {
                         switch (SavedData.version)
                         {
                             case 3:
+                                import = LZ4MessagePackSerializer.Deserialize<List<ABMX.BoneModifier>>((byte[])bytes);
+                                break;
+
                             case 2:
-                                import = LZ4MessagePackSerializer.Deserialize<Dictionary<string, ABMX.BoneModifierData>>((byte[])bytes);
-                                if (import != null)
-                                {
-                                    foreach (var modifier in import)
-                                    {
-                                        var target = new ABMX.BoneModifier(modifier.Key);
-                                        Modifiers.Add(target);
-                                        target.MakeCoordinateSpecific(ChaControl.chaFile.coordinate.Length);
-                                        target.CoordinateModifiers[i] = modifier.Value;
-                                    }
-                                }
+                                import = LZ4MessagePackSerializer.Deserialize<Dictionary<string, ABMX.BoneModifierData>>((byte[])bytes)
+                                                               .Select(x => new ABMX.BoneModifier(x.Key, ABMX.BoneLocation.Unknown, new[] { x.Value }))
+                                                               .ToList();
                                 break;
 
                             default:
                                 OutdatedMessage("AMBX", true);
-                                throw new NotSupportedException($"{ChaControl.chaFile.coordinate[i].coordinateFileName} Save version {SavedData.version} is not supported");
+                                throw new NotSupportedException($"Save version {SavedData.version} is not supported");
                         }
                     }
                     catch (Exception ex)

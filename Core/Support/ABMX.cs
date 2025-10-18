@@ -83,6 +83,46 @@ namespace CosplayParty.Support
             }
 
             /// <summary>
+            /// Create empty modifier
+            /// </summary>
+            /// <param name="boneName">Name of the bone transform to affect</param>
+            /// <param name="boneLocation">Where the bone transform to affect is located</param>
+            /// <param name="coordinateModifiers">
+            /// Needs to be either 1 long to apply to all coordinates or 7 to apply to specific
+            /// coords
+            /// </param>
+            public BoneModifier(string boneName, BoneLocation boneLocation, BoneModifierData[] coordinateModifiers)
+            {
+                if (string.IsNullOrEmpty(boneName))
+                    throw new ArgumentException("Invalid boneName - " + boneName, nameof(boneName));
+                if (coordinateModifiers == null)
+                    throw new ArgumentNullException(nameof(coordinateModifiers));
+                if (coordinateModifiers.Length < 1)
+                    throw new ArgumentException("Need at least 1 element in coordinateModifiers", nameof(coordinateModifiers));
+                if (coordinateModifiers.Any(x => x == null))
+                {
+#if DEBUG
+                    throw new ArgumentException("coordinateModifiers can't have any nulls in it", nameof(coordinateModifiers));
+#else
+                var logText = "Some ABMX data failed to load for coordinates:";
+                for (int i = 0; i < coordinateModifiers.Length; i++)
+                {
+                    if (coordinateModifiers[i] == null)
+                    {
+                        coordinateModifiers[i] = new BoneModifierData();
+                        logText += $" #{i + 1}";
+                    }
+                }
+                KKABMX_Core.Logger.Log(BepInEx.Logging.LogLevel.Warning | BepInEx.Logging.LogLevel.Message, logText + "\nRe-save the card to stop this warning from appearing.");
+#endif
+                }
+
+                BoneName = boneName;
+                BoneLocation = boneLocation;
+                CoordinateModifiers = coordinateModifiers.ToArray();
+            }
+
+            /// <summary>
             /// Name of the targetted bone
             /// </summary>
             [Key(0)]
@@ -107,17 +147,17 @@ namespace CosplayParty.Support
             // Needs a public set to make serializing work
             public BoneModifierData[] CoordinateModifiers { get; set; }
 
-            public BoneModifierData GetModifier(CoordinateType coordinate)
-            {
-                if (CoordinateModifiers.Length == 1) return CoordinateModifiers[0];
-                return CoordinateModifiers[(int)coordinate];
-            }
-
             /// <summary>
             /// What part of the character the bone is on.
             /// </summary>
             [Key(2)]
             public BoneLocation BoneLocation { get; internal set; }
+
+            public BoneModifierData GetModifier(CoordinateType coordinate)
+            {
+                if (CoordinateModifiers.Length == 1) return CoordinateModifiers[0];
+                return CoordinateModifiers[(int)coordinate];
+            }
 
             /// <summary>
             /// Check if this modifier has unique values for each coordinate, or one set of values for all coordinates
