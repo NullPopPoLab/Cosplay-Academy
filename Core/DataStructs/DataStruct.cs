@@ -81,7 +81,7 @@ namespace CosplayParty
         public static void StartUpLoad()
         {
 #if TRACE
-            Settings.Logger.LogWarning($"Starting to load data");
+            Settings.Logger.LogDebug($"Starting to load data");
             Stopwatch.Start();
 #endif
             if (CreateFile())
@@ -90,7 +90,7 @@ namespace CosplayParty
                 OutfitDecider.ResetDecider();
 #if TRACE
                 Stopwatch.Stop();
-                Settings.Logger.LogWarning($"Took {Stopwatch.ElapsedMilliseconds} ms to create data");
+                Settings.Logger.LogDebug($"Took {Stopwatch.ElapsedMilliseconds} ms to create data");
 #endif
                 return;
             }
@@ -99,7 +99,7 @@ namespace CosplayParty
             OutfitDecider.ResetDecider();
 #if TRACE
             Stopwatch.Stop();
-            Settings.Logger.LogWarning($"Took {Stopwatch.ElapsedMilliseconds} ms to load data");
+            Settings.Logger.LogDebug($"Took {Stopwatch.ElapsedMilliseconds} ms to load data");
 #endif
         }
 
