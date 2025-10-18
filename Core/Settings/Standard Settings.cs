@@ -156,13 +156,15 @@ namespace CosplayParty
                 Constants.PluginCheck();
 #if TRACE
                 Stopwatch.Stop();
-                Settings.Logger.LogWarning($"Took {Stopwatch.ElapsedMilliseconds} ms for  Constants.PluginCheck();");
+                Logger.LogDebug($"Took {Stopwatch.ElapsedMilliseconds} ms for  Constants.PluginCheck();");
 #endif
 
+#if false // 廃止予定 
                 if (!Constants.PluginResults["Additional_Card_Info"] && !CharacterApi.RegisteredHandlers.Any(x => x.ExtendedDataId == "Additional_Card_Info")) //provide access to info even if plugin-doesn't exist
                 {
                     CharacterApi.RegisterExtraBehaviour<Dummy>("Additional_Card_Info");
                 }
+#endif
 
                 yield return null;
 
