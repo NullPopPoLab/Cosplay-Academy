@@ -113,7 +113,7 @@ namespace CosplayParty.Support
                         logText += $" #{i + 1}";
                     }
                 }
-                KKABMX_Core.Logger.Log(BepInEx.Logging.LogLevel.Warning | BepInEx.Logging.LogLevel.Message, logText + "\nRe-save the card to stop this warning from appearing.");
+                Settings.Logger.LogWarning(logText + "\nRe-save the card to stop this warning from appearing.");
 #endif
                 }
 
