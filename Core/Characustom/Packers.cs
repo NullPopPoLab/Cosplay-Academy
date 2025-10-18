@@ -614,6 +614,7 @@ namespace CosplayParty
                 {
                     switch (SavedData.version)
                     {
+                        case 3:
                         case 2:
                             Modifiers = LZ4MessagePackSerializer.Deserialize<List<ABMX.BoneModifier>>((byte[])bytes);
                             break;
@@ -652,22 +653,26 @@ namespace CosplayParty
                     Dictionary<string, ABMX.BoneModifierData> import;
                     try
                     {
-                        if (SavedData.version != 2)
+                        switch (SavedData.version)
                         {
-                            OutdatedMessage("AMBX", true);
-                            throw new NotSupportedException($"{ChaControl.chaFile.coordinate[i].coordinateFileName} Save version {SavedData.version} is not supported");
-                        }
+                            case 3:
+                            case 2:
+                                import = LZ4MessagePackSerializer.Deserialize<Dictionary<string, ABMX.BoneModifierData>>((byte[])bytes);
+                                if (import != null)
+                                {
+                                    foreach (var modifier in import)
+                                    {
+                                        var target = new ABMX.BoneModifier(modifier.Key);
+                                        Modifiers.Add(target);
+                                        target.MakeCoordinateSpecific(ChaControl.chaFile.coordinate.Length);
+                                        target.CoordinateModifiers[i] = modifier.Value;
+                                    }
+                                }
+                                break;
 
-                        import = LZ4MessagePackSerializer.Deserialize<Dictionary<string, ABMX.BoneModifierData>>((byte[])bytes);
-                        if (import != null)
-                        {
-                            foreach (var modifier in import)
-                            {
-                                var target = new ABMX.BoneModifier(modifier.Key);
-                                Modifiers.Add(target);
-                                target.MakeCoordinateSpecific();
-                                target.CoordinateModifiers[i] = modifier.Value;
-                            }
+                            default:
+                                OutdatedMessage("AMBX", true);
+                                throw new NotSupportedException($"{ChaControl.chaFile.coordinate[i].coordinateFileName} Save version {SavedData.version} is not supported");
                         }
                     }
                     catch (Exception ex)
@@ -682,7 +687,7 @@ namespace CosplayParty
                 return;
             }
 
-            var data = new PluginData { version = 2 };
+            var data = new PluginData { version = 3 };
             data.data.Add("boneData", LZ4MessagePackSerializer.Serialize(Modifiers));
             SetExtendedData("KKABMPlugin.ABMData", data, ChaControl);
         }
