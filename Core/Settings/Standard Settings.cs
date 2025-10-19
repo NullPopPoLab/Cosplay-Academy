@@ -60,6 +60,8 @@ namespace CosplayParty
         public static ConfigEntry<bool> SundayDate { get; private set; }
 #endif
 
+        public static ConfigEntry<bool> RandomizeDresscode { get; private set; }
+        
 //        public static ConfigEntry<bool> AccKeeper { get; private set; }
         public static ConfigEntry<bool> RandomizeUnderwear { get; private set; }
 //        public static ConfigEntry<bool> RandomizeUnderwearOnly { get; private set; }
@@ -89,6 +91,8 @@ namespace CosplayParty
             EnableSetting = Config.Bind("General", "Enable Cosplay Party", true, new ConfigDescription("Doesn't require Restart\nDoesn't Disable On Coordinate Load Support or Force Hair Color", null, new ConfigurationManagerAttributes() { Order = 5 }));
 
             //Main Game
+            RandomizeDresscode = Config.Bind("Main Game", "Randomize Dresscode", true, "When empty Dresscode setting, select a folder in 1st layer");
+
 //            AccKeeper = Config.Bind("Main Game", "On Coordinate Load Support", true, new ConfigDescription("Keep head and tail accessories\nUsed for characters who have accessory based hair and avoid them going bald\nWorks best with a Cosplay Party Ready character marked by Additional Card Info", null, new ConfigurationManagerAttributes() { IsAdvanced = true, Order = 4 }));
             RandomizeUnderwear = Config.Bind("Main Game", "Randomize Underwear", false, "Loads underwear from Underwear folder (Does not apply to Gym/Swim outfits)\nWill probably break some outfits that depends on underwear outside of Gym/Swim if not set up with Additional Card Info plugin");
 //            RandomizeUnderwearOnly = Config.Bind("Main Game", "Randomize Underwear Only", false, "Its an option");

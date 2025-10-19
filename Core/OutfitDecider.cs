@@ -77,21 +77,27 @@ namespace CosplayParty
             for (int sets = 0, setslen = Constants.GameCoordinateSize; sets < setslen; sets++)
             {
                 var order = Settings.SpecificCategories[sets].Value;
-                if(order==""){
+                if (order=="" && Settings.RandomizeDresscode.Value)
+                {
                     // ランダムカテゴリから選択 
                     order = folders[UnityEngine.Random.Range(0, folders.Count)];
 				}
 
-                var f2 = f1.SelectSubFolder(path + sep + order);
-                if (f2 == null)
+                var f2 = f1;
+                if (order != "")
                 {
-                    Settings.Logger.LogDebug($"Selected folder for set {sets}: {order}: -- not found --");
-                    continue;
+                    f2 = f1.SelectSubFolder(sep + order);
+                    if (f2 == null)
+                    {
+                        Settings.Logger.LogDebug($"Selected folder for set {sets}: {path + sep + order}: -- not found --");
+                        continue;
+                    }
                 }
 
-                    if (outfitData[sets].IsSet())//Skip set items
+                if (outfitData[sets].IsSet())//Skip set items
                     {
-                        continue;
+                    Settings.Logger.LogDebug($"is not set {sets}");
+                    continue;
                     }
 
 #if false // 廃止予定 
