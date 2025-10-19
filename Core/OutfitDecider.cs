@@ -86,10 +86,11 @@ namespace CosplayParty
                 var f2 = f1;
                 if (order != "")
                 {
-                    f2 = f1.SelectSubFolder(sep + order);
+                    var dir = path + sep + order;
+                    f2 = f1.SelectSubFolder(dir);
                     if (f2 == null)
                     {
-                        Settings.Logger.LogDebug($"Selected folder for set {sets}: {path + sep + order}: -- not found --");
+                        Settings.Logger.LogDebug($"Selected folder for set {sets}: {dir}: -- not found --");
                         continue;
                     }
                 }
