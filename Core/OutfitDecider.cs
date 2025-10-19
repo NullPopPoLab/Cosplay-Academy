@@ -10,6 +10,7 @@ namespace CosplayParty
         private static readonly OutfitData[] outfitData;
 
         private static ChaDefault ThisOutfitData;
+        public static string SelectByPeriod = "";
 
         static OutfitDecider()
         {
@@ -77,16 +78,30 @@ namespace CosplayParty
             for (int sets = 0, setslen = Constants.GameCoordinateSize; sets < setslen; sets++)
             {
                 var order = Settings.SpecificCategories[sets].Value;
+#if KKS
+                if (sets == 0)
+                {
+                    // 私服は時間帯別選択優先 
+                    if (SelectByPeriod != "")
+                    {
+                        order = SelectByPeriod;
+                        Settings.Logger.LogDebug("code for set 0: " + order);
+                    }
+                }
+#endif
                 if (order=="" && Settings.RandomizeDresscode.Value)
                 {
                     // ランダムカテゴリから選択 
                     order = folders[UnityEngine.Random.Range(0, folders.Count)];
-				}
 
+                    Settings.Logger.LogDebug("code randomized: " + order);
+                }
+
+                var dir = path;
                 var f2 = f1;
                 if (order != "")
                 {
-                    var dir = path + sep + order;
+                    dir += sep + order;
                     f2 = f1.SelectSubFolder(dir);
                     if (f2 == null)
                     {
@@ -125,6 +140,7 @@ namespace CosplayParty
                     }
 #endif
 
+                Settings.Logger.LogDebug($"for {sets}, select from: " + dir);
 #if KK
                 var cards = f2.GetAvailableCards("kk");
 #elif KKS

@@ -8,13 +8,66 @@ namespace CosplayParty
     {
         protected override void OnPeriodChange(Cycle.Type period)
         {
+            var changing = false;
+
+            switch (Settings.UpdateFrequency.Value)
+            {
+                case OutfitUpdate.EveryPeriod:
+                    changing = true;
 #if KK
-            if (period == Cycle.Type.Morning && Settings.UpdateFrequency.Value == OutfitUpdate.Daily || Settings.UpdateFrequency.Value == OutfitUpdate.EveryPeriod && (period == Cycle.Type.StaffTime || period == Cycle.Type.AfterSchool || Cycle.Type.MyHouse == period))
-#elif KKS
-            if (period == Cycle.Type.Morning && Settings.UpdateFrequency.Value == OutfitUpdate.Daily || Settings.UpdateFrequency.Value == OutfitUpdate.EveryPeriod)
+                    // 元実装の条件 趣旨不明(バグ?) 
+                    switch (period)
+                    {
+                        case Cycle.Type.AfterSchool:
+                        case Cycle.Type.StaffTime:
+                        case Cycle.Type.MyHouse:
+                            //changing = true;
+                            break;
+
+                        default:
+                            //changing = false;
+                            break;
+                    }
 #endif
+                    break;
+
+                case OutfitUpdate.Daily:
+                    if(period == Cycle.Type.Morning) changing = true;
+                    break;
+            }
+
+
+            if(changing)
             {
                 OutfitDecider.ResetDecider();
+
+                // 時間帯別設定 
+                // 残念ながら、ここに来るのは既にコーデセット抽出が済んだ後 
+                // 暫定措置として、1つ前のperiodで設定しとく 
+#if KKS
+                switch (period)
+                {
+                    case Cycle.Type.WakeUp:
+                        OutfitDecider.SelectByPeriod = Settings.SpecificCategoriesByPeriod[0].Value;
+                        break;
+                    case Cycle.Type.Morning:
+                        OutfitDecider.SelectByPeriod = Settings.SpecificCategoriesByPeriod[1].Value;
+                        break;
+                    case Cycle.Type.Daytime:
+                        OutfitDecider.SelectByPeriod = Settings.SpecificCategoriesByPeriod[2].Value;
+                        break;
+                    case Cycle.Type.Evening:
+                        OutfitDecider.SelectByPeriod = Settings.SpecificCategoriesByPeriod[3].Value;
+                        break;
+                    case Cycle.Type.GotoMyHouse:
+                        OutfitDecider.SelectByPeriod = Settings.SpecificCategoriesByPeriod[4].Value;
+                        break;
+                    default:
+                        OutfitDecider.SelectByPeriod = "";
+                        break;
+                }
+#endif
+                Settings.Logger.LogDebug($"set for {period}: " + OutfitDecider.SelectByPeriod);
             }
             foreach (var item in CharaEvent.ChaDefaults)
             {

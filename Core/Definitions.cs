@@ -282,6 +282,15 @@ namespace CosplayParty
 #endif
         public static readonly int GameCoordinateSize = DefaultSpecificCategories.Length;
 
+#if KKS
+        public static string[] DefaultSpecificCategoriesByPeriod = new string[] {
+            "", // morning
+            "", // daytime
+            "", // evening
+            "", // night
+        };
+#endif
+
         private class PluginCheckData
         {
             public string GUID;
