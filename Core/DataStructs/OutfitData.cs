@@ -101,26 +101,26 @@ namespace CosplayParty
             if (filter.Angry)
             {
                 filter.Angry = UnityEngine.Random.Range(0, 101) <= Settings.AngrySpecialOutfitRatio.Value;
-                Settings.Logger.LogDebug($"Random: for angry {filter.Angry} ({Settings.AngrySpecialOutfitRatio.Value}%)");
+                //Settings.Logger.LogDebug($"Random: for angry {filter.Angry} ({Settings.AngrySpecialOutfitRatio.Value}%)");
             }
 #endif
             if (filter.Lewd)
             {
                 filter.Lewd = UnityEngine.Random.Range(0, 101) <= Settings.LewdSpecialOutfitRatio.Value;
-                Settings.Logger.LogDebug($"Random: for lewd {filter.Lewd} ({Settings.LewdSpecialOutfitRatio.Value}%)");
+                //Settings.Logger.LogDebug($"Random: for lewd {filter.Lewd} ({Settings.LewdSpecialOutfitRatio.Value}%)");
             }
 
             var applicable = Outfits_Per_State.Where(x => Filter(x, filter));
             if (filter.Angry && applicable.Count() < 1)
             {
-                Settings.Logger.LogDebug("Angry coord not found; retry without it");
+                //Settings.Logger.LogDebug("Angry coord not found; retry without it");
                 // 候補なければAngryを外して試す 
                 filter.Angry = false;
                 applicable = Outfits_Per_State.Where(x => Filter(x, filter));
             }
             if (filter.Lewd && applicable.Count() < 1)
             {
-                Settings.Logger.LogDebug("Lewd coord not found; retry without it");
+                //Settings.Logger.LogDebug("Lewd coord not found; retry without it");
                 // 候補なければLewdを外して試す 
                 filter.Lewd = false;
                 applicable = Outfits_Per_State.Where(x => Filter(x, filter));
