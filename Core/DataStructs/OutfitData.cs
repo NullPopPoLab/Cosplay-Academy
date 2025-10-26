@@ -13,7 +13,6 @@ namespace CosplayParty
         private bool Part_of_Set = false;
         public List<CardData> Outfits_Per_State = new List<CardData>();
         private CardData Match_Outfit_Paths = null;
-        public static bool Anger = false;
 
         public OutfitData()
         {
@@ -43,7 +42,11 @@ namespace CosplayParty
             Part_of_Set = IsSet;
         }
 
+#if true
+        public CardData Random(SpecialCoordFilter filter)
+#else
         public CardData Random(bool Match, bool unrestricted, int personality = 0, ChaFileParameter.Attribute trait = null, int breast = 0, int height = 0)//get any random outfit according to experience
+#endif
         {
 
 #if false // 廃止予定 
@@ -90,8 +93,39 @@ namespace CosplayParty
                 if (ac < 1) return null;
                 return applicable.ElementAt(UnityEngine.Random.Range(0, ac));
             }
-#endif
             var applicable = Outfits_Per_State.Where(x => Filter(x, unrestricted, personality, trait, breast, height));
+#endif
+
+// Angry,Lewdランダム適用 
+#if KK
+            if (filter.Angry)
+            {
+                filter.Angry = UnityEngine.Random.Range(0, 101) <= Settings.AngrySpecialOutfitRatio.Value;
+                Settings.Logger.LogDebug($"Random: for angry {filter.Angry} ({Settings.AngrySpecialOutfitRatio.Value}%)");
+            }
+#endif
+            if (filter.Lewd)
+            {
+                filter.Lewd = UnityEngine.Random.Range(0, 101) <= Settings.LewdSpecialOutfitRatio.Value;
+                Settings.Logger.LogDebug($"Random: for lewd {filter.Lewd} ({Settings.LewdSpecialOutfitRatio.Value}%)");
+            }
+
+            var applicable = Outfits_Per_State.Where(x => Filter(x, filter));
+            if (filter.Angry && applicable.Count() < 1)
+            {
+                Settings.Logger.LogDebug("Angry coord not found; retry without it");
+                // 候補なければAngryを外して試す 
+                filter.Angry = false;
+                applicable = Outfits_Per_State.Where(x => Filter(x, filter));
+            }
+            if (filter.Lewd && applicable.Count() < 1)
+            {
+                Settings.Logger.LogDebug("Lewd coord not found; retry without it");
+                // 候補なければLewdを外して試す 
+                filter.Lewd = false;
+                applicable = Outfits_Per_State.Where(x => Filter(x, filter));
+            }
+
             var ac = applicable.Count();
             if (ac < 1) return null;
             return applicable.ElementAt(UnityEngine.Random.Range(0, ac));
@@ -161,7 +195,7 @@ namespace CosplayParty
 
         public void Coordinate()//set a random outfit to coordinate for non-set items when coordinated
         {
-                Match_Outfit_Paths = Random(false, true);
+                Match_Outfit_Paths = Random(new SpecialCoordFilter());
         }
 
         public bool IsSet()
@@ -169,8 +203,21 @@ namespace CosplayParty
             return Part_of_Set;
         }
 
-        private bool Filter(CardData check, bool unrestricted, int personality, ChaFileParameter.Attribute trait, int breast, int height)
+        private bool Filter(CardData check, SpecialCoordFilter filter)
         {
+            //Settings.Logger.LogDebug($"Filter: {check.Filepath}; {check.SpecialType}");
+
+            // Angry,Lewd 状態不一致不可 
+            // (候補なければfalseに変更して再度試される) 
+            if (filter.Angry != check.SpecialType.Angry) return false;
+            if (filter.Lewd != check.SpecialType.Lewd) return false;
+
+            // 身長制限 
+            if (check.SpecialType.DenyByHeiget[filter.HeightGrade]) return false;
+            // バスト制限 
+            if (check.SpecialType.DenyByBust[filter.BustGrade]) return false;
+
+#if false
             if (!check.DefinedData)
             {
                 return true;
@@ -200,6 +247,7 @@ namespace CosplayParty
             {
                 return false;
             }
+#endif
 
             return true;
         }

@@ -31,7 +31,6 @@ namespace CosplayParty
             {
                 item.processed = false;
             }
-            OutfitData.Anger = false;
             Get_Outfits();
             foreach (var data in outfitData)
             {
@@ -91,7 +90,8 @@ namespace CosplayParty
 #endif
                 if (order=="" && Settings.RandomizeDresscode.Value)
                 {
-                    // ランダムカテゴリから選択 
+                    // 直下のフォルダをランダム選択 
+                    // コーデは、そのフォルダ内から選択される 
                     order = folders[UnityEngine.Random.Range(0, folders.Count)];
 
                     Settings.Logger.LogDebug("code randomized: " + order);
@@ -142,12 +142,14 @@ namespace CosplayParty
 
                 Settings.Logger.LogDebug($"for {sets}, select from: " + dir);
 #if KK
-                var cards = f2.GetAvailableCards("kk");
+                var attr = "kk";
 #elif KKS
-                var cards = f2.GetAvailableCards("kks");
+                var attr = "kks";
 #else
-                var cards = f2.GetAvailableCards("none");
+                var attr = "";
 #endif
+                var cards = f2.GetAvailableCards(attr);
+
                 //Settings.Logger.LogDebug($"{cards.Count} available cards found");
 #if false // 廃止予定 
                 cards.AddRange(Grabber(sets));
@@ -186,17 +188,11 @@ namespace CosplayParty
             var person = ThisOutfitData.heroine;
             if (person != null)
             {
-#if KK
-                OutfitData.Anger = person.isAnger;
-#endif
-            }
-            else
-            {
-                OutfitData.Anger = false;
+                Settings.Logger.LogDebug($"Decision for {name}");
             }
             for (var i = 0; i < Constants.GameCoordinateSize; i++)
             {
-                Generalized_Assignment(false, i, i);
+                Generalized_Assignment(i, i);
             }
 
             SpecialProcess();
@@ -206,23 +202,30 @@ namespace CosplayParty
             }
         }
 
-        private static void Generalized_Assignment(bool uniform_type, int Path_Num, int Data_Num)
+        private static void Generalized_Assignment(int Path_Num, int Data_Num)
         {
             var status = ThisOutfitData.ChaControl.fileParam;
-            var bust = ThisOutfitData.ChaControl.GetBustCategory();
-            var height = ThisOutfitData.ChaControl.GetHeightCategory();
             var src = outfitData[Data_Num];
             if (src == null)
             {
-                //Settings.Logger.LogWarning($"Generalized_Assignment: uniform={uniform_type} pn={Path_Num} dn={Data_Num} is null");
+                //Settings.Logger.LogWarning($"Generalized_Assignment: outfitData{Data_Num} is null");
                 ThisOutfitData.alloutfitpaths[Path_Num] = null;
                 return;
             }
 
-            //Settings.Logger.LogDebug($"Generalized_Assignment: uniform={uniform_type} pn={Path_Num} dn={Data_Num} bust={bust} height={height}");
+            var filter = new SpecialCoordFilter();
+#if KK
+            filter.Angry = ThisOutfitData.heroine.isAnger;
+#endif
+            filter.Lewd= ThisOutfitData.heroine.lewdness >= 100;
+            filter.HeightGrade = ThisOutfitData.ChaControl.GetHeightCategory();
+            filter.BustGrade = ThisOutfitData.ChaControl.GetBustCategory();
 
-            ThisOutfitData.alloutfitpaths[Path_Num] = src.Random(uniform_type, false, status.personality, status.attribute, bust, height);
+            //Settings.Logger.LogDebug($"Generalized_Assignment: num:{Path_Num}:{Data_Num} filter:{filter}");
+
+            ThisOutfitData.alloutfitpaths[Path_Num] = src.Random(filter);
 #if false // 廃止予定 
+            ThisOutfitData.alloutfitpaths[Path_Num] = src.Random(uniform_type, false, status.personality, status.attribute, bust, height);
             switch (Settings.H_EXP_Choice.Value)
             {
                 case Hexp.RandConstant:

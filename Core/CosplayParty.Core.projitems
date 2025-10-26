@@ -16,6 +16,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)DataStructs\CardData.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DataStructs\MainFolderStruct.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DataStructs\HFolderStruct.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DataStructs\SpecialCoordFilter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Settings\ConfigClass.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DataStructs\DataStruct.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Definitions.cs" />

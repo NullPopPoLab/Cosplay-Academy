@@ -20,27 +20,35 @@ namespace CosplayParty
         [Key("_cards")]
         public List<CardData> Cards { get; private set; }
 
+        [Key("_specialType")]
+        public SpecialCoordType SpecialType;
 
         private string _foldername = "";
 
 
         [SerializationConstructor]
-        public FolderData(string _folder, List<CardData> _cards, List<FolderData> _sub)
+        public FolderData(string _folder, List<CardData> _cards, List<FolderData> _sub, SpecialCoordType special)
         {
             FolderPath = _folder;
             Subfolderdata = _sub;
             Cards = _cards;
+            SpecialType = special;
             _init();
             CleanUp();
             SetParent();
+            //Settings.Logger.LogDebug($"FolderData: {_folder}; {SpecialType}");
         }
 
-        public FolderData(string path)
+        public FolderData(string path, FolderData parent=null)
         {
             Subfolderdata = new List<FolderData>();
             Cards = new List<CardData>();
             FolderPath = path;
+            SpecialType = (parent == null) ? SpecialCoordType.Create() : parent.SpecialType.Clone();
             _init();
+            SpecialType.Apply(_foldername);
+            //Settings.Logger.LogDebug($"FolderData: {_foldername} <= {FolderPath}; {SpecialType}");
+
             var sep = Path.DirectorySeparatorChar;
             if (Directory.Exists(path))
             {
@@ -52,8 +60,6 @@ namespace CosplayParty
         private void _init(){
             var di = new DirectoryInfo(FolderPath);
             _foldername = (di == null) ? "" : di.Name;
-
-            //Settings.Logger.LogDebug($"{_foldername} <= {FolderPath}");
         }
 
         public int GetCardCount()
@@ -66,20 +72,50 @@ namespace CosplayParty
             return n;
         }
 
+        private bool _isAvailableName(bool sub = false)
+        {
+            // 空の名前はサブフォルダ検索の機会を与える 
+            if (_foldername.Length < 1) return true;
+
+            // 明示的に設定された場合のみ先頭の _ を許可 
+            if (sub && _foldername[0] == '_') return false;
+
+            if (_foldername[0] == '!')
+            {
+                switch (_foldername)
+                {
+                    // KK/KKS専用フィルタ 
+#if KK
+                    case "!kk": return true;
+#endif
+#if KKS
+                    case "!kks": return true;
+#endif
+
+                    // 状態別フィルタは OutfitDate.Filter() で適用 
+                    case "!anger":
+                    case "!lewd":
+                    case "!short":
+                    case "!not_short":
+                    case "!tall":
+                    case "!not_tall":
+                    case "!flat":
+                    case "!not_flat":
+                    case "!busty":
+                    case "!not_busty":
+                        return true;
+
+                    default: return false;
+                }
+
+            }
+
+            return true;
+        }
+
         public int GetAvailableCardCount(string attr,bool sub = false)
         {
-            if (!sub) { }
-            else if (_foldername.Length > 0)
-            {
-                if (_foldername[0] == '_') return 0;
-                if (_foldername[0] == '!')
-                {
-                    if (_foldername != "!" + attr) return 0;
-                }
-            }
-            else{
-                Settings.Logger.LogWarning($"no name by {FolderPath}");
-            }
+            if (!_isAvailableName(sub)) return 0;
 
             var n = Cards.Count;
             for (var i = 0; i < Subfolderdata.Count; ++i)
@@ -141,7 +177,7 @@ namespace CosplayParty
                 {
                     continue;
                 }
-                Subfolderdata.Add(new FolderData(subfolder));
+                Subfolderdata.Add(new FolderData(subfolder,this));
             }
         }
 
@@ -181,25 +217,13 @@ namespace CosplayParty
         public List<CardData> GetAvailableCards(string attr, bool sub = false)
         {
             var list = new List<CardData>();
-
-            if (!sub) { }
-            else if (_foldername.Length > 0){
-                if (_foldername[0] == '_') return list;
-                if (_foldername[0] == '!')
-                {
-                    if (_foldername != "!" + attr) return list;
-                }
-            }
-            else
-            {
-                Settings.Logger.LogWarning($"no name by {FolderPath}");
-            }
+            if (!_isAvailableName(sub)) return list;
 
             list.AddRange(Cards);
 
             foreach (var item in Subfolderdata)
             {
-                list.AddRange(item.GetAvailableCards(attr,true));
+                list.AddRange(item.GetAvailableCards(attr, true));
             }
 
             return list;

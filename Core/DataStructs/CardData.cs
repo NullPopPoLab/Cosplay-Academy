@@ -15,6 +15,7 @@ namespace CosplayParty
         [Key("_name")]
         public string Filepath { get; private set; }
 
+#if false
         [Key("_defined")]
         public bool DefinedData { get; private set; }
 
@@ -37,6 +38,10 @@ namespace CosplayParty
 
         [Key("_allow")]
         public ChaFileParameter.Attribute Allowed { get; private set; }
+#endif
+
+        [Key("_specialType")]
+        public SpecialCoordType SpecialType { get; private set; }
 
         internal CardData(string _name) { Filepath = _name; }
 
@@ -44,6 +49,9 @@ namespace CosplayParty
         {
             Filepath = _name;
             SetParent(parent);
+
+            SpecialType = parent.SpecialType;
+            //Settings.Logger.LogDebug($"CardData: {parent.FolderPath}/{_name}; {SpecialType}");
         }
 
 #if false // Additional_Card_Info 廃止予定 
@@ -241,13 +249,17 @@ namespace CosplayParty
 #endif
 
         [SerializationConstructor]
-#if KK
+#if true
+        public CardData(string _name, SpecialCoordType spct)
+#elif KK
         public CardData(string _name, bool _defined, Dictionary<int, int> _personality, ChaFileParameter.Attribute _restrict, ChaFileParameter.Attribute _allow, bool[] _height, bool[] _breast)
 #elif KKS
         public CardData(string _name, bool _defined, Dictionary<int, int> _personality, ChaFileParameter.Attribute _restrict, ChaFileParameter.Attribute _allow, bool[] _height, bool[] _breast, Dictionary<int, int> _interest)
 #endif
         {
             Filepath = _name;
+            SpecialType = spct;
+#if false
             DefinedData = _defined;
             RestrictedPersonality = _personality;
             Restricted = _restrict;
@@ -257,6 +269,7 @@ namespace CosplayParty
 #if KK
 #elif KKS
             RestrictedInterest = _interest;
+#endif
 #endif
         }
 

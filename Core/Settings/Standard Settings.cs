@@ -61,7 +61,11 @@ namespace CosplayParty
 #endif
 
         public static ConfigEntry<bool> RandomizeDresscode { get; private set; }
-        
+        public static ConfigEntry<int> LewdSpecialOutfitRatio { get; private set; }
+#if KK
+        public static ConfigEntry<int> AngrySpecialOutfitRatio { get; private set; }
+#endif
+
 //        public static ConfigEntry<bool> AccKeeper { get; private set; }
 //        public static ConfigEntry<bool> RandomizeUnderwear { get; private set; }
 //        public static ConfigEntry<bool> RandomizeUnderwearOnly { get; private set; }
@@ -92,6 +96,10 @@ namespace CosplayParty
 
             //Main Game
             RandomizeDresscode = Config.Bind("Main Game", "Randomize Dresscode", true, "When empty Dresscode setting, select a folder in 1st layer");
+            LewdSpecialOutfitRatio = Config.Bind("Main Game", "Lewd Special Outfit Ratio", 50, "Percentage of selecting from !lewd folder when max lewdness");
+#if KK
+            AngrySpecialOutfitRatio = Config.Bind("Main Game", "Anger Special Outfit Ratio", 50, "Percentage of selecting from !anger folder when in angry");
+#endif
 
 //            AccKeeper = Config.Bind("Main Game", "On Coordinate Load Support", true, new ConfigDescription("Keep head and tail accessories\nUsed for characters who have accessory based hair and avoid them going bald\nWorks best with a Cosplay Party Ready character marked by Additional Card Info", null, new ConfigurationManagerAttributes() { IsAdvanced = true, Order = 4 }));
 //            RandomizeUnderwear = Config.Bind("Main Game", "Randomize Underwear", false, "Loads underwear from Underwear folder (Does not apply to Gym/Swim outfits)\nWill probably break some outfits that depends on underwear outside of Gym/Swim if not set up with Additional Card Info plugin");
