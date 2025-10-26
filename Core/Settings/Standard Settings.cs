@@ -61,12 +61,13 @@ namespace CosplayParty
 #endif
 
         public static ConfigEntry<bool> RandomizeDresscode { get; private set; }
-        public static ConfigEntry<int> LewdSpecialOutfitRatio { get; private set; }
+        public static ConfigEntry<int> SpecialOutfitRatio_Lewd { get; private set; }
 #if KK
-        public static ConfigEntry<int> AngrySpecialOutfitRatio { get; private set; }
+        public static ConfigEntry<int> SpecialOutfitRatio_Angry { get; private set; }
+        public static ConfigEntry<int> SpecialOutfitRatio_Teacher { get; private set; }
 #endif
 
-//        public static ConfigEntry<bool> AccKeeper { get; private set; }
+        //        public static ConfigEntry<bool> AccKeeper { get; private set; }
         public static ConfigEntry<bool> RandomizeUnderwear { get; private set; }
 //        public static ConfigEntry<bool> RandomizeUnderwearOnly { get; private set; }
 //        public static ConfigEntry<bool> ForceRandomUnderwear { get; private set; }
@@ -96,12 +97,13 @@ namespace CosplayParty
 
             //Main Game
             RandomizeDresscode = Config.Bind("Main Game", "Randomize Dresscode", true, "When empty Dresscode setting, select a folder in 1st layer");
-            LewdSpecialOutfitRatio = Config.Bind("Main Game", "Lewd Special Outfit Ratio", 50, new ConfigDescription("Percentage of selecting from !lewd folder when max lewdness", new AcceptableValueRange<int>(0,100)));
+            SpecialOutfitRatio_Lewd = Config.Bind("Main Game", "Special Outfit Ratio for Lewd", 100, new ConfigDescription("Percentage of selecting from !lewd folder when max lewdness", new AcceptableValueRange<int>(0,100)));
 #if KK
-            AngrySpecialOutfitRatio = Config.Bind("Main Game", "Anger Special Outfit Ratio", 50, new ConfigDescription("Percentage of selecting from !anger folder when in angry", new AcceptableValueRange<int>(0, 100)));
+            SpecialOutfitRatio_Angry = Config.Bind("Main Game", "Special Outfit Ratio for Angry", 100, new ConfigDescription("Percentage of selecting from !angry folder when in angry", new AcceptableValueRange<int>(0, 100)));
+            SpecialOutfitRatio_Teacher = Config.Bind("Main Game", "Special Outfit Ratio for Teacher", 100, new ConfigDescription("Percentage of selecting from !teacher folder for teacher", new AcceptableValueRange<int>(0, 100)));
 #endif
 
-//            AccKeeper = Config.Bind("Main Game", "On Coordinate Load Support", true, new ConfigDescription("Keep head and tail accessories\nUsed for characters who have accessory based hair and avoid them going bald\nWorks best with a Cosplay Party Ready character marked by Additional Card Info", null, new ConfigurationManagerAttributes() { IsAdvanced = true, Order = 4 }));
+            //            AccKeeper = Config.Bind("Main Game", "On Coordinate Load Support", true, new ConfigDescription("Keep head and tail accessories\nUsed for characters who have accessory based hair and avoid them going bald\nWorks best with a Cosplay Party Ready character marked by Additional Card Info", null, new ConfigurationManagerAttributes() { IsAdvanced = true, Order = 4 }));
             RandomizeUnderwear = Config.Bind("Main Game", "Randomize Underwear", false, "Loads underwear from Underwear folder (Does not apply to Gym/Swim outfits)\nWill probably break some outfits that depends on underwear outside of Gym/Swim if not set up with Additional Card Info plugin");
 //            RandomizeUnderwearOnly = Config.Bind("Main Game", "Randomize Underwear Only", false, "Its an option");
 //            ForceRandomUnderwear = Config.Bind("Main Game", "Force underwear parts", false, "Doesn't force Top or Bottom");

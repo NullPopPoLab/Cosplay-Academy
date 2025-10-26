@@ -96,6 +96,7 @@ namespace CosplayParty
                     // 状態別フィルタは OutfitDate.Filter() で適用 
                     case "!anger":
                     case "!lewd":
+                    case "!teacher":
                     case "!short":
                     case "!not_short":
                     case "!tall":

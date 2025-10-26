@@ -9,12 +9,13 @@ namespace CosplayParty
     {
         public bool Angry;
         public bool Lewd;
+        public bool Teacher;
         public int HeightGrade;
         public int BustGrade;
 
         public override string ToString()
         {
-            return $"angry={Angry} lewd={Lewd} height={HeightGrade} bust={BustGrade}";
+            return $"angry={Angry} lewd={Lewd} teacher={Teacher} height={HeightGrade} bust={BustGrade}";
         }
     }
 
@@ -26,6 +27,8 @@ namespace CosplayParty
         public bool Angry;
         [Key("_lewd")]
         public bool Lewd;
+        [Key("_teacher")]
+        public bool Teacher;
         [Key("_denyByHeight")]
         public bool[] DenyByHeiget;
         [Key("_denyByBust")]
@@ -36,6 +39,7 @@ namespace CosplayParty
             var t = new SpecialCoordType();
             t.Angry = false;
             t.Lewd = false;
+            t.Teacher = false;
             t.DenyByHeiget = new bool[3];
             t.DenyByBust = new bool[3];
             return t;
@@ -46,6 +50,7 @@ namespace CosplayParty
             var t = new SpecialCoordType();
             t.Angry = Angry;
             t.Lewd = Lewd;
+            t.Teacher = Teacher;
             t.DenyByHeiget = new bool[3] { DenyByHeiget[0], DenyByHeiget[1], DenyByHeiget[2] };
             t.DenyByBust = new bool[3] { DenyByBust[0], DenyByBust[1], DenyByBust[2] };
             return t;
@@ -61,6 +66,10 @@ namespace CosplayParty
 
                 case "!lewd":
                     Lewd = true;
+                    break;
+
+                case "!teacher":
+                    Teacher = true;
                     break;
 
                 case "!short":

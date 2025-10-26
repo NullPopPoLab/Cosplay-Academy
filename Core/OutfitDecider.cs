@@ -216,12 +216,13 @@ namespace CosplayParty
             var filter = new SpecialCoordFilter();
 #if KK
             filter.Angry = ThisOutfitData.heroine.isAnger;
+            filter.Teacher = !ThisOutfitData.heroine.isStaff; // なんか思ってたんと逆らしい。 
 #endif
             filter.Lewd= ThisOutfitData.heroine.lewdness >= 100;
             filter.HeightGrade = ThisOutfitData.ChaControl.GetHeightCategory();
             filter.BustGrade = ThisOutfitData.ChaControl.GetBustCategory();
 
-            //Settings.Logger.LogDebug($"Generalized_Assignment: num:{Path_Num}:{Data_Num} filter:{filter}");
+            Settings.Logger.LogDebug($"Generalized_Assignment: num:{Path_Num}:{Data_Num} filter:{filter}");
 
             ThisOutfitData.alloutfitpaths[Path_Num] = src.Random(filter);
 #if false // 廃止予定 

@@ -100,13 +100,18 @@ namespace CosplayParty
 #if KK
             if (filter.Angry)
             {
-                filter.Angry = UnityEngine.Random.Range(0, 101) <= Settings.AngrySpecialOutfitRatio.Value;
+                filter.Angry = UnityEngine.Random.Range(0, 101) <= Settings.SpecialOutfitRatio_Angry.Value;
                 //Settings.Logger.LogDebug($"Random: for angry {filter.Angry} ({Settings.AngrySpecialOutfitRatio.Value}%)");
+            }
+            if (filter.Teacher)
+            {
+                filter.Teacher = UnityEngine.Random.Range(0, 101) <= Settings.SpecialOutfitRatio_Teacher.Value;
+                //Settings.Logger.LogDebug($"Random: for teacher {filter.teacher} ({Settings.TeacherSpecialOutfitRatio.Value}%)");
             }
 #endif
             if (filter.Lewd)
             {
-                filter.Lewd = UnityEngine.Random.Range(0, 101) <= Settings.LewdSpecialOutfitRatio.Value;
+                filter.Lewd = UnityEngine.Random.Range(0, 101) <= Settings.SpecialOutfitRatio_Lewd.Value;
                 //Settings.Logger.LogDebug($"Random: for lewd {filter.Lewd} ({Settings.LewdSpecialOutfitRatio.Value}%)");
             }
 
@@ -123,6 +128,13 @@ namespace CosplayParty
                 //Settings.Logger.LogDebug("Lewd coord not found; retry without it");
                 // 候補なければLewdを外して試す 
                 filter.Lewd = false;
+                applicable = Outfits_Per_State.Where(x => Filter(x, filter));
+            }
+            if (filter.Teacher && applicable.Count() < 1)
+            {
+                //Settings.Logger.LogDebug("Teacher coord not found; retry without it");
+                // 候補なければTeacherを外して試す 
+                filter.Teacher = false;
                 applicable = Outfits_Per_State.Where(x => Filter(x, filter));
             }
 
@@ -207,10 +219,11 @@ namespace CosplayParty
         {
             //Settings.Logger.LogDebug($"Filter: {check.Filepath}; {check.SpecialType}");
 
-            // Angry,Lewd 状態不一致不可 
+            // 状態不一致不可 
             // (候補なければfalseに変更して再度試される) 
             if (filter.Angry != check.SpecialType.Angry) return false;
             if (filter.Lewd != check.SpecialType.Lewd) return false;
+            if (filter.Teacher != check.SpecialType.Teacher) return false;
 
             // 身長制限 
             if (check.SpecialType.DenyByHeiget[filter.HeightGrade]) return false;
