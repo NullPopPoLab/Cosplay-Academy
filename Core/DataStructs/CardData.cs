@@ -250,7 +250,7 @@ namespace CosplayParty
 
         [SerializationConstructor]
 #if true
-        public CardData(string _name, SpecialCoordType spct)
+        public CardData(string _name, SpecialCoordType _specialType)
 #elif KK
         public CardData(string _name, bool _defined, Dictionary<int, int> _personality, ChaFileParameter.Attribute _restrict, ChaFileParameter.Attribute _allow, bool[] _height, bool[] _breast)
 #elif KKS
@@ -258,7 +258,7 @@ namespace CosplayParty
 #endif
         {
             Filepath = _name;
-            SpecialType = spct;
+            SpecialType = _specialType;
 #if false
             DefinedData = _defined;
             RestrictedPersonality = _personality;

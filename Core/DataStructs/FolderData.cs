@@ -23,16 +23,17 @@ namespace CosplayParty
         [Key("_specialType")]
         public SpecialCoordType SpecialType;
 
+        [IgnoreMember]
         private string _foldername = "";
 
 
         [SerializationConstructor]
-        public FolderData(string _folder, List<CardData> _cards, List<FolderData> _sub, SpecialCoordType special)
+        public FolderData(string _folder, List<CardData> _cards, List<FolderData> _sub, SpecialCoordType _specialType)
         {
             FolderPath = _folder;
             Subfolderdata = _sub;
             Cards = _cards;
-            SpecialType = special;
+            SpecialType = _specialType;
             _init();
             CleanUp();
             SetParent();
