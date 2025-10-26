@@ -63,10 +63,10 @@ namespace CosplayParty
         public static ConfigEntry<bool> RandomizeDresscode { get; private set; }
         
 //        public static ConfigEntry<bool> AccKeeper { get; private set; }
-        public static ConfigEntry<bool> RandomizeUnderwear { get; private set; }
+//        public static ConfigEntry<bool> RandomizeUnderwear { get; private set; }
 //        public static ConfigEntry<bool> RandomizeUnderwearOnly { get; private set; }
 //        public static ConfigEntry<bool> ForceRandomUnderwear { get; private set; }
-        public static ConfigEntry<bool> UnderwearStates { get; private set; }
+//        public static ConfigEntry<bool> UnderwearStates { get; private set; }
         public static ConfigEntry<bool> ExtremeAccKeeper { get; private set; }
 
         private static ConfigEntry<string> Lastversion { get; set; }
@@ -94,7 +94,7 @@ namespace CosplayParty
             RandomizeDresscode = Config.Bind("Main Game", "Randomize Dresscode", true, "When empty Dresscode setting, select a folder in 1st layer");
 
 //            AccKeeper = Config.Bind("Main Game", "On Coordinate Load Support", true, new ConfigDescription("Keep head and tail accessories\nUsed for characters who have accessory based hair and avoid them going bald\nWorks best with a Cosplay Party Ready character marked by Additional Card Info", null, new ConfigurationManagerAttributes() { IsAdvanced = true, Order = 4 }));
-            RandomizeUnderwear = Config.Bind("Main Game", "Randomize Underwear", false, "Loads underwear from Underwear folder (Does not apply to Gym/Swim outfits)\nWill probably break some outfits that depends on underwear outside of Gym/Swim if not set up with Additional Card Info plugin");
+//            RandomizeUnderwear = Config.Bind("Main Game", "Randomize Underwear", false, "Loads underwear from Underwear folder (Does not apply to Gym/Swim outfits)\nWill probably break some outfits that depends on underwear outside of Gym/Swim if not set up with Additional Card Info plugin");
 //            RandomizeUnderwearOnly = Config.Bind("Main Game", "Randomize Underwear Only", false, "Its an option");
 //            ForceRandomUnderwear = Config.Bind("Main Game", "Force underwear parts", false, "Doesn't force Top or Bottom");
 
@@ -136,7 +136,7 @@ namespace CosplayParty
             ChangeOutfit = Config.Bind("Maker", "Change generated outfit", false, new ConfigDescription("Pick new coordinates in maker", null, AdvancedConfig));
 
             //Other Mods
-            UnderwearStates = Config.Bind("Other Mods", "Randomize Underwear: ACC_States", true, "Attempts to write logic for AccStateSync and Accessory states to use.");
+//            UnderwearStates = Config.Bind("Other Mods", "Randomize Underwear: ACC_States", true, "Attempts to write logic for AccStateSync and Accessory states to use.");
 
             CoordinatePath = Config.Bind("Coordinate Location", "Path to coordinate folder", new DirectoryInfo(UserData.Path).FullName + "Coordinate" + sep + "CosplayParty", "Coordinate Path");
             UpdateFolders = Config.Bind("Coordinate Location", "Folder Options", false, new ConfigDescription("", null, new ConfigurationManagerAttributes() { HideSettingName = true, HideDefaultButton = true, CustomDrawer = new Action<ConfigEntryBase>(FolderUpdateGUI) }));
