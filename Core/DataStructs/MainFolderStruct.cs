@@ -34,6 +34,7 @@ namespace CosplayParty
             return result;
         }
 
+#if false
         public List<CardData> GetAvailableCards(string attr)
         {
             var result = new List<CardData>();
@@ -43,6 +44,7 @@ namespace CosplayParty
             }
             return result;
         }
+#endif
 
         public List<FolderData> GetAllFolders()
         {
@@ -71,9 +73,10 @@ namespace CosplayParty
             for (var i = 0; i < FolderData.Count; ++i)
             {
                 var f2 = FolderData[i];
-                var p2 = f2.FolderPath;
+                var p2 = f2.FullDir;
                 var l1 = path.Length;
                 var l2 = p2.Length;
+                //Settings.Logger.LogDebug($"FolderStruct.SelectSubFolder: {path} : {p2}");
                 if (l1 < l2) continue;
                 if (p2 == path) return f2;
                 if (p2 + sep != path.Substring(0, l2) + sep) continue;
@@ -90,9 +93,13 @@ namespace CosplayParty
             var subdirectories = DirectoryFinder.Grab_Folder_Directories(path, true);
             foreach (var directory in subdirectories)
             {
-                if (FolderData.Any(x => x.FolderPath == directory))
+                if (FolderData.Any(x => x.FullDir == directory))
+                {
+                    //Settings.Logger.LogDebug($"FolderStruct.Populate: skip {directory}");
                     continue;
+                }
 
+                //Settings.Logger.LogDebug($"FolderStruct.Populate: add {directory}");
                 FolderData.Add(new FolderData(directory));
             }
         }
@@ -110,19 +117,13 @@ namespace CosplayParty
             for (var j = FolderData.Count - 1; j > -1; j--)
             {
                 var folder = FolderData[j];
-                if (!Directory.Exists(folder.FolderPath))
+                if (!Directory.Exists(folder.FullDir))
                 {
                     FolderData.RemoveAt(j);
                     continue;
                 }
                 folder.CleanUp();
-#if KK
-                if (folder.GetAvailableCardCount("kk") < 1)
-#elif KKS
-                if (folder.GetAvailableCardCount("kks") < 1)
-#else
-                if (folder.GetAvailableCardCount("none") < 1)
-#endif
+                if (folder.GetCardCount() < 1)
                 {
                     FolderData.RemoveAt(j);
                 }

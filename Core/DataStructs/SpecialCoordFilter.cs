@@ -7,6 +7,7 @@ namespace CosplayParty
 {
     public struct SpecialCoordFilter
     {
+        public string SubDir;
         public bool Angry;
         public bool Lewd;
         public bool Teacher;
@@ -23,6 +24,8 @@ namespace CosplayParty
     [MessagePackObject]
     public struct SpecialCoordType
     {
+        [Key("_deny")]
+        public bool Never;
         [Key("_angry")]
         public bool Angry;
         [Key("_lewd")]
@@ -37,6 +40,7 @@ namespace CosplayParty
         public static SpecialCoordType Create()
         {
             var t = new SpecialCoordType();
+            t.Never = false;
             t.Angry = false;
             t.Lewd = false;
             t.Teacher = false;
@@ -48,6 +52,7 @@ namespace CosplayParty
         public SpecialCoordType Clone()
         {
             var t = new SpecialCoordType();
+            t.Never = Never;
             t.Angry = Angry;
             t.Lewd = Lewd;
             t.Teacher = Teacher;
@@ -60,6 +65,23 @@ namespace CosplayParty
         {
             switch (name)
             {
+                case "!kk":
+#if KK
+                    Never = false;
+#else
+                    Never = true;
+#endif
+                    break;
+
+                case "!kks":
+#if KKS
+                    Never = false;
+#else
+                    Never = true;
+#endif
+                    break;
+
+
                 case "!angry":
                     Angry = true;
                     break;
@@ -112,7 +134,7 @@ namespace CosplayParty
 
         public override string ToString()
         {
-            return $"angry={Angry} lewd={Lewd} height=[{DenyByHeiget[0]},{DenyByHeiget[1]},{DenyByHeiget[2]}] bust=[{DenyByBust[0]},{DenyByBust[1]},{DenyByBust[2]}]";
+            return $"never={Never} angry={Angry} lewd={Lewd} height=[{DenyByHeiget[0]},{DenyByHeiget[1]},{DenyByHeiget[2]}] bust=[{DenyByBust[0]},{DenyByBust[1]},{DenyByBust[2]}]";
         }
     }
 }

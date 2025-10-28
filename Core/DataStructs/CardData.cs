@@ -51,7 +51,7 @@ namespace CosplayParty
             SetParent(parent);
 
             SpecialType = parent.SpecialType;
-            //Settings.Logger.LogDebug($"CardData: {parent.FolderPath}/{_name}; {SpecialType}");
+            //Settings.Logger.LogDebug($"CardData: {parent.SubDir}/{_name}; {SpecialType}");
         }
 
 #if false // Additional_Card_Info 廃止予定 
@@ -282,7 +282,7 @@ namespace CosplayParty
         {
             if (ParentFolder == null)
                 return Filepath;
-            return ParentFolder.FolderPath + Path.DirectorySeparatorChar + Filepath;
+            return ParentFolder.FullDir + Path.DirectorySeparatorChar + Filepath;
         }
     }
 }

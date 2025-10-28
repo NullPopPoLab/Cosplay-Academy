@@ -96,7 +96,7 @@ namespace CosplayParty
             var applicable = Outfits_Per_State.Where(x => Filter(x, unrestricted, personality, trait, breast, height));
 #endif
 
-// Angry,Lewdランダム適用 
+            // Angry,Lewdランダム適用 
 #if KK
             if (filter.Angry)
             {
@@ -217,7 +217,11 @@ namespace CosplayParty
 
         private bool Filter(CardData check, SpecialCoordFilter filter)
         {
-            //Settings.Logger.LogDebug($"Filter: {check.Filepath}; {check.SpecialType}");
+            var dirname = (check.ParentFolder == null) ? "" : check.ParentFolder.SubDir;
+            //Settings.Logger.LogDebug($"Filter: {dirname}/{check.Filepath}; {check.SpecialType}");
+
+            // 常に不可 
+            if (check.SpecialType.Never) return false;
 
             // 状態不一致不可 
             // (候補なければfalseに変更して再度試される) 
@@ -229,6 +233,10 @@ namespace CosplayParty
             if (check.SpecialType.DenyByHeiget[filter.HeightGrade]) return false;
             // バスト制限 
             if (check.SpecialType.DenyByBust[filter.BustGrade]) return false;
+
+            // 対象フォルダ外 
+            if (filter.SubDir.Length > dirname.Length) return false;
+            if (filter.SubDir != dirname.Substring(0, filter.SubDir.Length)) return false;
 
 #if false
             if (!check.DefinedData)
