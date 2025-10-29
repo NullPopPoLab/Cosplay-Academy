@@ -34,9 +34,12 @@ namespace CosplayParty
         private static readonly Role[] roleSet = new Role[Constants.CoordinateRoles.Length];
 
         private static readonly Filter[] filterBySets = new Filter[Constants.GameCoordinateSize];
+#if KKS
+        private static readonly Filter[] filterByPeriods = new Filter[Settings.SpecificCategoriesByPeriod.Length];
+#endif
 
         private static ChaDefault ThisOutfitData;
-        public static string SelectByPeriod = "";
+        public static int SelectByPeriod = -1;
 
         static OutfitDecider()
         {
@@ -44,11 +47,16 @@ namespace CosplayParty
             {
                 roleSet[role] = new Role();
             }
-            for (var seta = 0; seta < filterBySets.Length; ++seta)
+            for (var sets = 0; sets < filterBySets.Length; ++sets)
             {
-                filterBySets[seta] = new Filter();
+                filterBySets[sets] = new Filter();
             }
-//            Get_Outfits();
+#if KKS
+            for (var period = 0; period < filterByPeriods.Length; ++period)
+            {
+                filterByPeriods[period] = new Filter();
+            }
+#endif
         }
 
         public static void ResetOutfits()
@@ -131,7 +139,7 @@ namespace CosplayParty
 
                 var folders = rt.FolderList;
                 ft.Order = Settings.SpecificCategories[sets].Value;
-#if KKS
+#if KKS && false // ここでは無効 
                 if (sets == 0)
                 {
                     // 私服は時間帯別選択優先 
@@ -166,7 +174,20 @@ namespace CosplayParty
 
                 Settings.Logger.LogDebug($"for {sets}, select from: " + dir);
             }
+
+#if KKS
+            // 時間帯別設定 
+            for (int period=0;period< filterByPeriods.Length; ++period)
+            {
+                var rt = roleSet[0];
+                var ft = filterByPeriods[period];
+                var folders = rt.FolderList;
+                ft.Order = Settings.SpecificCategoriesByPeriod[period].Value;
+                ft.Folder=(ft.Order=="")?null: rt.BaseFolder.SelectSubFolder(rt.BaseDir + sep + ft.Order);
+            }
+#endif
         }
+
 #if false // 廃止予定 
         private static List<CardData> Grabber(int sets)
         {
@@ -217,6 +238,11 @@ namespace CosplayParty
             if (ThisOutfitData.heroine == null)
             {
                 // フリーH らしい 
+                if (!Settings.EnableInFreeH.Value)
+                {
+                    ThisOutfitData.alloutfitpaths[sets] = null;
+                    return;
+                }
             }
 
             var status = ThisOutfitData.ChaControl.fileParam;
@@ -232,8 +258,16 @@ namespace CosplayParty
             if (ft == null)
             {
                 Settings.Logger.LogWarning($"Generalized_Assignment: FilterBySets[{sets}] is null");
+                ThisOutfitData.alloutfitpaths[sets] = null;
                 return;
             }
+#if KKS
+            if (sets==0 && SelectByPeriod >=0 && filterByPeriods[SelectByPeriod].Folder!=null)
+            {
+                // 時間帯別設定優先 
+                ft = filterByPeriods[SelectByPeriod];
+            }
+#endif
 
             var filter = new SpecialCoordFilter();
             filter.SubDir = ft.Order;

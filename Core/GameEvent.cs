@@ -48,22 +48,22 @@ namespace CosplayParty
                 switch (period)
                 {
                     case Cycle.Type.Morning:
-                        OutfitDecider.SelectByPeriod = Settings.SpecificCategoriesByPeriod[0].Value;
+                        OutfitDecider.SelectByPeriod = 0;
                         break;
                     case Cycle.Type.Daytime:
-                        OutfitDecider.SelectByPeriod = Settings.SpecificCategoriesByPeriod[1].Value;
+                        OutfitDecider.SelectByPeriod = 1;
                         break;
                     case Cycle.Type.Evening:
-                        OutfitDecider.SelectByPeriod = Settings.SpecificCategoriesByPeriod[2].Value;
+                        OutfitDecider.SelectByPeriod = 2;
                         break;
                     case Cycle.Type.Night:
-                        OutfitDecider.SelectByPeriod = Settings.SpecificCategoriesByPeriod[3].Value;
+                        OutfitDecider.SelectByPeriod = 3;
                         break;
                     case Cycle.Type.MyHouse:
-                        OutfitDecider.SelectByPeriod = Settings.SpecificCategoriesByPeriod[4].Value;
+                        OutfitDecider.SelectByPeriod = 4;
                         break;
                     default:
-                        OutfitDecider.SelectByPeriod = "";
+                        OutfitDecider.SelectByPeriod = -1;
                         break;
                 }
 #endif

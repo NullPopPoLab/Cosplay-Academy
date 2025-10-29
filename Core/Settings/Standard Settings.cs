@@ -61,6 +61,8 @@ namespace CosplayParty
 #endif
 
         public static ConfigEntry<bool> RandomizeDresscode { get; private set; }
+        public static ConfigEntry<bool> EnableInFreeH { get; private set; }
+
         public static ConfigEntry<int> SpecialOutfitRatio_Lewd { get; private set; }
 #if KK
         public static ConfigEntry<int> SpecialOutfitRatio_Angry { get; private set; }
@@ -112,6 +114,8 @@ namespace CosplayParty
 #if KK
             SundayDate = Config.Bind("Story Mode", "Sunday Date Special", true, "Date will wear something different on Sunday, not really useful unless Update Frequency is not daily/period ");
 #endif
+            //FreeH
+            EnableInFreeH = Config.Bind("Free H", "Enable in Free H", false, "Rondomize enable in free H.");
 
             //Cache
             UpdateCache = Config.Bind("Cache", "Update Cache Buttons", false, new ConfigDescription("", null, new ConfigurationManagerAttributes() { HideSettingName = true, HideDefaultButton = true, CustomDrawer = new Action<ConfigEntryBase>(UpdateCacheData) }));
