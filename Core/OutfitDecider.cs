@@ -53,6 +53,9 @@ namespace CosplayParty
 
         public static void ResetOutfits()
         {
+            Settings.Logger.LogDebug("ResetOutfits()");
+
+
             for (var role = 0; role < roleSet.Length; ++role)
             {
                 roleSet[role].Clear();
@@ -63,19 +66,12 @@ namespace CosplayParty
 
         public static void ResetDecider()
         {
-#if false
-            for (var role = 0; role < roleSet.Length; ++role)
-            {
-                roleSet[role].Clear();
-            }
-#endif
+            Settings.Logger.LogDebug("ResetDecider()");
+
             foreach (var item in CharaEvent.ChaDefaults)
             {
                 item.processed = false;
             }
-#if false
-            Get_Outfits();
-#endif
 
             for (var role = 0; role < roleSet.Length; ++role)
             {
@@ -218,6 +214,11 @@ namespace CosplayParty
 
         private static void Generalized_Assignment(int sets)
         {
+            if (ThisOutfitData.heroine == null)
+            {
+                // フリーH らしい 
+            }
+
             var status = ThisOutfitData.ChaControl.fileParam;
             var src = roleSet[0].CoordSet;
             if (src == null)
@@ -228,15 +229,23 @@ namespace CosplayParty
             }
 
             var ft = filterBySets[sets];
+            if (ft == null)
+            {
+                Settings.Logger.LogWarning($"Generalized_Assignment: FilterBySets[{sets}] is null");
+                return;
+            }
 
             var filter = new SpecialCoordFilter();
             filter.SubDir = ft.Order;
             filter.Unexclude = (ft.Folder == null) ? 0 : ft.Folder.SpecialType.Excluded;
+            if (ThisOutfitData.heroine != null)
+            {
 #if KK
-            filter.Angry = ThisOutfitData.heroine.isAnger;
-            filter.Teacher = !ThisOutfitData.heroine.isStaff; // なんか思ってたんと逆らしい。 
+                filter.Angry = ThisOutfitData.heroine.isAnger;
+                filter.Teacher = ThisOutfitData.heroine.isTeacher;
 #endif
-            filter.Lewd = ThisOutfitData.heroine.lewdness >= 100;
+                filter.Lewd = ThisOutfitData.heroine.HExperience == SaveData.Heroine.HExperienceKind.淫乱;
+            }
             filter.HeightGrade = ThisOutfitData.ChaControl.GetHeightCategory();
             filter.BustGrade = ThisOutfitData.ChaControl.GetBustCategory();
 

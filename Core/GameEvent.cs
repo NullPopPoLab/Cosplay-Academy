@@ -15,17 +15,19 @@ namespace CosplayParty
                 case OutfitUpdate.EveryPeriod:
                     changing = true;
 #if KK
-                    // 元実装の条件 趣旨不明(バグ?) 
+                    // 幕間会話シーンでの変更指定 
                     switch (period)
                     {
-                        case Cycle.Type.AfterSchool:
+                        case Cycle.Type.Morning:
+                        case Cycle.Type.LunchTime:
                         case Cycle.Type.StaffTime:
-                        case Cycle.Type.MyHouse:
-                            //changing = true;
+                        case Cycle.Type.AfterSchool:
+                        case Cycle.Type.GotoMyHouse:
+                            changing = true;
                             break;
 
                         default:
-                            //changing = false;
+                            changing = false;
                             break;
                     }
 #endif
@@ -42,24 +44,22 @@ namespace CosplayParty
                 OutfitDecider.ResetDecider();
 
                 // 時間帯別設定 
-                // 残念ながら、ここに来るのは既にコーデセット抽出が済んだ後 
-                // 暫定措置として、1つ前のperiodで設定しとく 
 #if KKS
                 switch (period)
                 {
-                    case Cycle.Type.WakeUp:
+                    case Cycle.Type.Morning:
                         OutfitDecider.SelectByPeriod = Settings.SpecificCategoriesByPeriod[0].Value;
                         break;
-                    case Cycle.Type.Morning:
+                    case Cycle.Type.Daytime:
                         OutfitDecider.SelectByPeriod = Settings.SpecificCategoriesByPeriod[1].Value;
                         break;
-                    case Cycle.Type.Daytime:
+                    case Cycle.Type.Evening:
                         OutfitDecider.SelectByPeriod = Settings.SpecificCategoriesByPeriod[2].Value;
                         break;
-                    case Cycle.Type.Evening:
+                    case Cycle.Type.Night:
                         OutfitDecider.SelectByPeriod = Settings.SpecificCategoriesByPeriod[3].Value;
                         break;
-                    case Cycle.Type.GotoMyHouse:
+                    case Cycle.Type.MyHouse:
                         OutfitDecider.SelectByPeriod = Settings.SpecificCategoriesByPeriod[4].Value;
                         break;
                     default:
@@ -69,6 +69,10 @@ namespace CosplayParty
 #endif
                 Settings.Logger.LogDebug($"set for {period}: " + OutfitDecider.SelectByPeriod);
             }
+            else{
+                Settings.Logger.LogDebug($"skip at {period}");
+            }
+
             foreach (var item in CharaEvent.ChaDefaults)
             {
                 item.Changestate = true;
@@ -98,6 +102,8 @@ namespace CosplayParty
         }
         protected override void OnStartH(MonoBehaviour proc, HFlag hFlag, bool vr)
         {
+            Settings.Logger.LogDebug("OnStartH");
+
             if (Settings.EnableSetting.Value)
             {
                 foreach (var Heroine in hFlag.lstHeroine)
@@ -112,6 +118,8 @@ namespace CosplayParty
 
         protected override void OnEndH(MonoBehaviour proc, HFlag hFlag, bool vr)
         {
+            Settings.Logger.LogDebug("OnEndH");
+
             if (hFlag.isFreeH)
             {
                 CharaEvent.ChaDefaults.Clear();
