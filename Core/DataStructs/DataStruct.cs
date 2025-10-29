@@ -87,7 +87,7 @@ namespace CosplayParty
             if (CreateFile())
             {
                 LoadFullStructure(Settings.CoordinatePath.Value);
-                OutfitDecider.ResetDecider();
+                OutfitDecider.ResetOutfits();
 #if TRACE
                 Stopwatch.Stop();
                 Settings.Logger.LogDebug($"Took {Stopwatch.ElapsedMilliseconds} ms to create data");
@@ -96,7 +96,7 @@ namespace CosplayParty
             }
             ReadFile();
 
-            OutfitDecider.ResetDecider();
+            OutfitDecider.ResetOutfits();
 #if TRACE
             Stopwatch.Stop();
             Settings.Logger.LogDebug($"Took {Stopwatch.ElapsedMilliseconds} ms to load data");

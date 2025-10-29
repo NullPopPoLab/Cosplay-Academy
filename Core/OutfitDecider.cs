@@ -48,20 +48,34 @@ namespace CosplayParty
             {
                 filterBySets[seta] = new Filter();
             }
+//            Get_Outfits();
         }
 
-        public static void ResetDecider()
+        public static void ResetOutfits()
         {
             for (var role = 0; role < roleSet.Length; ++role)
             {
                 roleSet[role].Clear();
             }
+            Get_Outfits();
+            ResetDecider();
+        }
 
+        public static void ResetDecider()
+        {
+#if false
+            for (var role = 0; role < roleSet.Length; ++role)
+            {
+                roleSet[role].Clear();
+            }
+#endif
             foreach (var item in CharaEvent.ChaDefaults)
             {
                 item.processed = false;
             }
+#if false
             Get_Outfits();
+#endif
 
             for (var role = 0; role < roleSet.Length; ++role)
             {

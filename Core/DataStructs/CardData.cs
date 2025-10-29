@@ -250,6 +250,7 @@ namespace CosplayParty
             RestrictedInterest = _interest;
 #endif
 #endif
+            //Settings.Logger.LogDebug($"CardData: {_name}; {SpecialType}");
         }
 
         internal void SetParent(FolderData _parent)
