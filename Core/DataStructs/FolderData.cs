@@ -166,7 +166,7 @@ namespace CosplayParty
                 var p2 = f2.FullDir;
                 var l1 = path.Length;
                 var l2 = p2.Length;
-                Settings.Logger.LogDebug($"FolderData.SelectSubFolder: {path} : {p2}");
+                //Settings.Logger.LogDebug($"FolderData.SelectSubFolder: {path} : {p2}");
                 if (l1 < l2) continue;
                 if (p2 == path) return f2;
                 if (p2 + sep != path.Substring(0, l2) + sep) continue;
