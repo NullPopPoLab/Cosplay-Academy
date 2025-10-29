@@ -27,17 +27,6 @@ namespace CosplayParty
         [Key("_interest")]
         public Dictionary<int, int> RestrictedInterest { get; private set; }
 #endif
-        [Key("_height")]
-        public bool[] Height_Restriction { get; private set; }
-
-        [Key("_breast")]
-        public bool[] Breastsize_Restriction { get; private set; }
-
-        [Key("_restrict")]
-        public ChaFileParameter.Attribute Restricted { get; private set; }
-
-        [Key("_allow")]
-        public ChaFileParameter.Attribute Allowed { get; private set; }
 #endif
 
         [Key("_specialType")]
@@ -249,23 +238,13 @@ namespace CosplayParty
 #endif
 
         [SerializationConstructor]
-#if true
         public CardData(string _name, SpecialCoordType _specialType)
-#elif KK
-        public CardData(string _name, bool _defined, Dictionary<int, int> _personality, ChaFileParameter.Attribute _restrict, ChaFileParameter.Attribute _allow, bool[] _height, bool[] _breast)
-#elif KKS
-        public CardData(string _name, bool _defined, Dictionary<int, int> _personality, ChaFileParameter.Attribute _restrict, ChaFileParameter.Attribute _allow, bool[] _height, bool[] _breast, Dictionary<int, int> _interest)
-#endif
         {
             Filepath = _name;
             SpecialType = _specialType;
 #if false
             DefinedData = _defined;
             RestrictedPersonality = _personality;
-            Restricted = _restrict;
-            Allowed = _allow;
-            Height_Restriction = _height;
-            Breastsize_Restriction = _breast;
 #if KK
 #elif KKS
             RestrictedInterest = _interest;

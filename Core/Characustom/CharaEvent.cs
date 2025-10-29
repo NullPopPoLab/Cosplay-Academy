@@ -143,7 +143,7 @@ namespace CosplayParty
                     heroine = heroine
                 };
 #if DEBUG
-                Settings.Logger.LogDebug($"Heroine null? {heroine == null}\nInH? {inH}");
+                //Settings.Logger.LogDebug($"Heroine null? {heroine == null}\nInH? {inH}");
 #endif
                 ChaDefaults.Add(ThisOutfitData);
                 return;

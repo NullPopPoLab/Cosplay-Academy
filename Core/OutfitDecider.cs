@@ -9,19 +9,21 @@ namespace CosplayParty
         //! フィルタリング情報 
         public class Filter
         {
-            public string Order;
+            public string Order = "";
+            public FolderData Folder;
         }
 
         //! コーデ役割別情報 
         public class Role
         {
-            public string BaseDir;
+            public string BaseDir = "";
             public OutfitData CoordSet = new OutfitData();
             public List<string> FolderList = new List<string>();
             public FolderData BaseFolder;
 
             public void Clear()
             {
+                BaseDir = "";
                 CoordSet.Clear();
                 FolderList.Clear();
                 BaseFolder = null;
@@ -42,9 +44,9 @@ namespace CosplayParty
             {
                 roleSet[role] = new Role();
             }
-            for (var cch = 0; cch < filterBySets.Length; ++cch)
+            for (var seta = 0; seta < filterBySets.Length; ++seta)
             {
-                filterBySets[cch] = new Filter();
+                filterBySets[seta] = new Filter();
             }
         }
 
@@ -69,24 +71,25 @@ namespace CosplayParty
 
         public static void Get_Outfits()
         {
+
             if (DataStruct.DefaultFolder.Count < 1)
             {
-                Settings.Logger.LogDebug($"{Settings.CoordinatePath.Value} not found");
+                Settings.Logger.LogWarning($"{Settings.CoordinatePath.Value} not found");
                 return;
             }
-            var f0 = DataStruct.DefaultFolder[0];
 
             // カード情報いちいちコーデチャネル別にスキャンし直さなくてもいいよね 
             // そんなわけでフィルタリングも後回し 
             for (var role = 0; role < roleSet.Length; ++role)
             {
+                var f0 = DataStruct.DefaultFolder[role];
                 var rt = roleSet[role];
                 rt.BaseDir = Settings.CoordinatePath.Value + Constants.CoordinateRoles[role];
                 var plen = rt.BaseDir.Length;
                 rt.BaseFolder = f0.SelectSubFolder(rt.BaseDir);
                 if (rt.BaseFolder == null)
                 {
-                    Settings.Logger.LogDebug($"{rt.BaseDir} not found");
+                    Settings.Logger.LogWarning($"{rt.BaseDir} not found");
                     continue;
                 }
 
@@ -102,7 +105,7 @@ namespace CosplayParty
 
                 var cards = rt.BaseFolder.GetAllCards();
 
-                //Settings.Logger.LogDebug($"{cards.Count} available cards found");
+                //Settings.Logger.LogDebug($"{cards.Count} cards found");
 #if false // 廃止予定 
                 cards.AddRange(Grabber(sets));
 #endif
@@ -139,54 +142,24 @@ namespace CosplayParty
                 }
 
                 var dir = rt.BaseDir;
-                var f2 = rt.BaseFolder;
+                ft.Folder = rt.BaseFolder;
                 if (ft.Order != "")
                 {
                     dir += sep + ft.Order;
-                    f2 = f2.SelectSubFolder(dir);
-                    if (f2 == null)
+                    ft.Folder = ft.Folder.SelectSubFolder(dir);
+                    if (ft.Folder == null)
                     {
                         Settings.Logger.LogDebug($"Selected folder for set {sets}: {dir}: -- not found --");
                         continue;
                     }
                 }
 
-#if false // 廃止予定 
-                if (outfitData[sets].IsSet())//Skip set items
-                    {
-                    Settings.Logger.LogDebug($"already set {sets}");
-                    continue;
-                    }
-
-                    if (Settings.EnableSets.Value)
-                    {
-                        var AllFolder = f2.GetAllFolders();
-
-                        Grabber(ref AllFolder, sets, 0);
-
-                        if (AllFolder.Count == 0)
-                        {
-                            outfitData[sets].Insert(new List<CardData>(), false);
-                            continue;
-                        }
-
-                        var selectedfolder = AllFolder[UnityEngine.Random.Range(0, AllFolder.Count)];
-
-                        Settings.Logger.LogDebug($"Selected folder for set {sets}: {order}: {selectedfolder.FolderPath}");
-
-                        var isset = false;
-
-                        outfitData[sets].Insert(selectedfolder.GetAllCards(), isset);
-                        continue;
-                    }
-#endif
-
                 Settings.Logger.LogDebug($"for {sets}, select from: " + dir);
             }
         }
+#if false // 廃止予定 
         private static List<CardData> Grabber(int sets)
         {
-#if false // 廃止予定 
 #if KK
             if (Settings.GrabSwimsuits.Value && sets == 4)
             {
@@ -204,10 +177,10 @@ namespace CosplayParty
                 return DataStruct.DefaultFolder[8].FolderData[hstate].GetAllCards();
             }
 #endif
-#endif
 
             return new List<CardData>();
         }
+#endif
 
         public static void Decision(string name, ChaDefault cha)
         {
@@ -235,13 +208,16 @@ namespace CosplayParty
             var src = roleSet[0].CoordSet;
             if (src == null)
             {
-                //Settings.Logger.LogWarning($"Generalized_Assignment: outfitData{Data_Num} is null");
+                Settings.Logger.LogWarning($"Generalized_Assignment: CoordSet is null");
                 ThisOutfitData.alloutfitpaths[sets] = null;
                 return;
             }
 
+            var ft = filterBySets[sets];
+
             var filter = new SpecialCoordFilter();
-            filter.SubDir = filterBySets[sets].Order;
+            filter.SubDir = ft.Order;
+            filter.Unexclude = (ft.Folder == null) ? 0 : ft.Folder.SpecialType.Excluded;
 #if KK
             filter.Angry = ThisOutfitData.heroine.isAnger;
             filter.Teacher = !ThisOutfitData.heroine.isStaff; // なんか思ってたんと逆らしい。 

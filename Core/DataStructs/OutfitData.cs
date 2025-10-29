@@ -42,13 +42,10 @@ namespace CosplayParty
             Part_of_Set = IsSet;
         }
 
-#if true
         public CardData Random(SpecialCoordFilter filter)
-#else
-        public CardData Random(bool Match, bool unrestricted, int personality = 0, ChaFileParameter.Attribute trait = null, int breast = 0, int height = 0)//get any random outfit according to experience
-#endif
         {
-
+            try
+            {
 #if false // 廃止予定 
             if (Match)
             {
@@ -96,7 +93,7 @@ namespace CosplayParty
             var applicable = Outfits_Per_State.Where(x => Filter(x, unrestricted, personality, trait, breast, height));
 #endif
 
-            // Angry,Lewdランダム適用 
+                // Angry,Lewdランダム適用 
 #if KK
             if (filter.Angry)
             {
@@ -109,39 +106,45 @@ namespace CosplayParty
                 //Settings.Logger.LogDebug($"Random: for teacher {filter.teacher} ({Settings.TeacherSpecialOutfitRatio.Value}%)");
             }
 #endif
-            if (filter.Lewd)
-            {
-                filter.Lewd = UnityEngine.Random.Range(0, 101) <= Settings.SpecialOutfitRatio_Lewd.Value;
-                //Settings.Logger.LogDebug($"Random: for lewd {filter.Lewd} ({Settings.LewdSpecialOutfitRatio.Value}%)");
-            }
+                if (filter.Lewd)
+                {
+                    filter.Lewd = UnityEngine.Random.Range(0, 101) <= Settings.SpecialOutfitRatio_Lewd.Value;
+                    //Settings.Logger.LogDebug($"Random: for lewd {filter.Lewd} ({Settings.LewdSpecialOutfitRatio.Value}%)");
+                }
 
-            var applicable = Outfits_Per_State.Where(x => Filter(x, filter));
-            if (filter.Angry && applicable.Count() < 1)
-            {
-                //Settings.Logger.LogDebug("Angry coord not found; retry without it");
-                // 候補なければAngryを外して試す 
-                filter.Angry = false;
-                applicable = Outfits_Per_State.Where(x => Filter(x, filter));
-            }
-            if (filter.Lewd && applicable.Count() < 1)
-            {
-                //Settings.Logger.LogDebug("Lewd coord not found; retry without it");
-                // 候補なければLewdを外して試す 
-                filter.Lewd = false;
-                applicable = Outfits_Per_State.Where(x => Filter(x, filter));
-            }
-            if (filter.Teacher && applicable.Count() < 1)
-            {
-                //Settings.Logger.LogDebug("Teacher coord not found; retry without it");
-                // 候補なければTeacherを外して試す 
-                filter.Teacher = false;
-                applicable = Outfits_Per_State.Where(x => Filter(x, filter));
-            }
+                var applicable = Outfits_Per_State.Where(x => Filter(x, filter));
+                if (filter.Angry && applicable.Count() < 1)
+                {
+                    //Settings.Logger.LogDebug("Angry coord not found; retry without it");
+                    // 候補なければAngryを外して試す 
+                    filter.Angry = false;
+                    applicable = Outfits_Per_State.Where(x => Filter(x, filter));
+                }
+                if (filter.Lewd && applicable.Count() < 1)
+                {
+                    //Settings.Logger.LogDebug("Lewd coord not found; retry without it");
+                    // 候補なければLewdを外して試す 
+                    filter.Lewd = false;
+                    applicable = Outfits_Per_State.Where(x => Filter(x, filter));
+                }
+                if (filter.Teacher && applicable.Count() < 1)
+                {
+                    //Settings.Logger.LogDebug("Teacher coord not found; retry without it");
+                    // 候補なければTeacherを外して試す 
+                    filter.Teacher = false;
+                    applicable = Outfits_Per_State.Where(x => Filter(x, filter));
+                }
 
-            var ac = applicable.Count();
-            if (ac < 1) return null;
-            return applicable.ElementAt(UnityEngine.Random.Range(0, ac));
-        }
+                var ac = applicable.Count();
+                if (ac < 1) return null;
+                return applicable.ElementAt(UnityEngine.Random.Range(0, ac));
+            }
+            catch (Exception e)
+            {
+                Settings.Logger.LogDebug($"Random: "+e);
+                return null;
+            }
+            }
 
 #if false // 廃止予定 
         public CardData RandomSet(bool Match, bool unrestricted, int personality = 0, ChaFileParameter.Attribute trait = null, int breast = 0, int height = 0)//if set exists add its items to pool along with any coordinated outfit and other choices
@@ -207,7 +210,7 @@ namespace CosplayParty
 
         public void Coordinate()//set a random outfit to coordinate for non-set items when coordinated
         {
-                Match_Outfit_Paths = Random(new SpecialCoordFilter());
+                Match_Outfit_Paths = Random(SpecialCoordFilter.Create());
         }
 
         public bool IsSet()
@@ -222,6 +225,8 @@ namespace CosplayParty
 
             // 常に不可 
             if (check.SpecialType.Never) return false;
+            // 指定位置のサブフォルダ除外 
+            if (check.SpecialType.Excluded > filter.Unexclude) return false;
 
             // 状態不一致不可 
             // (候補なければfalseに変更して再度試される) 
@@ -239,11 +244,6 @@ namespace CosplayParty
             if (filter.SubDir != dirname.Substring(0, filter.SubDir.Length)) return false;
 
 #if false
-            if (!check.DefinedData)
-            {
-                return true;
-            }
-
             if (unrestricted)
             {
                 return check.RestrictedPersonality.Count == 0 && check.Restricted.AllFalse() && check.Breastsize_Restriction.All(x => !x) && check.Height_Restriction.All(x => !x);
@@ -253,23 +253,9 @@ namespace CosplayParty
             {
                 return false;
             }
-
-            if (check.Restricted.AnyOverlap(trait))
-            {
-                return false;
-            }
-
-            if (check.Breastsize_Restriction[breast])
-            {
-                return false;
-            }
-
-            if (check.Height_Restriction[height])
-            {
-                return false;
-            }
 #endif
 
+            //Settings.Logger.LogDebug($"Filter: available {dirname}/{check.Filepath}");
             return true;
         }
     }

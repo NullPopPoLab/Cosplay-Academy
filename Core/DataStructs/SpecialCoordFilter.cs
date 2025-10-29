@@ -8,15 +8,23 @@ namespace CosplayParty
     public struct SpecialCoordFilter
     {
         public string SubDir;
+        public int Unexclude;
         public bool Angry;
         public bool Lewd;
         public bool Teacher;
         public int HeightGrade;
         public int BustGrade;
 
+        public static SpecialCoordFilter Create()
+        {
+            var t = new SpecialCoordFilter();
+            t.SubDir = "";
+            return t;
+        }
+
         public override string ToString()
         {
-            return $"angry={Angry} lewd={Lewd} teacher={Teacher} height={HeightGrade} bust={BustGrade}";
+            return $"subdir={SubDir} unexclude={Unexclude} angry={Angry} lewd={Lewd} teacher={Teacher} height={HeightGrade} bust={BustGrade}";
         }
     }
 
@@ -24,7 +32,9 @@ namespace CosplayParty
     [MessagePackObject]
     public struct SpecialCoordType
     {
-        [Key("_deny")]
+        [Key("_excluded")]
+        public int Excluded;
+        [Key("_never")]
         public bool Never;
         [Key("_angry")]
         public bool Angry;
@@ -40,6 +50,7 @@ namespace CosplayParty
         public static SpecialCoordType Create()
         {
             var t = new SpecialCoordType();
+            t.Excluded = 0;
             t.Never = false;
             t.Angry = false;
             t.Lewd = false;
@@ -52,6 +63,7 @@ namespace CosplayParty
         public SpecialCoordType Clone()
         {
             var t = new SpecialCoordType();
+            t.Excluded = Excluded;
             t.Never = Never;
             t.Angry = Angry;
             t.Lewd = Lewd;
@@ -65,18 +77,18 @@ namespace CosplayParty
         {
             switch (name)
             {
+                case "":
+                    Never = true;
+                    break;
+
                 case "!kk":
-#if KK
-                    Never = false;
-#else
+#if !KK
                     Never = true;
 #endif
                     break;
 
                 case "!kks":
-#if KKS
-                    Never = false;
-#else
+#if !KKS
                     Never = true;
 #endif
                     break;
@@ -129,12 +141,20 @@ namespace CosplayParty
                 case "!not_busty":
                     DenyByBust[2] = true;
                     break;
+
+                default:
+                    switch (name[0]){
+                        case '!': case '_':
+                            ++Excluded;
+                            break;
+                    }
+                    break;
             }
         }
 
         public override string ToString()
         {
-            return $"never={Never} angry={Angry} lewd={Lewd} height=[{DenyByHeiget[0]},{DenyByHeiget[1]},{DenyByHeiget[2]}] bust=[{DenyByBust[0]},{DenyByBust[1]},{DenyByBust[2]}]";
+            return $"excluded={Excluded} never={Never} angry={Angry} lewd={Lewd} height=[{DenyByHeiget[0]},{DenyByHeiget[1]},{DenyByHeiget[2]}] bust=[{DenyByBust[0]},{DenyByBust[1]},{DenyByBust[2]}]";
         }
     }
 }

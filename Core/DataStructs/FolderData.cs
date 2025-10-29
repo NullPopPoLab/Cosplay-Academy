@@ -99,62 +99,6 @@ namespace CosplayParty
             return n;
         }
 
-#if false
-        private bool _isAvailableName(bool sub = false)
-        {
-            // 空の名前はサブフォルダ検索の機会を与える 
-            if (_foldername.Length < 1) return true;
-
-            // 明示的に設定された場合のみ先頭の _ を許可 
-            if (sub && _foldername[0] == '_') return false;
-
-            if (_foldername[0] == '!')
-            {
-                switch (_foldername)
-                {
-                    // KK/KKS専用フィルタ 
-#if KK
-                    case "!kk": return true;
-#endif
-#if KKS
-                    case "!kks": return true;
-#endif
-
-                    // 状態別フィルタは OutfitDate.Filter() で適用 
-                    case "!anger":
-                    case "!lewd":
-                    case "!teacher":
-                    case "!short":
-                    case "!not_short":
-                    case "!tall":
-                    case "!not_tall":
-                    case "!flat":
-                    case "!not_flat":
-                    case "!busty":
-                    case "!not_busty":
-                        return true;
-
-                    default: return false;
-                }
-
-            }
-
-            return true;
-        }
-
-        public int GetAvailableCardCount(string attr,bool sub = false)
-        {
-            if (!_isAvailableName(sub)) return 0;
-
-            var n = Cards.Count;
-            for (var i = 0; i < Subfolderdata.Count; ++i)
-            {
-                n += Subfolderdata[i].GetAvailableCardCount(attr, true);
-            }
-            return n;
-        }
-#endif
-
         public void FindCards()
         {
             var files = Directory.GetFiles(FullDir, "*.png");
@@ -222,7 +166,7 @@ namespace CosplayParty
                 var p2 = f2.FullDir;
                 var l1 = path.Length;
                 var l2 = p2.Length;
-                //Settings.Logger.LogDebug($"FolderData.SelectSubFolder: {path} : {p2}");
+                Settings.Logger.LogDebug($"FolderData.SelectSubFolder: {path} : {p2}");
                 if (l1 < l2) continue;
                 if (p2 == path) return f2;
                 if (p2 + sep != path.Substring(0, l2) + sep) continue;
@@ -245,23 +189,6 @@ namespace CosplayParty
 
             return list;
         }
-
-#if false
-        public List<CardData> GetAvailableCards(string attr, bool sub = false)
-        {
-            var list = new List<CardData>();
-            if (!_isAvailableName(sub)) return list;
-
-            list.AddRange(Cards);
-
-            foreach (var item in Subfolderdata)
-            {
-                list.AddRange(item.GetAvailableCards(attr, true));
-            }
-
-            return list;
-        }
-#endif
 
         public void Update()
         {
