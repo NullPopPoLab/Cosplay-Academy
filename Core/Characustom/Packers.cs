@@ -373,7 +373,7 @@ namespace CosplayParty
 
             if (UnderwearSavedData != null)
             {
-                if (KCOX_Version.IsAvailable(ExtendedCharacterData.version))
+                if (KCOX_Version.IsAvailable(UnderwearSavedData.version))
                 {
                     if (UnderwearSavedData.data.TryGetValue("Overlays", out var underbyteArr) && underbyteArr != null)
                     {
@@ -400,7 +400,7 @@ namespace CosplayParty
                     SavedData = ExtendedSave.GetExtendedDataById(ChaControl.chaFile.coordinate[outfitnum], "KCOX");
                     if (SavedData != null)
                     {
-                        if (KCOX_Version.IsAvailable(ExtendedCharacterData.version))
+                        if (KCOX_Version.IsAvailable(SavedData.version))
                         {
                             if (SavedData.data.TryGetValue("Overlays", out var bytes))
                             {
