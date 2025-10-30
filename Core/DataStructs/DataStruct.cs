@@ -19,10 +19,9 @@ namespace CosplayParty
 
 #if false // 廃止予定 
         public static Dictionary<string, FolderStruct> IndividualStructures = new Dictionary<string, FolderStruct>();
-#endif
         public static List<FolderStruct> DefaultFolder => FullStructures.ElementAt(Defaultint).Value;
-
         internal static int Defaultint = 0;
+#endif
 
         public static List<CardData> GetAllCards()
         {

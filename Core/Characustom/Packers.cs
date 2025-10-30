@@ -65,7 +65,7 @@ namespace CosplayParty
 
                 if (!ValidOutfits.ContainsKey(i)) ValidOutfits[i] = false;
 
-                if (!Underwearbools.ContainsKey(i)) Underwearbools[i] = new bool[3];
+                //if (!Underwearbools.ContainsKey(i)) Underwearbools[i] = new bool[3];
 
                 if (!UnderwearProcessed.ContainsKey(i)) UnderwearProcessed[i] = new bool[9];
 

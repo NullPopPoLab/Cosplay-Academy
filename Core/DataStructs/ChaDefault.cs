@@ -17,7 +17,9 @@ namespace CosplayParty
 
         internal Dictionary<int, List<ChaFileAccessory.PartsInfo>> CoordinatePartsQueue = new Dictionary<int, List<ChaFileAccessory.PartsInfo>>();
         internal Dictionary<int, CardData> alloutfitpaths = new Dictionary<int, CardData>();
+        internal Dictionary<int, CardData> allunderwearpaths = new Dictionary<int, CardData>();
         internal readonly Dictionary<int, string> outfitpaths = new Dictionary<int, string>();
+        internal readonly Dictionary<int, string> underwarepaths = new Dictionary<int, string>();
 
         internal int Outfit_Size => ChaControl.chaFile.coordinate.Length;
 
@@ -106,10 +108,25 @@ namespace CosplayParty
             for (var i = 0; i < Constants.GameCoordinateSize; i++)
             {
                 var card = alloutfitpaths[i];
-                if (card == null) continue;
-                outfitpaths[i] = card.GetFullPath();
+                if (card != null)
+                {
+                    outfitpaths[i] = card.GetFullPath();
+                    Settings.Logger.LogDebug($"{(ChaFileDefine.CoordinateType)i} outfit assigning " + outfitpaths[i]);
+                }
+                else
+                {
+                    outfitpaths.Remove(i);
+                }
 
-                Settings.Logger.LogDebug($"{(ChaFileDefine.CoordinateType)i} assigning " + outfitpaths[i]);
+                card = allunderwearpaths[i];
+                if (card != null)
+                {
+                    underwarepaths[i] = card.GetFullPath();
+                    Settings.Logger.LogDebug($"{(ChaFileDefine.CoordinateType)i} underware assigning " + underwarepaths[i]);
+                }
+                else {
+                    underwarepaths.Remove(i);
+                }
             }
 
 #if false // Additional_Card_Info 廃止予定 

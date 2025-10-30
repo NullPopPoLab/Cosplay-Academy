@@ -89,8 +89,9 @@ namespace CosplayParty
 
         public static void Get_Outfits()
         {
+            var f0 = DataStruct.FullStructures[Settings.CoordinatePath.Value];
 
-            if (DataStruct.DefaultFolder.Count < 1)
+            if (f0==null)
             {
                 Settings.Logger.LogWarning($"{Settings.CoordinatePath.Value} not found");
                 return;
@@ -100,11 +101,11 @@ namespace CosplayParty
             // そんなわけでフィルタリングも後回し 
             for (var role = 0; role < roleSet.Length; ++role)
             {
-                var f0 = DataStruct.DefaultFolder[role];
+                var f1 = f0[role];
                 var rt = roleSet[role];
                 rt.BaseDir = Settings.CoordinatePath.Value + Constants.CoordinateRoles[role];
                 var plen = rt.BaseDir.Length;
-                rt.BaseFolder = f0.SelectSubFolder(rt.BaseDir);
+                rt.BaseFolder = f1.SelectSubFolder(rt.BaseDir);
                 if (rt.BaseFolder == null)
                 {
                     Settings.Logger.LogWarning($"{rt.BaseDir} not found");
@@ -123,7 +124,7 @@ namespace CosplayParty
 
                 var cards = rt.BaseFolder.GetAllCards();
 
-                //Settings.Logger.LogDebug($"{cards.Count} cards found");
+                Settings.Logger.LogDebug($"{cards.Count} cards found in {rt.BaseDir}");
 #if false // 廃止予定 
                 cards.AddRange(Grabber(sets));
 #endif
@@ -139,17 +140,6 @@ namespace CosplayParty
 
                 var folders = rt.FolderList;
                 ft.Order = Settings.SpecificCategories[sets].Value;
-#if KKS && false // ここでは無効 
-                if (sets == 0)
-                {
-                    // 私服は時間帯別選択優先 
-                    if (SelectByPeriod != "")
-                    {
-                        ft.Order = SelectByPeriod;
-                        Settings.Logger.LogDebug("code for set 0: " + ft.Order);
-                    }
-                }
-#endif
                 if (ft.Order == "" && Settings.RandomizeDresscode.Value)
                 {
                     // 直下のフォルダをランダム選択 
@@ -241,17 +231,9 @@ namespace CosplayParty
                 if (!Settings.EnableInFreeH.Value)
                 {
                     ThisOutfitData.alloutfitpaths[sets] = null;
+                    ThisOutfitData.allunderwearpaths[sets] = null;
                     return;
                 }
-            }
-
-            var status = ThisOutfitData.ChaControl.fileParam;
-            var src = roleSet[0].CoordSet;
-            if (src == null)
-            {
-                Settings.Logger.LogWarning($"Generalized_Assignment: CoordSet is null");
-                ThisOutfitData.alloutfitpaths[sets] = null;
-                return;
             }
 
             var ft = filterBySets[sets];
@@ -259,6 +241,7 @@ namespace CosplayParty
             {
                 Settings.Logger.LogWarning($"Generalized_Assignment: FilterBySets[{sets}] is null");
                 ThisOutfitData.alloutfitpaths[sets] = null;
+                ThisOutfitData.allunderwearpaths[sets] = null;
                 return;
             }
 #if KKS
@@ -269,9 +252,43 @@ namespace CosplayParty
             }
 #endif
 
+            var status = ThisOutfitData.ChaControl.fileParam;
+            var src0 = roleSet[0].CoordSet;
+            if (src0 == null)
+            {
+                ThisOutfitData.alloutfitpaths[sets] = null;
+                //Settings.Logger.LogWarning($"Generalized_Assignment: outfits CoordSet is null");
+#if false
+                return;
+#endif
+            }
+
+            var src1 = Settings.RandomizeUnderwear.Value ? roleSet[1].CoordSet : null;
+            // 下着除外 
+            switch (sets)
+            {
+#if KK
+                case 3: // 水着 
+                    src1 = null;
+                    break;
+#elif KKS
+                case 1: // 水着 
+                case 3: // 風呂場 
+                    src1 = null;
+                    break;
+#endif
+            }
+            if (src1 == null)
+            {
+                ThisOutfitData.allunderwearpaths[sets] = null;
+                //Settings.Logger.LogWarning($"Generalized_Assignment: underwears CoordSet is null");
+            }
+
             var filter = new SpecialCoordFilter();
             filter.SubDir = ft.Order;
             filter.Unexclude = (ft.Folder == null) ? 0 : ft.Folder.SpecialType.Excluded;
+            filter.HeightGrade = ThisOutfitData.ChaControl.GetHeightCategory();
+            filter.BustGrade = ThisOutfitData.ChaControl.GetBustCategory();
             if (ThisOutfitData.heroine != null)
             {
 #if KK
@@ -280,27 +297,21 @@ namespace CosplayParty
 #endif
                 filter.Lewd = ThisOutfitData.heroine.HExperience == SaveData.Heroine.HExperienceKind.淫乱;
             }
-            filter.HeightGrade = ThisOutfitData.ChaControl.GetHeightCategory();
-            filter.BustGrade = ThisOutfitData.ChaControl.GetBustCategory();
 
             Settings.Logger.LogDebug($"Generalized_Assignment: sets:{sets} filter:{filter}");
 
-            ThisOutfitData.alloutfitpaths[sets] = src.Random(filter);
-#if false // 廃止予定 
-            ThisOutfitData.alloutfitpaths[sets] = src.Random(uniform_type, false, status.personality, status.attribute, bust, height);
-            switch (Settings.H_EXP_Choice.Value)
+            if (src0 != null)
             {
-                case Hexp.RandConstant:
-                    ThisOutfitData.alloutfitpaths[sets] = src.Random(uniform_type, false, status.personality, status.attribute, bust, height);
-                    break;
-                case Hexp.Maximize:
-                    ThisOutfitData.alloutfitpaths[sets] = src.Random(uniform_type, false, status.personality, status.attribute, bust, height);
-                    break;
-                default:
-                    ThisOutfitData.alloutfitpaths[sets] = src.RandomSet(uniform_type, false, status.personality, status.attribute, bust, height);
-                    break;
+                ThisOutfitData.alloutfitpaths[sets] = src0.Random(filter);
+                //Settings.Logger.LogDebug($"Generalized_Assignment: outfit={ThisOutfitData.alloutfitpaths[sets]}");
             }
-#endif
+            if (src1 != null)
+            {
+                filter.SubDir = "";
+                filter.Unexclude = 0;
+                ThisOutfitData.allunderwearpaths[sets] = src1.Random(filter);
+                //Settings.Logger.LogDebug($"Generalized_Assignment: underwear={ThisOutfitData.allunderwearpaths[sets]}");
+            }
         }
     }
 }

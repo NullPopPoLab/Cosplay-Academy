@@ -66,6 +66,9 @@ namespace CosplayParty
             return result;
         }
 
+        //! フォルダ選択 
+        /*! @note SubFolder といいつつフルパス指定で。
+        */
         public FolderData SelectSubFolder(string path)
         {
             var sep = Path.DirectorySeparatorChar;

@@ -26,7 +26,7 @@ namespace CosplayParty
 
         #region Underwear stuff
         public readonly ChaFileCoordinate Underwear = new ChaFileCoordinate();
-        private readonly Dictionary<int, bool[]> Underwearbools = new Dictionary<int, bool[]>(); //0: not bot; 1: notbra; 2: notshorts
+        //private readonly Dictionary<int, bool[]> Underwearbools = new Dictionary<int, bool[]>(); //0: not bot; 1: notbra; 2: notshorts
         private readonly Dictionary<int, List<int>> UnderwearAccessoriesLocations = new Dictionary<int, List<int>>();
         private List<ChaFileAccessory.PartsInfo> Underwear_PartsInfos = new List<ChaFileAccessory.PartsInfo>();
         private readonly Dictionary<int, bool[]> UnderClothingKeep = new Dictionary<int, bool[]>();
@@ -99,12 +99,12 @@ namespace CosplayParty
 
                 if (!MakeUpKeep.ContainsKey(i)) MakeUpKeep[i] = false;
 
-                if (!Underwearbools.ContainsKey(i)) Underwearbools[i] = new bool[3];
+                //if (!Underwearbools.ContainsKey(i)) Underwearbools[i] = new bool[3];
 
                 if (!UnderwearProcessed.ContainsKey(i)) UnderwearProcessed[i] = new bool[9];
 
                 ValidOutfits[i] = ThisOutfitData.outfitpaths.TryGetValue(i, out var path) && path.EndsWith(".png");
-                if (ValidOutfits[i] /*|| Settings.RandomizeUnderwear.Value && Underwear.GetLastErrorCode() == 0 再検討*/)
+                if (ValidOutfits[i] || Settings.RandomizeUnderwear.Value && Underwear.GetLastErrorCode() == 0)
                 {
                     GeneralizedLoad(i, ValidOutfits[i]);
                     if (ValidOutfits[i])
@@ -252,7 +252,7 @@ namespace CosplayParty
             }
             if (UnderClothingKeep == null) UnderClothingKeep = new bool[9];
             if (HairToColor == null) HairToColor = new List<int>();
-            if (Underwearbools[outfitnum] == null) Underwearbools[outfitnum] = new bool[3];
+            //if (Underwearbools[outfitnum] == null) Underwearbools[outfitnum] = new bool[3];
 #if false // Additional_Card_Info 廃止予定 
             for (var i = 0; i < 9; i++)
             {
@@ -299,11 +299,11 @@ namespace CosplayParty
                 parts.Add(p);
             }
 
-#if false // 再検討; 下着可換 
             if (Settings.RandomizeUnderwear.Value && Underwear.GetLastErrorCode() == 0)
             {
-                var underwearbools = Underwearbools[outfitnum];
+                //var underwearbools = Underwearbools[outfitnum];
                 var processed = UnderwearProcessed[outfitnum];
+#if false // 再検討; 下着可換 
                 Underwear_ME_Data.ChangeCoord(outfitnum);
                 var Local_Underwear_ACC_Info = new List<ChaFileAccessory.PartsInfo>(Underwear_PartsInfos);
                 var ObjectTypeList = new List<ObjectType>() { ObjectType.Accessory };
@@ -394,8 +394,8 @@ namespace CosplayParty
                         Additional_Clothing_Process(6, outfitnum, Underwear_ME_Data);
                     }
                 }
-            }
 #endif
+            }
 
             var haircolor = new Color[] { ChaControl.fileHair.parts[1].baseColor, ChaControl.fileHair.parts[1].startColor, ChaControl.fileHair.parts[1].endColor, ChaControl.fileHair.parts[1].outlineColor };
             if (Settings.HairMatch.Value && !MakerAPI.InsideMaker)
