@@ -61,18 +61,20 @@ namespace CosplayParty
 
             for (var i = 0; i < ThisOutfitData.Outfit_Size; i++)
             {
-                if (!UnderwearAccessoriesLocations.ContainsKey(i)) UnderwearAccessoriesLocations[i] = new List<int>();
+                var outfit = ThisOutfitData.Outfits[i];
 
-                if (!ValidOutfits.ContainsKey(i)) ValidOutfits[i] = false;
+                //if (!UnderwearAccessoriesLocations.ContainsKey(i)) UnderwearAccessoriesLocations[i] = new List<int>();
+
+                //if (!ValidOutfits.ContainsKey(i)) ValidOutfits[i] = false;
 
                 //if (!Underwearbools.ContainsKey(i)) Underwearbools[i] = new bool[3];
 
-                if (!UnderwearProcessed.ContainsKey(i)) UnderwearProcessed[i] = new bool[9];
+                //if (!UnderwearProcessed.ContainsKey(i)) UnderwearProcessed[i] = new bool[9];
 
-                if (!UnderClothingKeep.ContainsKey(i)) UnderClothingKeep[i] = new bool[9];
+                //if (!UnderClothingKeep.ContainsKey(i)) UnderClothingKeep[i] = new bool[9];
             }
 
-            if (ValidOutfits.All(x => x.Value == false))//don't do anything if there is nothing to repack
+            if (ThisOutfitData.Outfits.All(x => x.Outer.IsReady == false))//don't do anything if there is nothing to repack
             {
 #if TRACE
                 TimeWatch[2].Stop();
@@ -219,7 +221,7 @@ namespace CosplayParty
             var Start = TimeWatch[3].ElapsedMilliseconds;
             TimeWatch[3].Start();
 #endif
-            if (!ForceALL || ValidOutfits.All(x => x.Value == false))//don't do anything if there is nothing to repack
+            if (!ForceALL || ThisOutfitData.Outfits.All(x => x.Outer.IsReady == false))//don't do anything if there is nothing to repack
             {
 #if TRACE
                 TimeWatch[3].Stop();
@@ -278,11 +280,12 @@ namespace CosplayParty
                         var original = MessagePackSerializer.Deserialize<Dictionary<int, Dictionary<int, Hair.HairSupport.HairAccessoryInfo>>>((byte[])ByteData);
                         for (var i = 0; i < ThisOutfitData.Outfit_Size; i++)
                         {
-                            if (!ValidOutfits[i] || !original.ContainsKey(i))
+                            var outfit = ThisOutfitData.Outfits[i];
+                            if (!outfit.Outer.IsReady || !original.ContainsKey(i))
                             {
                                 continue;
                             }
-                            HairAccessories[i] = original[i];
+                            outfit.HairAccessories = original[i];
                         }
                     }
                 }
@@ -293,7 +296,7 @@ namespace CosplayParty
             }
             var HairPlugin = new PluginData();
 
-            HairPlugin.data.Add("HairAccessories", MessagePackSerializer.Serialize(HairAccessories));
+            HairPlugin.data.Add("HairAccessories", MessagePackSerializer.Serialize(ThisOutfitData.HairAccessoriesPack));
             SetExtendedData("com.deathweasel.bepinex.hairaccessorycustomizer", HairPlugin, ChaControl);
         }
 
@@ -388,13 +391,15 @@ namespace CosplayParty
 
             for (var outfitnum = 0; outfitnum < ThisOutfitData.Outfit_Size; outfitnum++)
             {
-                var underwearproccessed = UnderwearProcessed[outfitnum];
+                var outfit = ThisOutfitData.Outfits[outfitnum];
+
+                var underwearproccessed = outfit.ProcInfo.UnderwearProcessed;
                 if (!Clothdict.ContainsKey((CoordinateType)outfitnum))
                 {
                     Clothdict[(CoordinateType)outfitnum] = new Dictionary<string, ClothesTexData>();
                 }
 
-                if (ValidOutfits[outfitnum])
+                if (outfit.Outer.IsReady)
                 {
                     Clothdict[(CoordinateType)outfitnum].Clear();
                     SavedData = ExtendedSave.GetExtendedDataById(ChaControl.chaFile.coordinate[outfitnum], "KCOX");
@@ -483,11 +488,13 @@ namespace CosplayParty
             bool result;
             for (var i = 0; i < ThisOutfitData.Outfit_Size; i++)
             {
+                var outfit = ThisOutfitData.Outfits[i];
+
                 result = false;
                 SavedData = ExtendedSave.GetExtendedDataById(ChaControl.chaFile.coordinate[i], "com.deathweasel.bepinex.clothingunlocker");
                 if (SavedData != null && SavedData.data.TryGetValue("ClothingUnlockedCoordinate", out var loadedClothingUnlocked))
                 {
-                    if (!ValidOutfits[i])
+                    if (!outfit.Outer.IsReady)
                     {
                         FailureBools.TryGetValue(i, out var Failed);
                         result = (bool)loadedClothingUnlocked || Failed;
@@ -549,12 +556,14 @@ namespace CosplayParty
             PluginData SavedData;
             for (var outfitnum = 0; outfitnum < ThisOutfitData.Outfit_Size; outfitnum++)
             {
-                if (!ValidOutfits[outfitnum])
+                var outfit = ThisOutfitData.Outfits[outfitnum];
+
+                if (!outfit.Outer.IsReady)
                 {
                     continue;
                 }
-                var UnderwearProcessed = this.UnderwearProcessed[outfitnum];
-                var UnderClothingKeep = this.UnderClothingKeep[outfitnum];
+                var UnderwearProcessed = outfit.ProcInfo.UnderwearProcessed;
+                var UnderClothingKeep = outfit.ProcInfo.UnderClothingKeep;
                 Bra.Remove(outfitnum);
                 Top.Remove(outfitnum);
 
@@ -708,7 +717,9 @@ namespace CosplayParty
             PluginData SavedData;
             for (var i = 0; i < ThisOutfitData.Outfit_Size; i++)
             {
-                if (ValidOutfits[i])
+                var outfit = ThisOutfitData.Outfits[i];
+
+                if (outfit.Outer.IsReady)
                 {
                     Modifiers.RemoveAll(x => x.CoordinateIndex == i);
                 }
@@ -836,10 +847,12 @@ namespace CosplayParty
 
             for (int outfitnum = 0, nn = ThisOutfitData.Outfit_Size; outfitnum < nn; outfitnum++)
             {
+                var outfit = ThisOutfitData.Outfits[outfitnum];
+
                 var tempTriggerPropertyList = new List<AccStateSync.TriggerProperty>();
                 var tempTriggerGroupList = new List<AccStateSync.TriggerGroup>();
 
-                if (ValidOutfits[outfitnum])
+                if (outfit.Outer.IsReady)
                 {
                     TriggerPropertyList.RemoveAll(x => x.Coordinate == outfitnum);
                     TriggerGroupList.RemoveAll(x => x.Coordinate == outfitnum);
@@ -1092,11 +1105,13 @@ namespace CosplayParty
 
             for (int outfitnum = 0, n = ThisOutfitData.Outfit_Size; outfitnum < n; outfitnum++)
             {
+                var outfit = ThisOutfitData.Outfits[outfitnum];
+
                 if (!coordinate.ContainsKey(outfitnum))
                 {
                     data.Createoutfit(outfitnum);
                 }
-                if (!ValidOutfits[outfitnum])
+                if (!outfit.Outer.IsReady)
                 {
                     continue;
                 }
@@ -1253,10 +1268,12 @@ namespace CosplayParty
 
             for (var outfitnum = 0; outfitnum < ThisOutfitData.Outfit_Size; outfitnum++)
             {
+                var outfit = ThisOutfitData.Outfits[outfitnum];
+
                 if (!Parent_Data.ContainsKey(outfitnum))
                     Parent_Data[outfitnum] = new Accessory_Parents.CoordinateData();
 
-                if (!ValidOutfits[outfitnum])
+                if (!outfit.Outer.IsReady)
                 {
                     continue;
                 }
@@ -1355,12 +1372,14 @@ namespace CosplayParty
 
             for (var outfitnum = 0; outfitnum < ThisOutfitData.Outfit_Size; outfitnum++)
             {
+                var outfit = ThisOutfitData.Outfits[outfitnum];
+
                 if (!Coordinate.ContainsKey(outfitnum))
                 {
                     Coordinate[outfitnum] = new Accessory_States.CoordinateData();
                 }
 
-                if (ValidOutfits[outfitnum])
+                if (outfit.Outer.IsReady)
                 {
                     data.Clearoutfit(outfitnum);
 

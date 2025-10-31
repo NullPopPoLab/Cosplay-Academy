@@ -1,4 +1,4 @@
-﻿#if !KKS
+﻿#if KK
 using ActionGame;
 using ActionGame.Chara;
 using Extensions;
@@ -64,7 +64,8 @@ namespace CosplayParty
                     if (ThisOutfitData.ChangeKoiToClub)
                     {
                         ThisOutfitData.outfitpaths[4] = ThisOutfitData.ClubOutfitPath;
-                        ThisOutfitData.ClothingLoader.GeneralizedLoad(4, ThisOutfitData.outfitpaths[4].EndsWith(".png"));
+                        ThisOutfitData.Outfits[4].Outer.Load(ThisOutfitData.outfitpaths[4]);
+                        ThisOutfitData.ClothingLoader.GeneralizedLoad(4);
                         ThisOutfitData.ChangeKoiToClub = false;
                         ThisOutfitData.ClothingLoader.Run_Repacks(ThisOutfitData.ChaControl);
                         ThisOutfitData.ClothingLoader.Reload_RePacks(ThisOutfitData.ChaControl, true);
@@ -81,7 +82,8 @@ namespace CosplayParty
                         num = 0;
                     }
                     heroine.coordinates[num] = 4;
-                    ThisOutfitData.ClothingLoader.GeneralizedLoad(4, ThisOutfitData.outfitpaths[4].EndsWith(".png"));
+                    ThisOutfitData.Outfits[4].Outer.Load(ThisOutfitData.outfitpaths[4]);
+                    ThisOutfitData.ClothingLoader.GeneralizedLoad(4);
                     ThisOutfitData.ChangeClubToKoi = false;
                     ThisOutfitData.ClothingLoader.Run_Repacks(ThisOutfitData.ChaControl);
                     ThisOutfitData.ClothingLoader.Reload_RePacks(ThisOutfitData.ChaControl, true);
@@ -100,7 +102,8 @@ namespace CosplayParty
                             num = 0;
                         }
                         heroine.coordinates[num] = 4;
-                        ThisOutfitData.ClothingLoader.GeneralizedLoad(4, ThisOutfitData.outfitpaths[4].EndsWith(".png"));
+                        ThisOutfitData.Outfits[4].Outer.Load(ThisOutfitData.outfitpaths[4]);
+                        ThisOutfitData.ClothingLoader.GeneralizedLoad(4);
                         ThisOutfitData.ClothingLoader.Run_Repacks(ThisOutfitData.ChaControl);
                         ThisOutfitData.ClothingLoader.Reload_RePacks(ThisOutfitData.ChaControl, true);
                         ThisOutfitData.ChaControl.ChangeCoordinateTypeAndReload(ChaFileDefine.CoordinateType.Club);

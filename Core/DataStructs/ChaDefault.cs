@@ -1,4 +1,5 @@
-﻿using CosplayParty.Hair;
+﻿using System;
+using CosplayParty.Hair;
 using CosplayParty.ME;
 using ExtensibleSaveFormat;
 using System.Collections.Generic;
@@ -7,6 +8,219 @@ using System.Linq;
 
 namespace CosplayParty
 {
+    public class OverrideOuter : IDisposable
+    {
+        public bool IsLoaded;
+        public string Path = "";
+        public bool IsReady { get { return Path == "" || IsLoaded; } }
+
+        private ChaDefault ThisOutfitData;
+        private int Index;
+
+        public OverrideOuter(ChaDefault tod, int idx)
+        {
+            ThisOutfitData = tod;
+            Index = idx;
+        }
+
+        public void Dispose()
+        {
+            Unload();
+            ThisOutfitData = null;
+        }
+
+        public void Unload()
+        {
+            if (!IsLoaded) return;
+            IsLoaded = false;
+            Path = "";
+        }
+
+        public void Load(string path)
+        {
+            Unload();
+
+            if (String.IsNullOrEmpty(path)) return;
+            if (!path.EndsWith(".png")) return;
+
+            Path = path;
+            var ThisCoordinate = ThisOutfitData.ChaControl.chaFile.coordinate[Index];
+            IsLoaded = ThisCoordinate.LoadFile(Path);//in case it fails
+        }
+    }
+
+    public class OverrideInner : IDisposable
+    {
+        public bool IsLoaded;
+        public string Path = "";
+        public bool IsReady { get { return Path == "" || IsLoaded; } }
+
+        private ChaDefault ThisOutfitData;
+        private int Index;
+
+        public OverrideInner(ChaDefault tod, int idx)
+        {
+            ThisOutfitData = tod;
+            Index = idx;
+        }
+
+        public void Dispose()
+        {
+            Unload();
+            ThisOutfitData = null;
+        }
+
+        public void Unload()
+        {
+            if (!IsLoaded) return;
+            IsLoaded = false;
+            Path = "";
+        }
+
+        public void Load(string path)
+        {
+            Unload();
+
+        }
+    }
+
+    //! 承継対象のアクセ 
+    public class SuccessingAccessory
+    {
+        public ChaFileAccessory.PartsInfo Part;
+        public HairSupport.HairAccessoryInfo Hair;
+        public MaterialEditorProperties Material;
+
+        //! 髪型として残すか 
+        public bool ForHair;
+        //! 髪型以外として残すか 
+        public bool ForAcce;
+
+        public SuccessingAccessory(ChaFileAccessory.PartsInfo part, HairSupport.HairAccessoryInfo hair, MaterialEditorProperties mat, bool hf, bool af)
+        {
+            Part = part;
+            Hair = hair;
+            Material = mat;
+            ForHair = hf;
+            ForAcce = af;
+        }
+    }
+
+    //! コーデ差し替えで受け継ぐもの
+    /*! @note 初回ロードで構築し、ずっと残しておく必要がある。
+    */
+    public class CoordinateSuccession : IDisposable
+    {
+        //! 次のコーデに差し替え後も残しておくべきアクセ情報の保持
+        //        public List<ChaFileAccessory.PartsInfo> CoordinatePartsQueue = new List<ChaFileAccessory.PartsInfo>();
+        //! 次のコーデに差し替え後も残しておくべきアクセ情報の保持
+        //        public List<HairSupport.HairAccessoryInfo> HairAccQueue = new List<HairSupport.HairAccessoryInfo>();
+        //! CoordinatePartsQueue や HairAccQueue に登録するアクセそれぞれについて、髪型として残すかのフラグ
+        //        public List<bool> HairKeepQueue = new List<bool>();
+        //! CoordinatePartsQueue や HairAccQueue に登録するアクセそれぞれについて、髪型以外として残すかのフラグ
+        //        public List<bool> ACCKeepQueue = new List<bool>();
+
+        //! 承継対象のアクセ 
+        public List<SuccessingAccessory> KeptAccessories = new List<SuccessingAccessory>();
+
+        public void Dispose()
+        {
+            Reset();
+        }
+
+        public void Reset()
+        {
+            KeptAccessories.Clear();
+        }
+
+        public void Keep(ChaFileAccessory.PartsInfo part, HairSupport.HairAccessoryInfo hair, MaterialEditorProperties mat, bool hf, bool af)
+        {
+            KeptAccessories.Add(new SuccessingAccessory(part,hair,mat,hf,af));
+        }
+    }
+
+    //! コーデ編集情報 
+    /*! @note 編集前に Reset() を呼ぶ。
+    */
+    public class CoordinateProcessInfo : IDisposable
+    {
+        //! コーデ差し替え後に HairAccQueue から適用したアクセのインデクスが追記される 
+        public readonly List<int> HairKeepReturn = new List<int>();
+        //! コーデ差し替え後に CoordinatePartsQueue から適用したアクセのインデクスが追記される 
+        public readonly List<int> ACCKeepReturn = new List<int>();
+        //! コーデ差し替え後に下着付属として追加したアクセのインデクスが追記される 
+        public readonly List<int> UnderwearAccessoriesLocations = new List<int>();
+
+        public bool[] UnderwearProcessed = new bool[9];
+        public bool[] UnderClothingKeep = new bool[9];
+
+        public void Dispose()
+        {
+            Reset();
+        }
+
+        public void Reset()
+        {
+            HairKeepReturn.Clear();
+            ACCKeepReturn.Clear();
+            UnderwearAccessoriesLocations.Clear();
+            UnderwearProcessed = new bool[9];
+            UnderClothingKeep = new bool[9];
+        }
+    }
+
+    public class ChaOutfit : IDisposable
+    {
+        private ChaDefault ThisOutfitData;
+        private int Index;
+
+        public readonly OverrideOuter Outer;
+        public readonly OverrideInner Inner;
+
+        // このあたりの構造、ロード前のコーデ適用なんかもあるのでロードと密連動させてはならない 
+        // 用途に応じて適切なタイミングで扱う必要がある。 
+        public readonly CoordinateSuccession Succession;
+        public readonly CoordinateProcessInfo ProcInfo;
+
+        /*! @note シリアライズ向けにアクセ情報がまとめて保持される。
+        */
+        public Dictionary<int, HairSupport.HairAccessoryInfo> HairAccessories = new Dictionary<int, HairSupport.HairAccessoryInfo>();
+
+
+        public bool MakeUpKeep = false;
+
+        public ChaOutfit(ChaDefault tod, int idx)
+        {
+            ThisOutfitData = tod;
+            Index = idx;
+
+            Outer = new OverrideOuter(tod, idx);
+            Inner = new OverrideInner(tod, idx);
+            Succession = new CoordinateSuccession();
+            ProcInfo = new CoordinateProcessInfo();
+        }
+
+        public void Dispose()
+        {
+            Clear();
+            Outer.Dispose();
+            Inner.Dispose();
+            Succession.Dispose();
+            ProcInfo.Dispose();
+            ThisOutfitData = null;
+        }
+
+        public void Clear()
+        {
+            //Outer.Unload();
+            //Inner.Unload();
+            Succession.Reset();
+            ProcInfo.Reset();
+
+            HairAccessories.Clear();
+        }
+    }
+
     public class ChaDefault
     {
         internal ChaControl ChaControl;
@@ -15,11 +229,12 @@ namespace CosplayParty
         internal bool firstpass = true;
         internal bool processed = false;
 
-        internal Dictionary<int, List<ChaFileAccessory.PartsInfo>> CoordinatePartsQueue = new Dictionary<int, List<ChaFileAccessory.PartsInfo>>();
-        internal Dictionary<int, CardData> alloutfitpaths = new Dictionary<int, CardData>();
-        internal Dictionary<int, CardData> allunderwearpaths = new Dictionary<int, CardData>();
-        internal readonly Dictionary<int, string> outfitpaths = new Dictionary<int, string>();
-        internal readonly Dictionary<int, string> underwarepaths = new Dictionary<int, string>();
+        internal readonly ChaOutfit[] Outfits;
+
+        internal CardData[] outfitcards;
+        internal CardData[] underwearcards;
+        internal string[] outfitpaths;
+        internal string[] underwearpaths;
 
         internal int Outfit_Size => ChaControl.chaFile.coordinate.Length;
 
@@ -40,41 +255,50 @@ namespace CosplayParty
         internal ClothingLoader ClothingLoader;
         internal Dictionary<int, ChaFileCoordinate> Original_Coordinates = new Dictionary<int, ChaFileCoordinate>();
         internal Dictionary<string, PluginData> ExtendedCharacterData = new Dictionary<string, PluginData>();
-        internal Dictionary<int, List<bool>> HairKeepQueue = new Dictionary<int, List<bool>>();
-        internal Dictionary<int, List<bool>> ACCKeepQueue = new Dictionary<int, List<bool>>();
 
-        #region hair accessories
-        public Dictionary<int, List<HairSupport.HairAccessoryInfo>> HairAccQueue = new Dictionary<int, List<HairSupport.HairAccessoryInfo>>();
-        #endregion
-
-        #region Material Editor Save
-        public Dictionary<int, List<MaterialEditorProperties>> Original_Accessory_Data = new Dictionary<int, List<MaterialEditorProperties>>();
-        #endregion
-
-        #region Material Editor Return
+#region Material Editor Return
         public ME_List Finished;
-        #endregion
+#endregion
 
-        internal Dictionary<int, List<int>> HairKeepReturn = new Dictionary<int, List<int>>();
-        internal Dictionary<int, List<int>> ACCKeepReturn = new Dictionary<int, List<int>>();
+        //! シリアライズ用 HairAccessoryInfo 群 
+        public Dictionary<int, Dictionary<int, Hair.HairSupport.HairAccessoryInfo>> HairAccessoriesPack
+        {
+            get
+            {
+                var t = new Dictionary<int, Dictionary<int, Hair.HairSupport.HairAccessoryInfo>>();
+                for (var i = 0; i < Outfits.Length; ++i) t[i] = Outfits[i].HairAccessories;
+                return t;
+            }
+        }
 
         public ChaDefault(ChaControl chaControl)
         {
             ChaControl = chaControl;
             ClothingLoader = new ClothingLoader(this);
             Finished = new ME_List(Outfit_Size);
+
+            outfitcards=new CardData[Outfit_Size];
+            underwearcards = new CardData[Outfit_Size];
+            outfitpaths=new string[Outfit_Size];
+            underwearpaths = new string[Outfit_Size];
+
+            Outfits = new ChaOutfit[Outfit_Size];
+            for (int i = 0, n = Outfit_Size; i < n; i++)
+            {
+                Outfits[i] = new ChaOutfit(this, i);
+            }
         }
 
         public void Clear_Firstpass()
         {
             for (int i = 0, n = Outfit_Size; i < n; i++)
             {
+                Outfits[i].Clear();
+#if false
                 if (!HairKeepQueue.ContainsKey(i))
                 {
                     HairKeepQueue[i] = new List<bool>();
                     ACCKeepQueue[i] = new List<bool>();
-                    HairKeepReturn[i] = new List<int>();
-                    ACCKeepReturn[i] = new List<int>();
                     Original_Accessory_Data[i] = new List<MaterialEditorProperties>();
                     HairAccQueue[i] = new List<HairSupport.HairAccessoryInfo>();
                     CoordinatePartsQueue[i] = new List<ChaFileAccessory.PartsInfo>();
@@ -83,21 +307,18 @@ namespace CosplayParty
 
                 HairKeepQueue[i].Clear();
                 ACCKeepQueue[i].Clear();
-                HairKeepReturn[i].Clear();
-                ACCKeepReturn[i].Clear();
                 Original_Accessory_Data[i].Clear();
                 HairAccQueue[i].Clear();
                 CoordinatePartsQueue[i].Clear();
             }
-            for (int i = Outfit_Size, n = HairKeepQueue.Keys.Count; i < n; i++)
-            {
-                HairKeepQueue.Remove(i);
-                ACCKeepQueue.Remove(i);
-                HairKeepReturn.Remove(i);
-                ACCKeepReturn.Remove(i);
-                Original_Accessory_Data.Remove(i);
-                HairAccQueue.Remove(i);
-                CoordinatePartsQueue.Remove(i);
+                for (int i = Outfit_Size, n = HairKeepQueue.Keys.Count; i < n; i++)
+                {
+                    HairKeepQueue.Remove(i);
+                    ACCKeepQueue.Remove(i);
+                    Original_Accessory_Data.Remove(i);
+                    HairAccQueue.Remove(i);
+                    CoordinatePartsQueue.Remove(i);
+#endif
             }
             ME.TextureDictionary.Clear();
             Finished.SoftClear();
@@ -107,7 +328,7 @@ namespace CosplayParty
         {
             for (var i = 0; i < Constants.GameCoordinateSize; i++)
             {
-                var card = alloutfitpaths[i];
+                var card = outfitcards[i];
                 if (card != null)
                 {
                     outfitpaths[i] = card.GetFullPath();
@@ -115,17 +336,17 @@ namespace CosplayParty
                 }
                 else
                 {
-                    outfitpaths.Remove(i);
+                    outfitpaths[i] = "";
                 }
 
-                card = allunderwearpaths[i];
+                card = underwearcards[i];
                 if (card != null)
                 {
-                    underwarepaths[i] = card.GetFullPath();
-                    Settings.Logger.LogDebug($"{(ChaFileDefine.CoordinateType)i} underware assigning " + underwarepaths[i]);
+                    underwearpaths[i] = card.GetFullPath();
+                    Settings.Logger.LogDebug($"{(ChaFileDefine.CoordinateType)i} underware assigning " + underwearpaths[i]);
                 }
                 else {
-                    underwarepaths.Remove(i);
+                    underwearpaths[i] = "";
                 }
             }
 

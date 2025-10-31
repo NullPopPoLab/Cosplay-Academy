@@ -154,6 +154,8 @@ namespace CosplayParty
 
         public void Process(GameMode currentGameMode)
         {
+            Settings.Logger.LogDebug($"Process({currentGameMode})");
+
             ThisOutfitDataProcess();
 #if KK
             if (ThisOutfitData.heroine != null && ThisOutfitData.heroine.isTeacher && !Settings.TeacherDress.Value)
@@ -235,10 +237,12 @@ namespace CosplayParty
 
                 for (int outfitnum = 0, n = ThisOutfitData.Outfit_Size; outfitnum < n; outfitnum++)
                 {
+                    var outfit = ThisOutfitData.Outfits[outfitnum];
+
                     ThisOutfitData.Original_Coordinates[outfitnum] = CloneCoordinate(ChaFileControl.coordinate[outfitnum]);
+#if false // Additional_Card_Info 廃止予定 
                     var HairKeep = new List<int>();
                     var ACCKeep = new List<int>();
-#if false // Additional_Card_Info 廃止予定 
                     if (CoordinateInfo.ContainsKey(outfitnum))
                     {
                         HairKeep = CoordinateInfo[outfitnum].HairAcc;
@@ -249,10 +253,11 @@ namespace CosplayParty
                     {
                         HairInfo = new Dictionary<int, HairSupport.HairAccessoryInfo>();
                     }
+
                     var acclist = new List<ChaFileAccessory.PartsInfo>();
                     var Intermediate = ThisOutfitData.Chafile.coordinate[outfitnum].accessory.parts.ToList();
 
-                    var ME_ACC_Storage = ThisOutfitData.Original_Accessory_Data[outfitnum];
+                    //var ME_ACC_Storage = outfit.Original_Accessory_Data;
 
                     if (!Chafile_ME_Data.Coordinates.TryGetValue(outfitnum, out var coord))
                     {
@@ -270,25 +275,26 @@ namespace CosplayParty
                     for (var i = 0; i < Intermediate.Count; i++)
                     {
                         // CoordinateInfo.HairAcc 情報あり 
-                        var hkeep = HairKeep.Contains(i);
+                        var hkeep = false /*HairKeep.Contains(i)*/;
                         // CoordinateInfo.AccKeep 情報あり 
-                        var akeep = ACCKeep.Contains(i);
+                        var akeep = false /*ACCKeep.Contains(i)*/;
 
-                        // アクセを残すか 
-                        var keep = xkeep || hkeep || akeep;
 #if false // Additional_Card_Info 廃止予定 
                         if(!Cosplay_Academy_Ready)
 #endif
                         {
-                            if (!keep) keep = !Settings.DestinationHeadAccs.Value && Constants.HeadAcceSet.Contains(Intermediate[i].parentKey);
-                            if (!keep) keep = !Settings.DestinationForeheadAccs.Value && Constants.ForeheadAcceSet.Contains(Intermediate[i].parentKey);
-                            if (!keep) keep = !Settings.DestinationHatAccs.Value && Constants.HatAcceSet.Contains(Intermediate[i].parentKey);
-                            if (!keep) keep = !Settings.DestinationEarAccs.Value && Constants.EarAcceSet.Contains(Intermediate[i].parentKey);
-                            if (!keep) keep = !Settings.DestinationEyeAccs.Value && Constants.EyeAcceSet.Contains(Intermediate[i].parentKey);
-                            if (!keep) keep = !Settings.DestinationNoseAccs.Value && Constants.NoseAcceSet.Contains(Intermediate[i].parentKey);
-                            if (!keep) keep = !Settings.DestinationMouthAccs.Value && Constants.MouthAcceSet.Contains(Intermediate[i].parentKey);
-                            if (!keep) keep = !Settings.DestinationTailAccs.Value && Constants.TailAcceSet.Contains(Intermediate[i].parentKey);
+                            if (!hkeep) hkeep = !Settings.DestinationHeadAccs.Value && Constants.HeadAcceSet.Contains(Intermediate[i].parentKey);
+                            if (!hkeep) hkeep = !Settings.DestinationForeheadAccs.Value && Constants.ForeheadAcceSet.Contains(Intermediate[i].parentKey);
+                            if (!akeep) akeep = !Settings.DestinationHatAccs.Value && Constants.HatAcceSet.Contains(Intermediate[i].parentKey);
+                            if (!akeep) akeep = !Settings.DestinationEarAccs.Value && Constants.EarAcceSet.Contains(Intermediate[i].parentKey);
+                            if (!akeep) akeep = !Settings.DestinationEyeAccs.Value && Constants.EyeAcceSet.Contains(Intermediate[i].parentKey);
+                            if (!akeep) akeep = !Settings.DestinationNoseAccs.Value && Constants.NoseAcceSet.Contains(Intermediate[i].parentKey);
+                            if (!akeep) akeep = !Settings.DestinationMouthAccs.Value && Constants.MouthAcceSet.Contains(Intermediate[i].parentKey);
+                            if (!akeep) akeep = !Settings.DestinationTailAccs.Value && Constants.TailAcceSet.Contains(Intermediate[i].parentKey);
                         }
+
+                        // アクセを残すか 
+                        var keep = xkeep || hkeep || akeep;
 
                         //Settings.Logger.LogDebug($"Process: Acc {outfitnum}-{i} XK={xkeep} GI={geneinc} HK={hkeep} AK={akeep}");
 
@@ -307,13 +313,20 @@ namespace CosplayParty
                             {
                                 editorProperties = new MaterialEditorProperties();
                             }
+
+
+                            //Settings.Logger.LogDebug($"Keep from 1stpass: Acc {outfitnum}-{i}; {Intermediate[i]}");
+
+                            outfit.Succession.Keep(Intermediate[i], ACCdata, editorProperties, hkeep, akeep);
+#if false
                             ME_ACC_Storage.Add(editorProperties);
 
-                            ThisOutfitData.CoordinatePartsQueue[outfitnum].Add(Intermediate[i]);
-                            ThisOutfitData.HairAccQueue[outfitnum].Add(ACCdata);
+                            outfit.Succession.CoordinatePartsQueue.Add(Intermediate[i]);
+                            outfit.Succession.HairAccQueue.Add(ACCdata);
 
-                            ThisOutfitData.HairKeepQueue[outfitnum].Add(hkeep);
-                            ThisOutfitData.ACCKeepQueue[outfitnum].Add(akeep);
+                            outfit.Succession.HairKeepQueue.Add(hkeep);
+                            outfit.Succession.ACCKeepQueue.Add(akeep);
+#endif
                         }
                     }
                 }
@@ -351,6 +364,12 @@ namespace CosplayParty
                 return;
             }//if disabled don't run
 #endif
+            if (ThisOutfitData == null)
+            {
+                Settings.Logger.LogWarning("ThisOutfitData not ready");
+                return;
+            }
+
             ClothingLoader.CoordinateLoad(coordinate, ChaControl);
         }
 
