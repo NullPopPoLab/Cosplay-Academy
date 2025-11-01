@@ -225,13 +225,15 @@ namespace CosplayParty
 
         private static void Generalized_Assignment(int sets)
         {
+            var outfit = ThisOutfitData.Outfits[sets];
+
             if (ThisOutfitData.heroine == null)
             {
                 // フリーH らしい 
                 if (!Settings.EnableInFreeH.Value)
                 {
-                    ThisOutfitData.outfitcards[sets] = null;
-                    ThisOutfitData.underwearcards[sets] = null;
+                    outfit.Outer.Selected = null;
+                    outfit.Inner.Selected = null;
                     return;
                 }
             }
@@ -240,8 +242,8 @@ namespace CosplayParty
             if (ft == null)
             {
                 Settings.Logger.LogWarning($"Generalized_Assignment: FilterBySets[{sets}] is null");
-                ThisOutfitData.outfitcards[sets] = null;
-                ThisOutfitData.underwearcards[sets] = null;
+                outfit.Outer.Selected = null;
+                outfit.Inner.Selected = null;
                 return;
             }
 #if KKS
@@ -253,10 +255,10 @@ namespace CosplayParty
 #endif
 
             var status = ThisOutfitData.ChaControl.fileParam;
-            var src0 = roleSet[0].CoordSet;
+            var src0 = Settings.RandomizeOutfit.Value ? roleSet[0].CoordSet : null;
             if (src0 == null)
             {
-                ThisOutfitData.outfitcards[sets] = null;
+                outfit.Outer.Selected = null;
                 //Settings.Logger.LogWarning($"Generalized_Assignment: outfits CoordSet is null");
 #if false
                 return;
@@ -280,7 +282,7 @@ namespace CosplayParty
             }
             if (src1 == null)
             {
-                ThisOutfitData.underwearcards[sets] = null;
+                outfit.Inner.Selected = null;
                 //Settings.Logger.LogWarning($"Generalized_Assignment: underwears CoordSet is null");
             }
 
@@ -302,15 +304,15 @@ namespace CosplayParty
 
             if (src0 != null)
             {
-                ThisOutfitData.outfitcards[sets] = src0.Random(filter);
-                //Settings.Logger.LogDebug($"Generalized_Assignment: outfit={ThisOutfitData.alloutfitpaths[sets]}");
+                outfit.Outer.Selected = src0.Random(filter);
+                Settings.Logger.LogDebug($"Generalized_Assignment: outer={outfit.Outer.Selected?.GetFullPath()}");
             }
             if (src1 != null)
             {
                 filter.SubDir = "";
                 filter.Unexclude = 0;
-                ThisOutfitData.underwearcards[sets] = src1.Random(filter);
-                //Settings.Logger.LogDebug($"Generalized_Assignment: underwear={ThisOutfitData.allunderwearpaths[sets]}");
+                outfit.Inner.Selected = src1.Random(filter);
+                Settings.Logger.LogDebug($"Generalized_Assignment: inner={outfit.Inner.Selected?.GetFullPath()}");
             }
         }
     }

@@ -11,9 +11,9 @@ namespace CosplayParty
     public class OverrideOuter : IDisposable
     {
         public bool IsLoaded;
-        public string Path = "";
-        public bool IsReady { get { return Path == "" || IsLoaded; } }
+        public bool IsReady { get { return Selected == null || IsLoaded; } }
 
+        public CardData Selected;
         private ChaDefault ThisOutfitData;
         private int Index;
 
@@ -33,28 +33,31 @@ namespace CosplayParty
         {
             if (!IsLoaded) return;
             IsLoaded = false;
-            Path = "";
         }
 
-        public void Load(string path)
+        public void Select()
         {
             Unload();
 
-            if (String.IsNullOrEmpty(path)) return;
-            if (!path.EndsWith(".png")) return;
+            if (Selected == null) return;
 
-            Path = path;
-            var ThisCoordinate = ThisOutfitData.ChaControl.chaFile.coordinate[Index];
-            IsLoaded = ThisCoordinate.LoadFile(Path);//in case it fails
+            var path = Selected.GetFullPath();
+            if (String.IsNullOrEmpty(path)) Selected = null;
+            else if (!path.EndsWith(".png")) Selected = null;
+            else
+            {
+                var ThisCoordinate = ThisOutfitData.ChaControl.chaFile.coordinate[Index];
+                IsLoaded = ThisCoordinate.LoadFile(path);//in case it fails
+            }
         }
     }
 
     public class OverrideInner : IDisposable
     {
         public bool IsLoaded;
-        public string Path = "";
-        public bool IsReady { get { return Path == "" || IsLoaded; } }
+        public bool IsReady { get { return Selected == null || IsLoaded; } }
 
+        public CardData Selected;
         private ChaDefault ThisOutfitData;
         private int Index;
 
@@ -74,10 +77,9 @@ namespace CosplayParty
         {
             if (!IsLoaded) return;
             IsLoaded = false;
-            Path = "";
         }
 
-        public void Load(string path)
+        public void Select()
         {
             Unload();
 
@@ -231,11 +233,6 @@ namespace CosplayParty
 
         internal readonly ChaOutfit[] Outfits;
 
-        internal CardData[] outfitcards;
-        internal CardData[] underwearcards;
-        internal string[] outfitpaths;
-        internal string[] underwearpaths;
-
         internal int Outfit_Size => ChaControl.chaFile.coordinate.Length;
 
         internal ChaFileParameter Parameter;
@@ -276,11 +273,6 @@ namespace CosplayParty
             ChaControl = chaControl;
             ClothingLoader = new ClothingLoader(this);
             Finished = new ME_List(Outfit_Size);
-
-            outfitcards=new CardData[Outfit_Size];
-            underwearcards = new CardData[Outfit_Size];
-            outfitpaths=new string[Outfit_Size];
-            underwearpaths = new string[Outfit_Size];
 
             Outfits = new ChaOutfit[Outfit_Size];
             for (int i = 0, n = Outfit_Size; i < n; i++)
@@ -326,12 +318,14 @@ namespace CosplayParty
 
         public void FillOutfitpaths()
         {
+#if false
             for (var i = 0; i < Constants.GameCoordinateSize; i++)
             {
-                var card = outfitcards[i];
-                if (card != null)
+                var outfit = Outfits[i];
+
+                if (outfit.Outer.Selected != null)
                 {
-                    outfitpaths[i] = card.GetFullPath();
+                    outfit.Outer.Path = card.GetFullPath();
                     Settings.Logger.LogDebug($"{(ChaFileDefine.CoordinateType)i} outfit assigning " + outfitpaths[i]);
                 }
                 else
@@ -339,8 +333,7 @@ namespace CosplayParty
                     outfitpaths[i] = "";
                 }
 
-                card = underwearcards[i];
-                if (card != null)
+                if (outfit.Inner.Selected != null)
                 {
                     underwearpaths[i] = card.GetFullPath();
                     Settings.Logger.LogDebug($"{(ChaFileDefine.CoordinateType)i} underware assigning " + underwearpaths[i]);
@@ -349,6 +342,7 @@ namespace CosplayParty
                     underwearpaths[i] = "";
                 }
             }
+#endif
 
 #if false // Additional_Card_Info 廃止予定 
             var simpledirectory = ClothingLoader.CardInfo.SimpleFolderDirectory;

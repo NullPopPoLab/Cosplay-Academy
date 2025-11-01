@@ -70,6 +70,7 @@ namespace CosplayParty
 #endif
 
         //        public static ConfigEntry<bool> AccKeeper { get; private set; }
+        public static ConfigEntry<bool> RandomizeOutfit { get; private set; }
         public static ConfigEntry<bool> RandomizeUnderwear { get; private set; }
 //        public static ConfigEntry<bool> RandomizeUnderwearOnly { get; private set; }
 //        public static ConfigEntry<bool> ForceRandomUnderwear { get; private set; }
@@ -106,7 +107,8 @@ namespace CosplayParty
 #endif
 
             //            AccKeeper = Config.Bind("Main Game", "On Coordinate Load Support", true, new ConfigDescription("Keep head and tail accessories\nUsed for characters who have accessory based hair and avoid them going bald\nWorks best with a Cosplay Party Ready character marked by Additional Card Info", null, new ConfigurationManagerAttributes() { IsAdvanced = true, Order = 4 }));
-            RandomizeUnderwear = Config.Bind("Main Game", "Randomize Underwear", false, "Loads underwear from Underwear folder (Does not apply to Gym/Swim outfits)\nWill probably break some outfits that depends on underwear outside of Gym/Swim if not set up with Additional Card Info plugin");
+            RandomizeOutfit = Config.Bind("Main Game", "Randomize Outfit", true, "Loads outfit from outer folder");
+            RandomizeUnderwear = Config.Bind("Main Game", "Randomize Underwear", false, "Loads underwear from inner folder and replace them (Does not apply to Swim/Bath outfits)");
 //            RandomizeUnderwearOnly = Config.Bind("Main Game", "Randomize Underwear Only", false, "Its an option");
 //            ForceRandomUnderwear = Config.Bind("Main Game", "Force underwear parts", false, "Doesn't force Top or Bottom");
 
@@ -115,7 +117,7 @@ namespace CosplayParty
             SundayDate = Config.Bind("Story Mode", "Sunday Date Special", true, "Date will wear something different on Sunday, not really useful unless Update Frequency is not daily/period ");
 #endif
             //FreeH
-            EnableInFreeH = Config.Bind("Free H", "Enable in Free H", false, "Rondomize enable in free H.");
+            EnableInFreeH = Config.Bind("Free H", "Enable in Free H", false, "Rondomize Outfit enable in free H.");
 
             //Cache
             UpdateCache = Config.Bind("Cache", "Update Cache Buttons", false, new ConfigDescription("", null, new ConfigurationManagerAttributes() { HideSettingName = true, HideDefaultButton = true, CustomDrawer = new Action<ConfigEntryBase>(UpdateCacheData) }));

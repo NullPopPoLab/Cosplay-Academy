@@ -6,8 +6,12 @@ namespace CosplayParty
 {
     public class GameEvent : GameCustomFunctionController
     {
+        public static Cycle.Type CurrentPeriod;
+
         protected override void OnPeriodChange(Cycle.Type period)
         {
+            CurrentPeriod = period;
+
             var changing = false;
 
             switch (Settings.UpdateFrequency.Value)

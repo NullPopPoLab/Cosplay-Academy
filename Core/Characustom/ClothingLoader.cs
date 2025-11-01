@@ -91,6 +91,8 @@ namespace CosplayParty
 
             for (var i = 0; i < Constants.GameCoordinateSize; i++)
             {
+                var outfit = ThisOutfitData.Outfits[i];
+
                 //if (!UnderwearAccessoriesLocations.ContainsKey(i)) UnderwearAccessoriesLocations[i] = new List<int>();
 
                 //if (!MakeUpKeep.ContainsKey(i)) MakeUpKeep[i] = false;
@@ -99,15 +101,15 @@ namespace CosplayParty
 
                 //if (!UnderwearProcessed.ContainsKey(i)) UnderwearProcessed[i] = new bool[9];
 
-                ThisOutfitData.Outfits[i].Outer.Load(ThisOutfitData.outfitpaths[i]);
-                ThisOutfitData.Outfits[i].Inner.Load(ThisOutfitData.underwearpaths[i]);
+                outfit.Outer.Select();
+                outfit.Inner.Select();
 
-                if (ThisOutfitData.Outfits[i].Outer.IsLoaded || ThisOutfitData.Outfits[i].Inner.IsLoaded)
+                if (outfit.Outer.IsLoaded || outfit.Inner.IsLoaded)
                 {
                     GeneralizedLoad(i);
                     if (ThisOutfitData.Outfits[i].Outer.IsLoaded)
                     {
-                        Settings.Logger.LogDebug($"loaded {(ChaFileDefine.CoordinateType)i} " + ThisOutfitData.outfitpaths[i]);
+                        Settings.Logger.LogDebug($"loaded {(ChaFileDefine.CoordinateType)i} " + outfit.Outer.Selected.GetFullPath());
                     }
                     else
                     {
@@ -139,7 +141,7 @@ namespace CosplayParty
             TimeWatch[1].Start();
 #endif
             var outfit = ThisOutfitData.Outfits[outfitnum];
-            
+
             if (!ThisOutfitData.Finished.Coordinates.TryGetValue(outfitnum, out var ME_coord))
             {
                 ThisOutfitData.Finished.Coordinates[outfitnum] = ME_coord = new ME_Coordinate();
@@ -193,7 +195,6 @@ namespace CosplayParty
 
             var keptacce = outfit.Succession.KeptAccessories;
 
-//            outfit.Succession.Reset(); // リセットしない 
             outfit.ProcInfo.Reset();
 
             var UnderwearAccessoryStart = keptacce.Count;
@@ -205,7 +206,7 @@ namespace CosplayParty
             }
 #endregion
             var HairToColor = new List<int>();
-#region Reassign Existing Accessories
+            #region Reassign Existing Accessories
 
 #if false // Additional_Card_Info 廃止予定 
             var ExpandedData = ExtendedSave.GetExtendedDataById(ThisCoordinate, "Additional_Card_Info");
@@ -244,6 +245,7 @@ namespace CosplayParty
             }
             else
 #endif
+
             if (Settings.HairMatch.Value && !MakerAPI.InsideMaker && Settings.DestinationHeadAccs.Value)
             {
                 // 頭に載っている髪パーツのみ対象とする 
@@ -286,7 +288,8 @@ namespace CosplayParty
             var MaterialEditorData = ExtendedSave.GetExtendedDataById(ThisCoordinate, "com.deathweasel.bepinex.materialeditor");
             ThisOutfitData.Finished.LoadCoordinate(MaterialEditorData, ThisOutfitData, outfitnum);
             var Import_ME_Data = new MaterialEditorProperties();
-#endregion
+            #endregion
+
             var parts = new List<ChaFileAccessory.PartsInfo>();
             // ロード対象アクセのみ選択 
             for (var i = 0; i < ThisCoordinate.accessory.parts.Length; ++i)
@@ -422,7 +425,6 @@ namespace CosplayParty
             var print = true;
             //Don't Skip if inside Maker
 
-
             var aidx = 0;
             if (MakerAPI.InsideMaker)
             {
@@ -520,7 +522,7 @@ namespace CosplayParty
             ThisCoordinate.accessory.parts = parts.ToArray();
 
             //outfit.Outer.HairAccessories = HairAccInfo;
-#endregion
+            #endregion
 
 #if TRACE
             TimeWatch[1].Stop();
