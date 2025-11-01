@@ -206,7 +206,7 @@ namespace CosplayParty
         public static void Decision(string name, ChaDefault cha)
         {
             ThisOutfitData = cha;
-            var person = ThisOutfitData.heroine;
+            var person = ThisOutfitData.Heroine;
             if (person != null)
             {
                 Settings.Logger.LogDebug($"Decision for {name}");
@@ -227,7 +227,7 @@ namespace CosplayParty
         {
             var outfit = ThisOutfitData.Outfits[sets];
 
-            if (ThisOutfitData.heroine == null)
+            if (ThisOutfitData.Heroine == null)
             {
                 // フリーH らしい 
                 if (!Settings.EnableInFreeH.Value)
@@ -291,13 +291,13 @@ namespace CosplayParty
             filter.Unexclude = (ft.Folder == null) ? 0 : ft.Folder.SpecialType.Excluded;
             filter.HeightGrade = ThisOutfitData.ChaControl.GetHeightCategory();
             filter.BustGrade = ThisOutfitData.ChaControl.GetBustCategory();
-            if (ThisOutfitData.heroine != null)
+            if (ThisOutfitData.Heroine != null)
             {
 #if KK
-                filter.Angry = ThisOutfitData.heroine.isAnger;
-                filter.Teacher = ThisOutfitData.heroine.isTeacher;
+                filter.Angry = ThisOutfitData.Heroine.isAnger;
+                filter.Teacher = ThisOutfitData.Heroine.isTeacher;
 #endif
-                filter.Lewd = ThisOutfitData.heroine.HExperience == SaveData.Heroine.HExperienceKind.淫乱;
+                filter.Lewd = ThisOutfitData.Heroine.HExperience == SaveData.Heroine.HExperienceKind.淫乱;
             }
 
             Settings.Logger.LogDebug($"Generalized_Assignment: sets:{sets} filter:{filter}");

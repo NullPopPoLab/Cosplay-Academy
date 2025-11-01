@@ -134,9 +134,9 @@ namespace CosplayParty
 #endif
             var outfit = ThisOutfitData.Outfits[outfitnum];
 
-            if (!ThisOutfitData.Finished.Coordinates.TryGetValue(outfitnum, out var ME_coord))
+            if (!ThisOutfitData.FinalMaterials.Coordinates.TryGetValue(outfitnum, out var ME_coord))
             {
-                ThisOutfitData.Finished.Coordinates[outfitnum] = ME_coord = new ME_Coordinate();
+                ThisOutfitData.FinalMaterials.Coordinates[outfitnum] = ME_coord = new ME_Coordinate();
             }
 
             ChaControl.fileStatus.coordinateType = outfitnum;
@@ -168,8 +168,8 @@ namespace CosplayParty
 #region MakeUp
             if (outfit.MakeUpKeep)
             {
-                ThisCoordinate.enableMakeup = ThisOutfitData.Original_Coordinates[outfitnum].enableMakeup;
-                ThisCoordinate.makeup = ThisOutfitData.Original_Coordinates[outfitnum].makeup;
+                ThisCoordinate.enableMakeup = outfit.Original_Coordinate.enableMakeup;
+                ThisCoordinate.makeup = outfit.Original_Coordinate.makeup;
             }
 #endregion
             var HairToColor = new List<int>();
@@ -253,7 +253,7 @@ namespace CosplayParty
             }
 #region ME Acc Import
             var MaterialEditorData = ExtendedSave.GetExtendedDataById(ThisCoordinate, "com.deathweasel.bepinex.materialeditor");
-            ThisOutfitData.Finished.LoadCoordinate(MaterialEditorData, ThisOutfitData, outfitnum);
+            ThisOutfitData.FinalMaterials.LoadCoordinate(MaterialEditorData, ThisOutfitData, outfitnum);
             var Import_ME_Data = new MaterialEditorProperties();
             #endregion
 
@@ -693,7 +693,7 @@ namespace CosplayParty
 
         private void Additional_Clothing_Process(int index, int outfitnum, ME_Coordinate ME_Data)
         {
-            var finishcoords = ThisOutfitData.Finished.Coordinates;
+            var finishcoords = ThisOutfitData.FinalMaterials.Coordinates;
             if (!finishcoords.TryGetValue(outfitnum, out var finishcoord))
             {
                 finishcoords[outfitnum] = new ME_Coordinate();
@@ -711,9 +711,9 @@ namespace CosplayParty
         private void HairMatchProcess(int outfitnum, int ACCPosition, Color[] haircolor, List<ChaFileAccessory.PartsInfo> Parts)
         {
             Parts[ACCPosition].color = haircolor;
-            if (!ThisOutfitData.Finished.Coordinates.TryGetValue(outfitnum, out var coord))
+            if (!ThisOutfitData.FinalMaterials.Coordinates.TryGetValue(outfitnum, out var coord))
             {
-                ThisOutfitData.Finished.Coordinates[outfitnum] = coord = new ME_Coordinate();
+                ThisOutfitData.FinalMaterials.Coordinates[outfitnum] = coord = new ME_Coordinate();
             }
             if (!coord.AccessoryProperties.TryGetValue(ACCPosition, out var editorProperties))
             {

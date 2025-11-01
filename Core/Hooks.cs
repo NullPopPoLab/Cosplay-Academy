@@ -58,7 +58,7 @@ namespace CosplayParty
                 //{
                 //    return;
                 //}
-                ThisOutfitData.heroine = heroine;
+                ThisOutfitData.Heroine = heroine;
                 if (__instance.MapNo == 46)
                 {
                     if (ThisOutfitData.ChangeKoiToClub)

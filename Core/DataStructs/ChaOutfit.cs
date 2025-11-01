@@ -59,11 +59,6 @@ namespace CosplayParty
             その後の差し替えでマスクがないとき戻す。 @n
         */
         Mask,
-
-        //! 下着連動アクセ 
-        /*! 下着差し替え時に外す。 @n
-        */
-        InnerOrnament,
     }
 
     //! 承継対象のアクセ 
@@ -151,6 +146,10 @@ namespace CosplayParty
         */
         public Dictionary<int, HairSupport.HairAccessoryInfo> HairAccessories = new Dictionary<int, HairSupport.HairAccessoryInfo>();
 
+        // FirstPass 処理で構築 
+        // Clear() でも残す 
+        public ChaFileCoordinate Original_Coordinate;
+        public Dictionary<int, HairSupport.HairAccessoryInfo> HairInfo;
 
         public bool MakeUpKeep = false;
 
@@ -163,6 +162,7 @@ namespace CosplayParty
             Inner = new OverridingInner(tod, idx);
             Succession = new CoordinateSuccession();
             ProcInfo = new CoordinateProcessInfo();
+            HairInfo = new Dictionary<int, HairSupport.HairAccessoryInfo>();
         }
 
         public void Dispose()
@@ -173,12 +173,11 @@ namespace CosplayParty
             Succession.Dispose();
             ProcInfo.Dispose();
             ThisOutfitData = null;
+            HairInfo = null;
         }
 
         public void Clear()
         {
-            //Outer.Unload();
-            //Inner.Unload();
             Succession.Reset();
             ProcInfo.Reset();
 

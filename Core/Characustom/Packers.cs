@@ -302,7 +302,7 @@ namespace CosplayParty
 
         private void ME_RePack(ChaControl ChaControl)
         {
-            var ME_Save = ThisOutfitData.Finished;
+            var ME_Save = ThisOutfitData.FinalMaterials;
             var SaveData = new PluginData();
             ME_Save.AllProperties(out var rendererProperties, out var materialFloatProperties, out var materialColorProperties, out var materialShaders, out var materialTextureProperties);
 
@@ -1630,9 +1630,9 @@ namespace CosplayParty
             ExtendedSave.SetExtendedDataById(ChaControl.chaFile, IDtoSET, data);
             ExtendedSave.SetExtendedDataById(ThisOutfitData.Chafile, IDtoSET, data);
 #if !KKS
-            if (ThisOutfitData.heroine != null)
+            if (ThisOutfitData.Heroine != null)
             {
-                ExtendedSave.SetExtendedDataById(ThisOutfitData.heroine.charFile, IDtoSET, data);
+                ExtendedSave.SetExtendedDataById(ThisOutfitData.Heroine.charFile, IDtoSET, data);
             }
 #endif
         }
