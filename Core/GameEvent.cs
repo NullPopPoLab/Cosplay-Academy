@@ -77,6 +77,7 @@ namespace CosplayParty
                 Settings.Logger.LogDebug($"skip at {period}");
             }
 
+            Settings.Logger.LogDebug($"set Changestate to All");
             foreach (var item in CharaEvent.ChaDefaults)
             {
                 item.Changestate = true;

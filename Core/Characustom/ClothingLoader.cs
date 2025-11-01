@@ -93,14 +93,6 @@ namespace CosplayParty
             {
                 var outfit = ThisOutfitData.Outfits[i];
 
-                //if (!UnderwearAccessoriesLocations.ContainsKey(i)) UnderwearAccessoriesLocations[i] = new List<int>();
-
-                //if (!MakeUpKeep.ContainsKey(i)) MakeUpKeep[i] = false;
-
-                //if (!Underwearbools.ContainsKey(i)) Underwearbools[i] = new bool[3];
-
-                //if (!UnderwearProcessed.ContainsKey(i)) UnderwearProcessed[i] = new bool[9];
-
                 outfit.Outer.Select();
                 outfit.Inner.Select();
 
@@ -153,30 +145,11 @@ namespace CosplayParty
 
             #region Queue accessories to keep
 
-#if false
-            // CoordinateSuccession から取り込んだ情報 
-            var PartsQueue = new Queue<ChaFileAccessory.PartsInfo>();
-            var HairQueue = new Queue<HairSupport.HairAccessoryInfo>();
-            var HairKeepQueue = new Queue<bool>();
-            var ACCKeepqueue = new Queue<bool>();
-            var ME_Queue = new Queue<MaterialEditorProperties>(outfit.Original_Accessory_Data);
-#endif
-
             var UnderClothingKeep = new bool[9];
 
             #endregion
             //Load new outfit
 
-#if false // ロードは済んでいる 
-            if (ThisOutfitData.Outfits[outfitnum] != null)
-            {
-                ThisOutfitData.Outfits[outfitnum].Load(ChaControl, ThisOutfitData, outfitnum);
-            }
-            if (ThisOutfitData.Underwears[outfitnum] != null)
-            {
-                ThisOutfitData.Underwears[outfitnum].Load(ChaControl, ThisOutfitData, outfitnum);
-            }
-#endif
             //ValidOutfits[outfitnum] = load_outfit;
             if (outfit.Outer.IsLoaded)
             {
@@ -185,12 +158,6 @@ namespace CosplayParty
 #else
                 ME_coord.SoftClear(new bool[9]);
 #endif
-                //only requeue items if a new file is loaded as they are unloaded.
-                //                PartsQueue = new Queue<ChaFileAccessory.PartsInfo>(outfit.Succession.CoordinatePartsQueue);
-                //                HairQueue = new Queue<HairSupport.HairAccessoryInfo>(outfit.Succession.HairAccQueue);
-                //                HairKeepQueue = new Queue<bool>(outfit.Succession.HairKeepQueue);
-                //                ACCKeepqueue = new Queue<bool>(outfit.Succession.ACCKeepQueue);
-                //ME_Queue = new Queue<MaterialEditorProperties>(outfit.Original_Accessory_Data);
             }
 
             var keptacce = outfit.Succession.KeptAccessories;
@@ -440,7 +407,7 @@ namespace CosplayParty
                         }
 
                         var acce = keptacce[aidx++];
-
+                        
                         parts[ACCpostion] = acce.Part;
                         if (acce.Hair.HairLength > -998)
                         {
@@ -451,15 +418,7 @@ namespace CosplayParty
                             HairAccInfo.Remove(ACCpostion);
                         }
 
-                        if (acce.ForHair)
-                        {
-                            outfit.ProcInfo.HairKeepReturn.Add(ACCpostion);
-                        }
-                        if (acce.ForAcce)
-                        {
-                            outfit.ProcInfo.ACCKeepReturn.Add(ACCpostion);
-                        }
-
+                        outfit.ProcInfo.ACCKeepReturn.Add(ACCpostion);
                         ME_coord.AddAccessory(outfitnum, ACCpostion, acce.Material);
                     }
 #if false // たぶん無意味どころか変える必要ないところまで変わる 
@@ -505,17 +464,8 @@ namespace CosplayParty
                     HairAccInfo.Remove(ACCpostion);
                 }
 
+                outfit.ProcInfo.ACCKeepReturn.Add(ACCpostion);
                 ME_coord.AddAccessory(outfitnum, ACCpostion, acce.Material);
-
-                if (acce.ForHair)
-                {
-                    outfit.ProcInfo.HairKeepReturn.Add(ACCpostion);
-                }
-                if (acce.ForAcce)
-                {
-                    outfit.ProcInfo.ACCKeepReturn.Add(ACCpostion);
-                }
-
                 ACCpostion++;
             }
 
@@ -547,11 +497,6 @@ namespace CosplayParty
             var outfitnum = chacontrol.fileStatus.coordinateType;
             var outfit = ThisOutfitData.Outfits[outfitnum];
 
-            //            var PartsQueue = new Queue<ChaFileAccessory.PartsInfo>(outfit.Succession.CoordinatePartsQueue);
-            //            var HairQueue = new Queue<HairSupport.HairAccessoryInfo>(outfit.Succession.HairAccQueue);
-            //            var ACCKeepQueue = new Queue<bool>(outfit.Succession.ACCKeepQueue);
-            //            var HairKeepQueue = new Queue<bool>(outfit.Succession.HairKeepQueue);
-            //            var ME_Queue = new Queue<MaterialEditorProperties>(outfit.Original_Accessory_Data);
             var keptacce = outfit.Succession.KeptAccessories;
 
             var HairKeepResult = new List<int>();
@@ -597,16 +542,8 @@ namespace CosplayParty
                         HairACCDictionary.Remove(ACCpostion);
                     }
 
+                    ACCKeepResult.Add(ACCpostion);
                     Coordinate_ME_Data.AddAccessory(outfitnum, ACCpostion, acce.Material);
-
-                    if (acce.ForHair)
-                    {
-                        HairKeepResult.Add(ACCpostion);
-                    }
-                    if (acce.ForAcce)
-                    {
-                        ACCKeepResult.Add(ACCpostion);
-                    }
                 }
                 if (Settings.HairMatch.Value && HairACCDictionary.TryGetValue(ACCpostion, out var info))
                 {
@@ -638,20 +575,13 @@ namespace CosplayParty
                 }
                 else
                 {
+                    HairACCDictionary.Remove(ACCpostion);
                 }
 
-                Coordinate_ME_Data.AddAccessory(outfitnum, ACCpostion, acce.Material);
-
-                if (InsideMaker)
+                //if (InsideMaker)
                 {
-                    if (acce.ForHair)
-                    {
-                        HairKeepResult.Add(ACCpostion);
-                    }
-                    if (acce.ForAcce)
-                    {
-                        ACCKeepResult.Add(ACCpostion);
-                    }
+                    ACCKeepResult.Add(ACCpostion);
+                    Coordinate_ME_Data.AddAccessory(outfitnum, ACCpostion, acce.Material);
                 }
                 ACCpostion++;
             }

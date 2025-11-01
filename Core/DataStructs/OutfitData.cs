@@ -16,15 +16,15 @@ namespace CosplayParty
 
         public OutfitData()
         {
-                Match_Outfit_Paths = Defaultcard;
-                Part_of_Set = false;
-                Outfits_Per_State = new List<CardData>();
+            Match_Outfit_Paths = Defaultcard;
+            Part_of_Set = false;
+            Outfits_Per_State = new List<CardData>();
         }
 
         public void Clear()
         {
-                Outfits_Per_State.Clear();
-                Part_of_Set = false;
+            Outfits_Per_State.Clear();
+            Part_of_Set = false;
         }
 
         public List<CardData> Sum()//returns list that is the sum of all available lists.
@@ -36,8 +36,8 @@ namespace CosplayParty
 
         public void Replace(List<CardData> Data, bool IsSet)//Insert data according to Outfits_Per_State[3] state and confirm if it is a setitem.
         {
-// 廃止 
-//            Data.Add(Defaultcard);
+            // 廃止 
+            //            Data.Add(Defaultcard);
             Outfits_Per_State = Data;
             Part_of_Set = IsSet;
         }
@@ -46,53 +46,6 @@ namespace CosplayParty
         {
             try
             {
-#if false // 廃止予定 
-            if (Match)
-            {
-                return Match_Outfit_Paths;
-            }
-
-            IEnumerable<CardData> applicable;
-            if (!Anger)
-            {
-                var Tries = 0;
-                var EXP = 0;
-                CardData Result=null;
-                do
-                {
-                    applicable = Outfits_Per_State.Where(x => Filter(x, unrestricted, personality, trait, breast, height));
-                    var ac = applicable.Count();
-                    if (ac < 1) break;
-                    var rand = UnityEngine.Random.Range(0, ac);
-                    Result = applicable.ElementAt(rand);
-                    var isdefault = Result.Filepath == defaultstring;
-#if false // 廃止予定 
-                    if (Settings.EnableDefaults.Value && isdefault || !isdefault)
-                    {
-                        break;
-                    }
-#endif
-                    if (Tries++ >= 10)
-                    {
-                        EXP--;
-                        Tries = 0;
-                        while (EXP > -1 && Outfits_Per_State.Count == 1)
-                        {
-                            EXP--;
-                        }
-                    }
-                } while (EXP > -1);
-                return Result;
-            }
-            else{
-                applicable = Outfits_Per_State.Where(x => Filter(x, unrestricted, personality, trait, breast, height));
-                var ac = applicable.Count();
-                if (ac < 1) return null;
-                return applicable.ElementAt(UnityEngine.Random.Range(0, ac));
-            }
-            var applicable = Outfits_Per_State.Where(x => Filter(x, unrestricted, personality, trait, breast, height));
-#endif
-
                 // Angry,Lewdランダム適用 
 #if KK
             if (filter.Angry)
@@ -141,67 +94,10 @@ namespace CosplayParty
             }
             catch (Exception e)
             {
-                Settings.Logger.LogDebug($"Random: "+e);
+                Settings.Logger.LogDebug($"Random: " + e);
                 return null;
             }
-            }
-
-#if false // 廃止予定 
-        public CardData RandomSet(bool Match, bool unrestricted, int personality = 0, ChaFileParameter.Attribute trait = null, int breast = 0, int height = 0)//if set exists add its items to pool along with any coordinated outfit and other choices
-        {
-            IEnumerable<CardData> applicable;
-
-                        var EXP = 0;
-                        var Tries = 0;
-                        var Result = Defaultcard;
-                        do
-                        {
-                            if (Part_of_Set || !Match)
-                            {
-                                applicable = Outfits_Per_State.Where(x => Filter(x, unrestricted, personality, trait, breast, height));
-                                var rand = UnityEngine.Random.Range(0, applicable.Count());
-                                Result = applicable.ElementAt(rand);
-                            }
-                            else
-                                Result = Match_Outfit_Paths;
-
-                            var isdefault = Result.Filepath == defaultstring;
-#if false // 廃止予定 
-                            if (Settings.EnableDefaults.Value && isdefault || !isdefault)
-                            {
-                                break;
-                            }
-#endif
-                            if ((Tries++ >= 3 || Match))
-                            {
-                                EXP--;
-                                Tries = 0;
-                                while (EXP > -1 && Outfits_Per_State.Count < 2)
-                                {
-                                    EXP--;
-                                }
-                            }
-                        } while (EXP > -1);
-                        return Result;
-
-#if false // 再検討 
-            var temp = new List<CardData>();
-
-                if (Part_of_Set || !Match)
-                    temp.AddRange(Outfits_Per_State.Where(x => Filter(x, unrestricted, personality, trait, breast, height)));
-                else
-                    temp.Add(Match_Outfit_Paths);
-
-            CardData LastResult;
-            var tries = 0;
-            do
-            {
-                LastResult = temp[UnityEngine.Random.Range(0, temp.Count)];
-            } while (++tries < 3 && LastResult == Defaultcard && !Settings.EnableDefaults.Value);
-            return LastResult;
-#endif
         }
-#endif
 
         public List<CardData> Exportarray()
         {
@@ -210,7 +106,7 @@ namespace CosplayParty
 
         public void Coordinate()//set a random outfit to coordinate for non-set items when coordinated
         {
-                Match_Outfit_Paths = Random(SpecialCoordFilter.Create());
+            Match_Outfit_Paths = Random(SpecialCoordFilter.Create());
         }
 
         public bool IsSet()

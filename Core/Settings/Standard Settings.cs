@@ -31,9 +31,9 @@ namespace CosplayParty
         public static ConfigEntry<bool> UseAlternativePath { get; private set; }
         public static ConfigEntry<string> CoordinatePath { get; private set; }
         public static ConfigEntry<bool> EnableSetting { get; private set; }
-//        public static ConfigEntry<bool> EnableSets { get; private set; }
-//        public static ConfigEntry<bool> IndividualSets { get; private set; }
-//        public static ConfigEntry<bool> EnableDefaults { get; private set; }
+        //        public static ConfigEntry<bool> EnableSets { get; private set; }
+        //        public static ConfigEntry<bool> IndividualSets { get; private set; }
+        //        public static ConfigEntry<bool> EnableDefaults { get; private set; }
         public static ConfigEntry<bool> StoryModeChange { get; private set; }
         public static ConfigEntry<bool> KeepOldBehavior { get; private set; }
 
@@ -47,13 +47,13 @@ namespace CosplayParty
         public static ConfigEntry<bool> DestinationMouthAccs { get; private set; }
         public static ConfigEntry<bool> DestinationTailAccs { get; private set; }
 
-        public static ConfigEntry<bool> Makerview { get; private set; }
-//        public static ConfigEntry<bool> FullSet { get; private set; }
-        public static ConfigEntry<bool> ResetMaker { get; set; }
+        //        public static ConfigEntry<bool> Makerview { get; private set; }
+        //        public static ConfigEntry<bool> FullSet { get; private set; }
+        //        public static ConfigEntry<bool> ResetMaker { get; set; }
 
         public static ConfigEntry<bool> ChangeOutfit { get; set; }
 
-//        public static ConfigEntry<Hexp> H_EXP_Choice { get; private set; }
+        //        public static ConfigEntry<Hexp> H_EXP_Choice { get; private set; }
 
         public static ConfigEntry<OutfitUpdate> UpdateFrequency { get; private set; }
 #if KK
@@ -72,9 +72,9 @@ namespace CosplayParty
         //        public static ConfigEntry<bool> AccKeeper { get; private set; }
         public static ConfigEntry<bool> RandomizeOutfit { get; private set; }
         public static ConfigEntry<bool> RandomizeUnderwear { get; private set; }
-//        public static ConfigEntry<bool> RandomizeUnderwearOnly { get; private set; }
-//        public static ConfigEntry<bool> ForceRandomUnderwear { get; private set; }
-//        public static ConfigEntry<bool> UnderwearStates { get; private set; }
+        //        public static ConfigEntry<bool> RandomizeUnderwearOnly { get; private set; }
+        //        public static ConfigEntry<bool> ForceRandomUnderwear { get; private set; }
+        //        public static ConfigEntry<bool> UnderwearStates { get; private set; }
         public static ConfigEntry<bool> ExtremeAccKeeper { get; private set; }
 
         private static ConfigEntry<string> Lastversion { get; set; }
@@ -100,7 +100,7 @@ namespace CosplayParty
 
             //Main Game
             RandomizeDresscode = Config.Bind("Main Game", "Randomize Dresscode", true, "When empty Dresscode setting, select a folder in 1st layer");
-            SpecialOutfitRatio_Lewd = Config.Bind("Main Game", "Special Outfit Ratio for Lewd", 100, new ConfigDescription("Percentage of selecting from !lewd folder when max lewdness", new AcceptableValueRange<int>(0,100)));
+            SpecialOutfitRatio_Lewd = Config.Bind("Main Game", "Special Outfit Ratio for Lewd", 100, new ConfigDescription("Percentage of selecting from !lewd folder when max lewdness", new AcceptableValueRange<int>(0, 100)));
 #if KK
             SpecialOutfitRatio_Angry = Config.Bind("Main Game", "Special Outfit Ratio for Angry", 100, new ConfigDescription("Percentage of selecting from !angry folder when in angry", new AcceptableValueRange<int>(0, 100)));
             SpecialOutfitRatio_Teacher = Config.Bind("Main Game", "Special Outfit Ratio for Teacher", 100, new ConfigDescription("Percentage of selecting from !teacher folder for teacher", new AcceptableValueRange<int>(0, 100)));
@@ -109,8 +109,8 @@ namespace CosplayParty
             //            AccKeeper = Config.Bind("Main Game", "On Coordinate Load Support", true, new ConfigDescription("Keep head and tail accessories\nUsed for characters who have accessory based hair and avoid them going bald\nWorks best with a Cosplay Party Ready character marked by Additional Card Info", null, new ConfigurationManagerAttributes() { IsAdvanced = true, Order = 4 }));
             RandomizeOutfit = Config.Bind("Main Game", "Randomize Outfit", true, "Loads outfit from outer folder");
             RandomizeUnderwear = Config.Bind("Main Game", "Randomize Underwear", false, "Loads underwear from inner folder and replace them (Does not apply to Swim/Bath outfits)");
-//            RandomizeUnderwearOnly = Config.Bind("Main Game", "Randomize Underwear Only", false, "Its an option");
-//            ForceRandomUnderwear = Config.Bind("Main Game", "Force underwear parts", false, "Doesn't force Top or Bottom");
+            //            RandomizeUnderwearOnly = Config.Bind("Main Game", "Randomize Underwear Only", false, "Its an option");
+            //            ForceRandomUnderwear = Config.Bind("Main Game", "Force underwear parts", false, "Doesn't force Top or Bottom");
 
             UpdateFrequency = Config.Bind("Story Mode", "Update Frequency", OutfitUpdate.Daily);
 #if KK
@@ -136,23 +136,23 @@ namespace CosplayParty
             DestinationTailAccs = Config.Bind("Accessories", "Destination Tail Accessories", true, "Remove source tail accessories or coordinating.");
 
             //Sets
-//            EnableSets = Config.Bind("Outfit Sets", "Enable Outfit Sets", true, new ConfigDescription("Outfits in set folders can be pulled from a group for themed sets", null, new ConfigurationManagerAttributes() { Order = 3 }));
-//            IndividualSets = Config.Bind("Outfit Sets", "Do not Find Matching Sets", false, new ConfigDescription("Don't look for other sets that are shared per coordinate type", null, AdvancedConfig));
-//            FullSet = Config.Bind("Outfit Sets", "Assign available sets only", false, new ConfigDescription("Prioritize sets in order: Uniform > Gym > Swim > Club > Casual > Nightwear\nDisabled priority reversed: example Nightwear set will overwrite all clothes if same folder is found", null, AdvancedConfig));
+            //            EnableSets = Config.Bind("Outfit Sets", "Enable Outfit Sets", true, new ConfigDescription("Outfits in set folders can be pulled from a group for themed sets", null, new ConfigurationManagerAttributes() { Order = 3 }));
+            //            IndividualSets = Config.Bind("Outfit Sets", "Do not Find Matching Sets", false, new ConfigDescription("Don't look for other sets that are shared per coordinate type", null, AdvancedConfig));
+            //            FullSet = Config.Bind("Outfit Sets", "Assign available sets only", false, new ConfigDescription("Prioritize sets in order: Uniform > Gym > Swim > Club > Casual > Nightwear\nDisabled priority reversed: example Nightwear set will overwrite all clothes if same folder is found", null, AdvancedConfig));
 
             //Additional Outfit
-//            EnableDefaults = Config.Bind("Additional Outfits", "Enable Default in rolls", false, new ConfigDescription("Adds default outfit to roll tables", null, AdvancedConfig));
+            //            EnableDefaults = Config.Bind("Additional Outfits", "Enable Default in rolls", false, new ConfigDescription("Adds default outfit to roll tables", null, AdvancedConfig));
 
             //prob
-//            H_EXP_Choice = Config.Bind("Probability", "Outfit Picker logic", Hexp.RandConstant, new ConfigDescription("Randomize: Each outfit can be from different H States\nRandConstant: Randomizes H State, but will choose the same level if outfit is found (will get next highest if Enable Default is not enabled)\nMaximize: Do I really gotta say?", null, AdvancedConfig));
+            //            H_EXP_Choice = Config.Bind("Probability", "Outfit Picker logic", Hexp.RandConstant, new ConfigDescription("Randomize: Each outfit can be from different H States\nRandConstant: Randomizes H State, but will choose the same level if outfit is found (will get next highest if Enable Default is not enabled)\nMaximize: Do I really gotta say?", null, AdvancedConfig));
 
             //Maker
-            Makerview = Config.Bind("Maker", "Enable Maker Mode", false, new ConfigDescription("", null, AdvancedConfig));
-//            ResetMaker = Config.Bind("Maker", "Reset Sets", false, new ConfigDescription("Will overwrite current day outfit in storymode if you wanted to view that version.", null, AdvancedConfig));
-            ChangeOutfit = Config.Bind("Maker", "Change generated outfit", false, new ConfigDescription("Pick new coordinates in maker", null, AdvancedConfig));
+            //            Makerview = Config.Bind("Maker", "Enable Maker Mode", false, new ConfigDescription("", null, AdvancedConfig));
+            //            ResetMaker = Config.Bind("Maker", "Reset Sets", false, new ConfigDescription("Will overwrite current day outfit in storymode if you wanted to view that version.", null, AdvancedConfig));
+            //            ChangeOutfit = Config.Bind("Maker", "Change generated outfit", false, new ConfigDescription("Pick new coordinates in maker", null, AdvancedConfig));
 
             //Other Mods
-//            UnderwearStates = Config.Bind("Other Mods", "Randomize Underwear: ACC_States", true, "Attempts to write logic for AccStateSync and Accessory states to use.");
+            //            UnderwearStates = Config.Bind("Other Mods", "Randomize Underwear: ACC_States", true, "Attempts to write logic for AccStateSync and Accessory states to use.");
 
             CoordinatePath = Config.Bind("Coordinate Location", "Path to coordinate folder", new DirectoryInfo(UserData.Path).FullName + "Coordinate" + sep + "CosplayParty", "Coordinate Path");
             UpdateFolders = Config.Bind("Coordinate Location", "Folder Options", false, new ConfigDescription("", null, new ConfigurationManagerAttributes() { HideSettingName = true, HideDefaultButton = true, CustomDrawer = new Action<ConfigEntryBase>(FolderUpdateGUI) }));
@@ -188,7 +188,7 @@ namespace CosplayParty
 
                 yield return null;
 
-//                Logger.LogMessage($"Following warnings/errors are related to coordinates Cosplay Party has cached");
+                //                Logger.LogMessage($"Following warnings/errors are related to coordinates Cosplay Party has cached");
 
                 DirectoryFinder.Organize();
 

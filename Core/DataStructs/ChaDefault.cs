@@ -8,227 +8,17 @@ using System.Linq;
 
 namespace CosplayParty
 {
-    public class OverrideOuter : IDisposable
-    {
-        public bool IsLoaded;
-        public bool IsReady { get { return Selected == null || IsLoaded; } }
-
-        public CardData Selected;
-        private ChaDefault ThisOutfitData;
-        private int Index;
-
-        public OverrideOuter(ChaDefault tod, int idx)
-        {
-            ThisOutfitData = tod;
-            Index = idx;
-        }
-
-        public void Dispose()
-        {
-            Unload();
-            ThisOutfitData = null;
-        }
-
-        public void Unload()
-        {
-            if (!IsLoaded) return;
-            IsLoaded = false;
-        }
-
-        public void Select()
-        {
-            Unload();
-
-            if (Selected == null) return;
-
-            var path = Selected.GetFullPath();
-            if (String.IsNullOrEmpty(path)) Selected = null;
-            else if (!path.EndsWith(".png")) Selected = null;
-            else
-            {
-                var ThisCoordinate = ThisOutfitData.ChaControl.chaFile.coordinate[Index];
-                IsLoaded = ThisCoordinate.LoadFile(path);//in case it fails
-            }
-        }
-    }
-
-    public class OverrideInner : IDisposable
-    {
-        public bool IsLoaded;
-        public bool IsReady { get { return Selected == null || IsLoaded; } }
-
-        public CardData Selected;
-        private ChaDefault ThisOutfitData;
-        private int Index;
-
-        public OverrideInner(ChaDefault tod, int idx)
-        {
-            ThisOutfitData = tod;
-            Index = idx;
-        }
-
-        public void Dispose()
-        {
-            Unload();
-            ThisOutfitData = null;
-        }
-
-        public void Unload()
-        {
-            if (!IsLoaded) return;
-            IsLoaded = false;
-        }
-
-        public void Select()
-        {
-            Unload();
-
-        }
-    }
-
-    //! 承継対象のアクセ 
-    public class SuccessingAccessory
-    {
-        public ChaFileAccessory.PartsInfo Part;
-        public HairSupport.HairAccessoryInfo Hair;
-        public MaterialEditorProperties Material;
-
-        //! 髪型として残すか 
-        public bool ForHair;
-        //! 髪型以外として残すか 
-        public bool ForAcce;
-
-        public SuccessingAccessory(ChaFileAccessory.PartsInfo part, HairSupport.HairAccessoryInfo hair, MaterialEditorProperties mat, bool hf, bool af)
-        {
-            Part = part;
-            Hair = hair;
-            Material = mat;
-            ForHair = hf;
-            ForAcce = af;
-        }
-    }
-
-    //! コーデ差し替えで受け継ぐもの
-    /*! @note 初回ロードで構築し、ずっと残しておく必要がある。
-    */
-    public class CoordinateSuccession : IDisposable
-    {
-        //! 次のコーデに差し替え後も残しておくべきアクセ情報の保持
-        //        public List<ChaFileAccessory.PartsInfo> CoordinatePartsQueue = new List<ChaFileAccessory.PartsInfo>();
-        //! 次のコーデに差し替え後も残しておくべきアクセ情報の保持
-        //        public List<HairSupport.HairAccessoryInfo> HairAccQueue = new List<HairSupport.HairAccessoryInfo>();
-        //! CoordinatePartsQueue や HairAccQueue に登録するアクセそれぞれについて、髪型として残すかのフラグ
-        //        public List<bool> HairKeepQueue = new List<bool>();
-        //! CoordinatePartsQueue や HairAccQueue に登録するアクセそれぞれについて、髪型以外として残すかのフラグ
-        //        public List<bool> ACCKeepQueue = new List<bool>();
-
-        //! 承継対象のアクセ 
-        public List<SuccessingAccessory> KeptAccessories = new List<SuccessingAccessory>();
-
-        public void Dispose()
-        {
-            Reset();
-        }
-
-        public void Reset()
-        {
-            KeptAccessories.Clear();
-        }
-
-        public void Keep(ChaFileAccessory.PartsInfo part, HairSupport.HairAccessoryInfo hair, MaterialEditorProperties mat, bool hf, bool af)
-        {
-            KeptAccessories.Add(new SuccessingAccessory(part,hair,mat,hf,af));
-        }
-    }
-
-    //! コーデ編集情報 
-    /*! @note 編集前に Reset() を呼ぶ。
-    */
-    public class CoordinateProcessInfo : IDisposable
-    {
-        //! コーデ差し替え後に HairAccQueue から適用したアクセのインデクスが追記される 
-        public readonly List<int> HairKeepReturn = new List<int>();
-        //! コーデ差し替え後に CoordinatePartsQueue から適用したアクセのインデクスが追記される 
-        public readonly List<int> ACCKeepReturn = new List<int>();
-        //! コーデ差し替え後に下着付属として追加したアクセのインデクスが追記される 
-        public readonly List<int> UnderwearAccessoriesLocations = new List<int>();
-
-        public bool[] UnderwearProcessed = new bool[9];
-        public bool[] UnderClothingKeep = new bool[9];
-
-        public void Dispose()
-        {
-            Reset();
-        }
-
-        public void Reset()
-        {
-            HairKeepReturn.Clear();
-            ACCKeepReturn.Clear();
-            UnderwearAccessoriesLocations.Clear();
-            UnderwearProcessed = new bool[9];
-            UnderClothingKeep = new bool[9];
-        }
-    }
-
-    public class ChaOutfit : IDisposable
-    {
-        private ChaDefault ThisOutfitData;
-        private int Index;
-
-        public readonly OverrideOuter Outer;
-        public readonly OverrideInner Inner;
-
-        // このあたりの構造、ロード前のコーデ適用なんかもあるのでロードと密連動させてはならない 
-        // 用途に応じて適切なタイミングで扱う必要がある。 
-        public readonly CoordinateSuccession Succession;
-        public readonly CoordinateProcessInfo ProcInfo;
-
-        /*! @note シリアライズ向けにアクセ情報がまとめて保持される。
-        */
-        public Dictionary<int, HairSupport.HairAccessoryInfo> HairAccessories = new Dictionary<int, HairSupport.HairAccessoryInfo>();
-
-
-        public bool MakeUpKeep = false;
-
-        public ChaOutfit(ChaDefault tod, int idx)
-        {
-            ThisOutfitData = tod;
-            Index = idx;
-
-            Outer = new OverrideOuter(tod, idx);
-            Inner = new OverrideInner(tod, idx);
-            Succession = new CoordinateSuccession();
-            ProcInfo = new CoordinateProcessInfo();
-        }
-
-        public void Dispose()
-        {
-            Clear();
-            Outer.Dispose();
-            Inner.Dispose();
-            Succession.Dispose();
-            ProcInfo.Dispose();
-            ThisOutfitData = null;
-        }
-
-        public void Clear()
-        {
-            //Outer.Unload();
-            //Inner.Unload();
-            Succession.Reset();
-            ProcInfo.Reset();
-
-            HairAccessories.Clear();
-        }
-    }
-
     public class ChaDefault
     {
         internal ChaControl ChaControl;
         internal ChaFile Chafile;
 
+        /*! @note 初期処理を要するときtrueにする
+        */
         internal bool firstpass = true;
+
+        /*! @note コーデの再選択を行うときtrueにする
+        */
         internal bool processed = false;
 
         internal readonly ChaOutfit[] Outfits;
@@ -286,31 +76,6 @@ namespace CosplayParty
             for (int i = 0, n = Outfit_Size; i < n; i++)
             {
                 Outfits[i].Clear();
-#if false
-                if (!HairKeepQueue.ContainsKey(i))
-                {
-                    HairKeepQueue[i] = new List<bool>();
-                    ACCKeepQueue[i] = new List<bool>();
-                    Original_Accessory_Data[i] = new List<MaterialEditorProperties>();
-                    HairAccQueue[i] = new List<HairSupport.HairAccessoryInfo>();
-                    CoordinatePartsQueue[i] = new List<ChaFileAccessory.PartsInfo>();
-                    continue;
-                }
-
-                HairKeepQueue[i].Clear();
-                ACCKeepQueue[i].Clear();
-                Original_Accessory_Data[i].Clear();
-                HairAccQueue[i].Clear();
-                CoordinatePartsQueue[i].Clear();
-            }
-                for (int i = Outfit_Size, n = HairKeepQueue.Keys.Count; i < n; i++)
-                {
-                    HairKeepQueue.Remove(i);
-                    ACCKeepQueue.Remove(i);
-                    Original_Accessory_Data.Remove(i);
-                    HairAccQueue.Remove(i);
-                    CoordinatePartsQueue.Remove(i);
-#endif
             }
             ME.TextureDictionary.Clear();
             Finished.SoftClear();
@@ -318,32 +83,6 @@ namespace CosplayParty
 
         public void FillOutfitpaths()
         {
-#if false
-            for (var i = 0; i < Constants.GameCoordinateSize; i++)
-            {
-                var outfit = Outfits[i];
-
-                if (outfit.Outer.Selected != null)
-                {
-                    outfit.Outer.Path = card.GetFullPath();
-                    Settings.Logger.LogDebug($"{(ChaFileDefine.CoordinateType)i} outfit assigning " + outfitpaths[i]);
-                }
-                else
-                {
-                    outfitpaths[i] = "";
-                }
-
-                if (outfit.Inner.Selected != null)
-                {
-                    underwearpaths[i] = card.GetFullPath();
-                    Settings.Logger.LogDebug($"{(ChaFileDefine.CoordinateType)i} underware assigning " + underwearpaths[i]);
-                }
-                else {
-                    underwearpaths[i] = "";
-                }
-            }
-#endif
-
 #if false // Additional_Card_Info 廃止予定 
             var simpledirectory = ClothingLoader.CardInfo.SimpleFolderDirectory;
             var simplenull = simpledirectory.IsNullOrEmpty();

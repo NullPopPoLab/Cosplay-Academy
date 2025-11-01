@@ -63,38 +63,49 @@ namespace CosplayParty
                 {
                     if (ThisOutfitData.ChangeKoiToClub)
                     {
+#if false
                         ThisOutfitData.outfitpaths[4] = ThisOutfitData.ClubOutfitPath;
                         ThisOutfitData.Outfits[4].Outer.Load(ThisOutfitData.outfitpaths[4]);
                         ThisOutfitData.ClothingLoader.GeneralizedLoad(4);
                         ThisOutfitData.ChangeKoiToClub = false;
                         ThisOutfitData.ClothingLoader.Run_Repacks(ThisOutfitData.ChaControl);
                         ThisOutfitData.ClothingLoader.Reload_RePacks(ThisOutfitData.ChaControl, true);
+#endif
+                        Settings.Logger.LogDebug($"do ChangeKoiToClub: {Chara.name} map:{__instance.MapNo}");
                         Chara.chaCtrl.ChangeCoordinateTypeAndReload(ChaFileDefine.CoordinateType.Club);
+                        ThisOutfitData.ChangeKoiToClub = false;
                     }
                 }
                 else if (ThisOutfitData.ChangeClubToKoi && __instance.MapNo == 22)
                 {
+#if false
                     ThisOutfitData.ClubOutfitPath = ThisOutfitData.outfitpaths[4];
                     ThisOutfitData.outfitpaths[4] = ThisOutfitData.KoiOutfitpath;
+#endif
                     var num = heroine.isDresses.Check(false);
                     if (num == -1)
                     {
                         num = 0;
                     }
+#if false
                     heroine.coordinates[num] = 4;
                     ThisOutfitData.Outfits[4].Outer.Load(ThisOutfitData.outfitpaths[4]);
                     ThisOutfitData.ClothingLoader.GeneralizedLoad(4);
                     ThisOutfitData.ChangeClubToKoi = false;
                     ThisOutfitData.ClothingLoader.Run_Repacks(ThisOutfitData.ChaControl);
                     ThisOutfitData.ClothingLoader.Reload_RePacks(ThisOutfitData.ChaControl, true);
+#endif
+                    Settings.Logger.LogDebug($"do ChangeClubToKoi: {Chara.name} map:{__instance.MapNo}");
                     Chara.chaCtrl.ChangeCoordinateTypeAndReload(ChaFileDefine.CoordinateType.Club);
                     //Chara.chaCtrl.SetAccessoryStateAll(true);
+                    ThisOutfitData.ChangeClubToKoi = false;
                 }
                 else if (ThisOutfitData.ChangeKoiToClub && __instance.MapNo != 22)
                 {
                     var remainThreshold = (heroine.lewdness / (4 - (int)heroine.HExperience));
                     if (UnityEngine.Random.Range(0, 101) >= remainThreshold)
                     {
+#if false
                         ThisOutfitData.outfitpaths[4] = ThisOutfitData.ClubOutfitPath;
                         var num = heroine.isDresses.Check(false);
                         if (num == -1)
@@ -106,6 +117,8 @@ namespace CosplayParty
                         ThisOutfitData.ClothingLoader.GeneralizedLoad(4);
                         ThisOutfitData.ClothingLoader.Run_Repacks(ThisOutfitData.ChaControl);
                         ThisOutfitData.ClothingLoader.Reload_RePacks(ThisOutfitData.ChaControl, true);
+#endif
+                        Settings.Logger.LogDebug($"do ChangeKoiToClub: {Chara.name} map:{__instance.MapNo}");
                         ThisOutfitData.ChaControl.ChangeCoordinateTypeAndReload(ChaFileDefine.CoordinateType.Club);
                         //ThisOutfitData.ChaControl.SetAccessoryStateAll(true);
                     }
@@ -158,6 +171,7 @@ namespace CosplayParty
                         {
                             if (ThisOutfitData.Changestate)
                             {
+                                Settings.Logger.LogDebug($"do Changestate: {_npc.name} map:{_npc.mapNo}=>{wp.MapNo}");
                                 ThisOutfitData.Changestate = false;
                                 return;
                             }
@@ -169,19 +183,20 @@ namespace CosplayParty
                             //ThisOutfitData.heroine.isDresses = tempdress.ToArray();
                             //actCtrl.SetDesire(0, ThisOutfitData.heroine, 100);
                             //ExpandedOutfit.Logger.LogWarning($"{_npc.chaCtrl.fileParam.fullname} is heading to club room...probably");
-#if false // おそらく廃止 
-                            if (UnityEngine.Random.Range(1, 101) <= Settings.KoiChance.Value)
+                            //if (UnityEngine.Random.Range(1, 101) <= Settings.KoiChance.Value)
                             {
+                                Settings.Logger.LogDebug($"set ChangeClubToKoi: {_npc.name} map:{_npc.mapNo}=>{wp.MapNo}");
                                 ThisOutfitData.ChangeClubToKoi = true;
                             }
-#endif
                         }
                         else if (_npc.mapNo == 22 && wp.MapNo == 46)
                         {
+                            Settings.Logger.LogDebug($"set ChangeKoiToClub: {_npc.name} map:{_npc.mapNo}=>{wp.MapNo}");
                             ThisOutfitData.ChangeKoiToClub = true;
                         }
                         else if (_npc.mapNo == 22 && wp.MapNo != 22)
                         {
+                            Settings.Logger.LogDebug($"set ChangeKoiToClub: {_npc.name} map:{_npc.mapNo}=>{wp.MapNo}");
                             ThisOutfitData.ChangeKoiToClub = true;
                             //var tempcoord = ThisOutfitData.heroine.coordinates.ToList();
                             //var tempdress = ThisOutfitData.heroine.isDresses.ToList();
@@ -197,7 +212,6 @@ namespace CosplayParty
                 }
                 catch (Exception ex)
                 {
-
                     Settings.Logger.LogError("SetWaitPoint fail - " + ex);
                 }
             }

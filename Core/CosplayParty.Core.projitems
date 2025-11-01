@@ -12,6 +12,8 @@
     <Compile Include="$(MSBuildThisFileDirectory)DataStructs\ChaDefault.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Characustom\CharaEvent.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Characustom\ClothingLoader.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DataStructs\ChaOutfit.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DataStructs\CoordOverrider.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DataStructs\FolderData.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DataStructs\CardData.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DataStructs\MainFolderStruct.cs" />

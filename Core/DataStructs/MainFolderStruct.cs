@@ -34,18 +34,6 @@ namespace CosplayParty
             return result;
         }
 
-#if false
-        public List<CardData> GetAvailableCards(string attr)
-        {
-            var result = new List<CardData>();
-            for (var i = 0; i < FolderData.Count; ++i)
-            {
-                result.AddRange(FolderData[i].GetAvailableCards(attr));
-            }
-            return result;
-        }
-#endif
-
         public List<FolderData> GetAllFolders()
         {
             var result = new List<FolderData>();

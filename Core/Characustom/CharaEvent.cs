@@ -36,7 +36,7 @@ namespace CosplayParty
         internal static void MakerAPI_MakerExiting()
         {
             Firstpass = 0;
-#if !KKS
+#if false
             if (!MakerAPI.IsInsideClassMaker())
             {
                 ChaDefaults.Clear();
@@ -63,12 +63,19 @@ namespace CosplayParty
             {
                 return;
             }
-#if DEBUG
-            Settings.Logger.LogDebug($"Processing {ChaControl.chaFile.parameter.fullname} {Firstpass}");
-#endif
+            if (currentGameMode == GameMode.Studio)
+            {
+                return;
+            }
             var IsMaker = currentGameMode == GameMode.Maker;
             // エディット中は作用させない 
             if (IsMaker) return;
+
+            Settings.Logger.LogDebug($"OnReload({currentGameMode})");
+
+#if DEBUG
+            Settings.Logger.LogDebug($"Processing {ChaControl.chaFile.parameter.fullname} {Firstpass}");
+#endif
 #if TRACE
             var Start = Time.ElapsedMilliseconds;
             if (ThisOutfitData == null || !ThisOutfitData.processed || currentGameMode == GameMode.Maker)
@@ -76,11 +83,7 @@ namespace CosplayParty
                 Time.Start();
             }
 #endif
-            if (currentGameMode == GameMode.Studio)
-            {
-                return;
-            }
-            if (IsMaker || !IsMaker && (ThisOutfitData == null || ThisOutfitData != null && !ThisOutfitData.processed))
+            if (/*IsMaker || !IsMaker &&*/ (ThisOutfitData == null || ThisOutfitData != null && !ThisOutfitData.processed))
             {
                 Process(currentGameMode);
 
@@ -98,7 +101,7 @@ namespace CosplayParty
                 ThisOutfitData.ClothingLoader.Reload_RePacks(ChaControl, inH);
             }
 
-            if (IsMaker && Firstpass++ == 0 || inH)
+            if (/*IsMaker && Firstpass++ == 0 ||*/ inH)
             {
                 ChaControl.ChangeCoordinateTypeAndReload();
             }
@@ -148,33 +151,57 @@ namespace CosplayParty
                 ChaDefaults.Add(ThisOutfitData);
                 return;
             }
+
             ThisOutfitData.ChaControl = ChaControl;
             ThisOutfitData.Chafile = ChaFileControl;
         }
 
         public void Process(GameMode currentGameMode)
         {
+            // disabled them 
+            switch (currentGameMode)
+            {
+                case GameMode.Studio: return;
+
+                case GameMode.Maker:
+                    /*if (!Settings.Makerview.Value)*/ return;
+                    break;
+
+                case GameMode.MainGame:
+                    if (!Settings.EnableSetting.Value) return;
+                    break;
+            }
+
             Settings.Logger.LogDebug($"Process({currentGameMode})");
 
+            // この時点で ThisOutfitData 未生成のケースがあり、ここで生成される 
             ThisOutfitDataProcess();
+
 #if KK
             if (ThisOutfitData.heroine != null && ThisOutfitData.heroine.isTeacher && !Settings.TeacherDress.Value)
             {
+                Settings.Logger.LogDebug("Teacher is excluded by TeacherDress setting");
                 return;
             }
 #endif
+
+#if false
             if (GameMode.Maker == currentGameMode)
             {
                 ThisOutfitData.firstpass = true;
                 ThisOutfitData.Chafile = MakerAPI.LastLoadedChaFile;
+
                 if (Settings.ResetMaker.Value)
                 {
                     OutfitDecider.ResetDecider();
                 }
             }
+#endif
 
             if (ThisOutfitData.firstpass) //Save all accessories to avoid duplicating head accessories each load and be reuseable
             {
+                Settings.Logger.LogDebug("Do firstpass: " + ThisOutfitData.Chafile.GetFancyCharacterName());
+
                 ThisOutfitData.Clear_Firstpass();
 
                 var CharaHair = new Dictionary<int, Dictionary<int, HairSupport.HairAccessoryInfo>>();
@@ -186,13 +213,13 @@ namespace CosplayParty
 
                 var MaterialEditorData = ExtendedSave.GetExtendedDataById(ThisOutfitData.Chafile, "com.deathweasel.bepinex.materialeditor");
 
-                #region ME Acc Import
+#region ME Acc Import
                 var Chafile_ME_Data = ThisOutfitData.Finished = new ME_List(MaterialEditorData, ThisOutfitData);
-                #endregion
+#endregion
 
-                #region Queue accessories to keep
+#region Queue accessories to keep
 
-                #region ACI Data
+#region ACI Data
 #if false // Additional_Card_Info 廃止予定 
                 var ACI_data = new Additional_Card_Info.DataStruct();
 
@@ -233,11 +260,15 @@ namespace CosplayParty
                 ClothingLoader.MakeUpKeep = CoordinateInfo.ToDictionary(x => x.Key, x => x.Value.MakeUpKeep);
                 ClothingLoader.CharacterClothingKeep_Coordinate = CoordinateInfo.ToDictionary(x => x.Key, x => x.Value.CoordinateSaveBools);
 #endif
-                #endregion
+#endregion
 
                 for (int outfitnum = 0, n = ThisOutfitData.Outfit_Size; outfitnum < n; outfitnum++)
                 {
                     var outfit = ThisOutfitData.Outfits[outfitnum];
+
+                    /*! @todo コーデのアクセ毎に設定を追加
+                    */
+                    var atype = AccessoryType.Standard;
 
                     ThisOutfitData.Original_Coordinates[outfitnum] = CloneCoordinate(ChaFileControl.coordinate[outfitnum]);
 #if false // Additional_Card_Info 廃止予定 
@@ -274,27 +305,19 @@ namespace CosplayParty
                     var ME_ACC_Data = coord.AccessoryProperties;
                     for (var i = 0; i < Intermediate.Count; i++)
                     {
-                        // CoordinateInfo.HairAcc 情報あり 
-                        var hkeep = false /*HairKeep.Contains(i)*/;
-                        // CoordinateInfo.AccKeep 情報あり 
-                        var akeep = false /*ACCKeep.Contains(i)*/;
-
-#if false // Additional_Card_Info 廃止予定 
-                        if(!Cosplay_Academy_Ready)
-#endif
                         {
-                            if (!hkeep) hkeep = !Settings.DestinationHeadAccs.Value && Constants.HeadAcceSet.Contains(Intermediate[i].parentKey);
-                            if (!hkeep) hkeep = !Settings.DestinationForeheadAccs.Value && Constants.ForeheadAcceSet.Contains(Intermediate[i].parentKey);
-                            if (!akeep) akeep = !Settings.DestinationHatAccs.Value && Constants.HatAcceSet.Contains(Intermediate[i].parentKey);
-                            if (!akeep) akeep = !Settings.DestinationEarAccs.Value && Constants.EarAcceSet.Contains(Intermediate[i].parentKey);
-                            if (!akeep) akeep = !Settings.DestinationEyeAccs.Value && Constants.EyeAcceSet.Contains(Intermediate[i].parentKey);
-                            if (!akeep) akeep = !Settings.DestinationNoseAccs.Value && Constants.NoseAcceSet.Contains(Intermediate[i].parentKey);
-                            if (!akeep) akeep = !Settings.DestinationMouthAccs.Value && Constants.MouthAcceSet.Contains(Intermediate[i].parentKey);
-                            if (!akeep) akeep = !Settings.DestinationTailAccs.Value && Constants.TailAcceSet.Contains(Intermediate[i].parentKey);
+                            if (atype == AccessoryType.Standard && !Settings.DestinationHeadAccs.Value && Constants.HeadAcceSet.Contains(Intermediate[i].parentKey)) atype = AccessoryType.HairOrnament;
+                            if (atype == AccessoryType.Standard && !Settings.DestinationForeheadAccs.Value && Constants.ForeheadAcceSet.Contains(Intermediate[i].parentKey)) atype = AccessoryType.HairOrnament;
+                            if (atype == AccessoryType.Standard && !Settings.DestinationHatAccs.Value && Constants.HatAcceSet.Contains(Intermediate[i].parentKey)) atype = AccessoryType.HairOrnament;
+                            if (atype == AccessoryType.Standard && !Settings.DestinationEarAccs.Value && Constants.EarAcceSet.Contains(Intermediate[i].parentKey)) atype = AccessoryType.HairOrnament;
+                            if (atype == AccessoryType.Standard && !Settings.DestinationEyeAccs.Value && Constants.EyeAcceSet.Contains(Intermediate[i].parentKey)) atype = AccessoryType.HairOrnament;
+                            if (atype == AccessoryType.Standard && !Settings.DestinationNoseAccs.Value && Constants.NoseAcceSet.Contains(Intermediate[i].parentKey)) atype = AccessoryType.HairOrnament;
+                            if (atype == AccessoryType.Standard && !Settings.DestinationMouthAccs.Value && Constants.MouthAcceSet.Contains(Intermediate[i].parentKey)) atype = AccessoryType.HairOrnament;
+                            if (atype == AccessoryType.Standard && !Settings.DestinationTailAccs.Value && Constants.TailAcceSet.Contains(Intermediate[i].parentKey)) atype = AccessoryType.Bodyfit;
                         }
 
                         // アクセを残すか 
-                        var keep = xkeep || hkeep || akeep;
+                        var keep = xkeep || atype != AccessoryType.Standard;
 
                         //Settings.Logger.LogDebug($"Process: Acc {outfitnum}-{i} XK={xkeep} GI={geneinc} HK={hkeep} AK={akeep}");
 
@@ -317,16 +340,7 @@ namespace CosplayParty
 
                             //Settings.Logger.LogDebug($"Keep from 1stpass: Acc {outfitnum}-{i}; {Intermediate[i]}");
 
-                            outfit.Succession.Keep(Intermediate[i], ACCdata, editorProperties, hkeep, akeep);
-#if false
-                            ME_ACC_Storage.Add(editorProperties);
-
-                            outfit.Succession.CoordinatePartsQueue.Add(Intermediate[i]);
-                            outfit.Succession.HairAccQueue.Add(ACCdata);
-
-                            outfit.Succession.HairKeepQueue.Add(hkeep);
-                            outfit.Succession.ACCKeepQueue.Add(akeep);
-#endif
+                            outfit.Succession.Keep(atype, Intermediate[i], ACCdata, editorProperties);
                         }
                     }
                 }
@@ -335,15 +349,11 @@ namespace CosplayParty
                 ThisOutfitData.firstpass = false;
             }
 
-            if (!Settings.EnableSetting.Value && GameMode.MainGame == currentGameMode || !Settings.Makerview.Value && GameMode.Maker == currentGameMode || GameMode.Studio == currentGameMode)
-            {
-                return;
-            }//if disabled don't run
-
             if (ChaControl.sex == 1)//run the following if female
             {
-                if (currentGameMode == GameMode.MainGame && !ThisOutfitData.processed || Settings.ChangeOutfit.Value && GameMode.Maker == currentGameMode)
+                if (currentGameMode == GameMode.MainGame && !ThisOutfitData.processed /*|| Settings.ChangeOutfit.Value && GameMode.Maker == currentGameMode*/)
                 {
+                    Settings.Logger.LogDebug("Processing: " + ThisOutfitData.Chafile.GetFancyCharacterName());
                     OutfitDecider.Decision(ChaControl.fileParam.fullname, ThisOutfitData);//Generate outfits
                     ThisOutfitData.processed = true;
                 }
