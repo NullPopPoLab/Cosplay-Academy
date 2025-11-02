@@ -1,4 +1,5 @@
-﻿using CosplayParty.Hair;
+﻿using System;
+using CosplayParty.Hair;
 using CosplayParty.ME;
 using ExtensibleSaveFormat;
 using KKAPI.Maker;
@@ -122,8 +123,15 @@ namespace CosplayParty
             Settings.Logger.LogDebug($"\tFullLoad: Total elapsed time {TimeWatch[0].ElapsedMilliseconds}ms\n\tRun {Average[0].Count}: {temp}ms\n\tAverage: {Average[0].Average()}ms");
 #endif
 
-            // ここで CoordinateProcessInfo が参照される 
-            Run_Repacks(character);
+            try
+            {
+                // ここで CoordinateProcessInfo が参照される 
+                Run_Repacks(character);
+            }
+            catch (Exception e)
+            {
+                Settings.Logger.LogError("ClothingLoader.FullLoad() Repack error: " + e);
+            }
         }
 
         public void GeneralizedLoad(int outfitnum)
@@ -160,7 +168,7 @@ namespace CosplayParty
 #endif
             }
 
-            var keptacce = outfit.Succession.KeptAccessories;
+            var keptacce = outfit.Current.Succession.KeptAccessories;
 
             outfit.ProcInfo.Reset();
 
@@ -238,7 +246,7 @@ namespace CosplayParty
             outfit.ProcInfo.UnderClothingKeep = UnderClothingKeep;
 
             var Inputdata = ExtendedSave.GetExtendedDataById(ThisCoordinate, "com.deathweasel.bepinex.hairaccessorycustomizer");
-            var HairAccInfo = outfit.HairAccessories;
+            var HairAccInfo = outfit.Current.HairAccessories;
             if (Inputdata != null)
             {
                 if (Inputdata.version == 0)
@@ -408,7 +416,7 @@ namespace CosplayParty
 
                         var acce = keptacce[aidx++];
                         
-                        parts[ACCpostion] = acce.Part;
+                        parts[ACCpostion] = acce.Parts;
                         if (acce.Hair.HairLength > -998)
                         {
                             HairAccInfo[ACCpostion] = acce.Hair;
@@ -446,7 +454,7 @@ namespace CosplayParty
 
                 var acce = keptacce[aidx++];
 
-                parts.Add(acce.Part);
+                parts.Add(acce.Parts);
                 if (acce.Hair.HairLength > -998)
                 {
                     var HairInfo = acce.Hair;
@@ -497,7 +505,7 @@ namespace CosplayParty
             var outfitnum = chacontrol.fileStatus.coordinateType;
             var outfit = ThisOutfitData.Outfits[outfitnum];
 
-            var keptacce = outfit.Succession.KeptAccessories;
+            var keptacce = outfit.Current.Succession.KeptAccessories;
 
             var HairKeepResult = new List<int>();
             var ACCKeepResult = new List<int>();
@@ -532,7 +540,7 @@ namespace CosplayParty
                 {
                     var acce = keptacce[aidx++];
 
-                    OriginalData[ACCpostion] = acce.Part;
+                    OriginalData[ACCpostion] = acce.Parts;
                     if (acce.Hair.HairLength > -998)
                     {
                         HairACCDictionary[ACCpostion] = acce.Hair;
@@ -563,7 +571,7 @@ namespace CosplayParty
 
                 var acce = keptacce[aidx++];
 
-                OriginalData.Add(acce.Part);
+                OriginalData.Add(acce.Parts);
                 if (acce.Hair.HairLength > -998)
                 {
                     var HairInfo = acce.Hair;

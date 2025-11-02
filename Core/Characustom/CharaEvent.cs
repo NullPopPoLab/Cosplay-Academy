@@ -1,4 +1,5 @@
-﻿using CosplayParty.Hair;
+﻿using System;
+using CosplayParty.Hair;
 using CosplayParty.ME;
 using ExtensibleSaveFormat;
 using KKAPI;
@@ -158,31 +159,35 @@ namespace CosplayParty
 
         public void Process(GameMode currentGameMode)
         {
-            // disabled them 
-            switch (currentGameMode)
+            try
             {
-                case GameMode.Studio: return;
 
-                case GameMode.Maker:
-                    /*if (!Settings.Makerview.Value)*/ return;
-                    break;
+                // disabled them 
+                switch (currentGameMode)
+                {
+                    case GameMode.Studio: return;
 
-                case GameMode.MainGame:
-                    if (!Settings.EnableSetting.Value) return;
-                    break;
-            }
+                    case GameMode.Maker:
+                        /*if (!Settings.Makerview.Value)*/
+                        return;
+                    //break;
 
-            Settings.Logger.LogDebug($"Process({currentGameMode})");
+                    case GameMode.MainGame:
+                        if (!Settings.EnableSetting.Value) return;
+                        break;
+                }
 
-            // この時点で ThisOutfitData 未生成のケースがあり、ここで生成される 
-            ThisOutfitDataProcess();
+                Settings.Logger.LogDebug($"Process({currentGameMode})");
+
+                // この時点で ThisOutfitData 未生成のケースがあり、ここで生成される 
+                ThisOutfitDataProcess();
 
 #if KK
-            if (ThisOutfitData.Heroine != null && ThisOutfitData.Heroine.isTeacher && !Settings.TeacherDress.Value)
-            {
-                Settings.Logger.LogDebug("Teacher is excluded by TeacherDress setting");
-                return;
-            }
+                if (ThisOutfitData.Heroine != null && ThisOutfitData.Heroine.isTeacher && !Settings.TeacherDress.Value)
+                {
+                    Settings.Logger.LogDebug("Teacher is excluded by TeacherDress setting");
+                    return;
+                }
 #endif
 
 #if false
@@ -198,14 +203,14 @@ namespace CosplayParty
             }
 #endif
 
-            if (ThisOutfitData.firstpass) //Save all accessories to avoid duplicating head accessories each load and be reuseable
-            {
-                Settings.Logger.LogDebug("Do firstpass: " + ThisOutfitData.Chafile.GetFancyCharacterName());
+                if (ThisOutfitData.firstpass) //Save all accessories to avoid duplicating head accessories each load and be reuseable
+                {
+                    Settings.Logger.LogDebug("Do firstpass: " + ThisOutfitData.Chafile.GetFancyCharacterName());
 
-                ThisOutfitData.Clear_Firstpass();
-                ThisOutfitData.Reset_Firstpass();
+                    ThisOutfitData.Clear_Firstpass();
+                    ThisOutfitData.Reset_Firstpass();
 
-#region ACI Data
+                    #region ACI Data
 #if false // Additional_Card_Info 廃止予定 
                 var ACI_data = new Additional_Card_Info.DataStruct();
 
@@ -246,24 +251,46 @@ namespace CosplayParty
                 ClothingLoader.MakeUpKeep = CoordinateInfo.ToDictionary(x => x.Key, x => x.Value.MakeUpKeep);
                 ClothingLoader.CharacterClothingKeep_Coordinate = CoordinateInfo.ToDictionary(x => x.Key, x => x.Value.CoordinateSaveBools);
 #endif
-#endregion
-                ThisOutfitData.firstpass = false;
-            }
-
-            if (ChaControl.sex == 1)//run the following if female
-            {
-                if (currentGameMode == GameMode.MainGame && !ThisOutfitData.processed /*|| Settings.ChangeOutfit.Value && GameMode.Maker == currentGameMode*/)
-                {
-                    Settings.Logger.LogDebug("Processing: " + ThisOutfitData.Chafile.GetFancyCharacterName());
-                    OutfitDecider.Decision(ChaControl.fileParam.fullname, ThisOutfitData);//Generate outfits
-                    ThisOutfitData.processed = true;
+                    #endregion
+                    ThisOutfitData.firstpass = false;
                 }
-                var HoldOutfit = ChaControl.fileStatus.coordinateType; //requried for Cutscene characters to wear correct outfit such as sakura's first cutscene
-//HoldOutfit = ChaControl.chaFile.coordinate.Length - 1;
-                ThisOutfitData.ClothingLoader.FullLoad(ChaControl, ChaFileControl);
-                ChaControl.fileStatus.coordinateType = HoldOutfit;
-                var temp = (ChaInfo)ChaControl;
-                ChaControl.ChangeCoordinateType((ChaFileDefine.CoordinateType)temp.fileStatus.coordinateType, true); //forces cutscene characters to use outfits
+
+                if (ChaControl.sex == 1)//run the following if female
+                {
+                    if (currentGameMode == GameMode.MainGame && !ThisOutfitData.processed /*|| Settings.ChangeOutfit.Value && GameMode.Maker == currentGameMode*/)
+                    {
+                        Settings.Logger.LogDebug("Processing: " + ThisOutfitData.Chafile.GetFancyCharacterName());
+                        OutfitDecider.Decision(ChaControl.fileParam.fullname, ThisOutfitData);//Generate outfits
+                        ThisOutfitData.processed = true;
+                    }
+                    var HoldOutfit = ChaControl.fileStatus.coordinateType; //requried for Cutscene characters to wear correct outfit such as sakura's first cutscene
+                    ThisOutfitData.ClothingLoader.FullLoad(ChaControl, ChaFileControl);
+                    ChaControl.fileStatus.coordinateType = HoldOutfit;
+                    var temp = (ChaInfo)ChaControl;
+                    var next = (ChaFileDefine.CoordinateType)temp.fileStatus.coordinateType;
+#if true // コーデタイプ切り替え実験 
+                    switch (next)
+                    {
+#if KK
+                        case ChaFileDefine.CoordinateType.Gym:
+#endif
+                        case ChaFileDefine.CoordinateType.Swim:
+                        case ChaFileDefine.CoordinateType.Pajamas:
+                            break;
+
+                        default:
+                            next = GameEvent.NextCoordType;
+                            break;
+                    }
+#endif
+                    Settings.Logger.LogDebug("next Coord type: " + next);
+                    ChaControl.ChangeCoordinateType(next, true); //forces cutscene characters to use outfits
+                }
+            }
+            catch(Exception e)
+            {
+                Settings.Logger.LogError("CharaEvent.Process() error " + e);
+
             }
         }
 

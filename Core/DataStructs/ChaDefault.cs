@@ -28,6 +28,7 @@ namespace CosplayParty
 
         internal int Outfit_Size => ChaControl.chaFile.coordinate.Length;
 
+#if false // for KoiChance 
 #if KK
         internal string KoiOutfitpath;
         internal string ClubOutfitPath;
@@ -35,15 +36,15 @@ namespace CosplayParty
         internal bool ChangeClubToKoi;
 #endif
         internal bool Changestate = false;
-        internal bool SkipFirstPriority = false;
+#endif
+
+        //        internal bool SkipFirstPriority = false;
         internal ME_Support ME = new ME_Support();
 
         internal ClothingLoader ClothingLoader;
-        internal Dictionary<string, PluginData> ExtendedCharacterData = new Dictionary<string, PluginData>();
+//        internal Dictionary<string, PluginData> ExtendedCharacterData = new Dictionary<string, PluginData>();
 
-#region Material Editor Return
         public ME_List FinalMaterials;
-#endregion
 
         //! シリアライズ用 HairAccessoryInfo 群 
         public Dictionary<int, Dictionary<int, Hair.HairSupport.HairAccessoryInfo>> HairAccessoriesPack
@@ -51,7 +52,7 @@ namespace CosplayParty
             get
             {
                 var t = new Dictionary<int, Dictionary<int, Hair.HairSupport.HairAccessoryInfo>>();
-                for (var i = 0; i < Outfits.Length; ++i) t[i] = Outfits[i].HairAccessories;
+                for (var i = 0; i < Outfits.Length; ++i) t[i] = Outfits[i].Current.HairAccessories;
                 return t;
             }
         }
@@ -73,115 +74,28 @@ namespace CosplayParty
         {
             for (int i = 0, n = Outfit_Size; i < n; i++)
             {
-                Outfits[i].Clear();
+                Outfits[i].Reset();
             }
             ME.TextureDictionary.Clear();
             FinalMaterials.SoftClear();
         }
 
-        private ChaFileCoordinate _cloneCoordinate(ChaFileCoordinate OriginalCoordinate)
-        {
-            return new ChaFileCoordinate
-            {
-                clothes = OriginalCoordinate.clothes,
-                makeup = OriginalCoordinate.makeup,
-                enableMakeup = OriginalCoordinate.enableMakeup,
-            }; ;
-        }
-
         public void Reset_Firstpass()
         {
-            var HairExtendedData = ExtendedSave.GetExtendedDataById(Chafile, "com.deathweasel.bepinex.hairaccessorycustomizer");
-
-            var CharaHair = new Dictionary<int, Dictionary<int, HairSupport.HairAccessoryInfo>>();
-            if (HairExtendedData != null && HairExtendedData.data.TryGetValue("HairAccessories", out var AllHairAccessories) && AllHairAccessories != null)
-                CharaHair = MessagePackSerializer.Deserialize<Dictionary<int, Dictionary<int, HairSupport.HairAccessoryInfo>>>((byte[])AllHairAccessories);
-
-            var MaterialEditorData = ExtendedSave.GetExtendedDataById(Chafile, "com.deathweasel.bepinex.materialeditor");
-            FinalMaterials = new ME_List(MaterialEditorData, this);
+            var src = new ChaOutfit.ImportSources();
+            src.Chafile = Chafile;
+            src.HairExtendedData = ExtendedSave.GetExtendedDataById(Chafile, "com.deathweasel.bepinex.hairaccessorycustomizer");
+            if (src.HairExtendedData != null && src.HairExtendedData.data.TryGetValue("HairAccessories", out var AllHairAccessories) && AllHairAccessories != null)
+                src.CharaHair = MessagePackSerializer.Deserialize<Dictionary<int, Dictionary<int, HairSupport.HairAccessoryInfo>>>((byte[])AllHairAccessories);
+            src.MaterialEditorData = ExtendedSave.GetExtendedDataById(Chafile, "com.deathweasel.bepinex.materialeditor");
+            src.FinalMaterials = FinalMaterials = new ME_List(src.MaterialEditorData, this);
+            src.Original_Coordinates = Chafile.coordinate;
 
             for (int outfitnum = 0, n = Outfit_Size; outfitnum < n; outfitnum++)
             {
                 var outfit = Outfits[outfitnum];
 
-                if (CharaHair.TryGetValue(outfitnum, out outfit.HairInfo) == false)
-                {
-                    outfit.HairInfo = new Dictionary<int, HairSupport.HairAccessoryInfo>();
-                }
-
-                /*! @todo コーデのアクセ毎に設定を追加
-                */
-                var atype = AccessoryType.Standard;
-
-                outfit.Original_Coordinate = _cloneCoordinate(Chafile.coordinate[outfitnum]);
-#if false // Additional_Card_Info 廃止予定 
-                    var HairKeep = new List<int>();
-                    var ACCKeep = new List<int>();
-                    if (CoordinateInfo.ContainsKey(outfitnum))
-                    {
-                        HairKeep = CoordinateInfo[outfitnum].HairAcc;
-                        ACCKeep = CoordinateInfo[outfitnum].AccKeep;
-                    }
-#endif
-
-                //var acclist = new List<ChaFileAccessory.PartsInfo>();
-                var acclist = Chafile.coordinate[outfitnum].accessory.parts.ToList();
-
-                //var ME_ACC_Storage = outfit.Original_Accessory_Data;
-
-                if (!FinalMaterials.Coordinates.TryGetValue(outfitnum, out var coord))
-                {
-                    coord = new ME_Coordinate();
-                }
-
-                // 強制的に保持するか 
-                var xkeep = (Settings.ExtremeAccKeeper.Value
-#if false // Additional_Card_Info 廃止予定 
-                    && !Cosplay_Academy_Ready
-#endif
-                    );
-
-                var ME_ACC_Data = coord.AccessoryProperties;
-                for (var i = 0; i < acclist.Count; i++)
-                {
-                    {
-                        if (atype == AccessoryType.Standard && !Settings.DestinationHeadAccs.Value && Constants.HeadAcceSet.Contains(acclist[i].parentKey)) atype = AccessoryType.HairOrnament;
-                        if (atype == AccessoryType.Standard && !Settings.DestinationForeheadAccs.Value && Constants.ForeheadAcceSet.Contains(acclist[i].parentKey)) atype = AccessoryType.HairOrnament;
-                        if (atype == AccessoryType.Standard && !Settings.DestinationHatAccs.Value && Constants.HatAcceSet.Contains(acclist[i].parentKey)) atype = AccessoryType.HairOrnament;
-                        if (atype == AccessoryType.Standard && !Settings.DestinationEarAccs.Value && Constants.EarAcceSet.Contains(acclist[i].parentKey)) atype = AccessoryType.HairOrnament;
-                        if (atype == AccessoryType.Standard && !Settings.DestinationEyeAccs.Value && Constants.EyeAcceSet.Contains(acclist[i].parentKey)) atype = AccessoryType.HairOrnament;
-                        if (atype == AccessoryType.Standard && !Settings.DestinationNoseAccs.Value && Constants.NoseAcceSet.Contains(acclist[i].parentKey)) atype = AccessoryType.HairOrnament;
-                        if (atype == AccessoryType.Standard && !Settings.DestinationMouthAccs.Value && Constants.MouthAcceSet.Contains(acclist[i].parentKey)) atype = AccessoryType.HairOrnament;
-                        if (atype == AccessoryType.Standard && !Settings.DestinationTailAccs.Value && Constants.TailAcceSet.Contains(acclist[i].parentKey)) atype = AccessoryType.Bodyfit;
-                    }
-
-                    // アクセを残すか 
-                    var keep = xkeep || atype != AccessoryType.Standard;
-
-                    //Settings.Logger.LogDebug($"Process: Acc {outfitnum}-{i} XK={xkeep} GI={geneinc} HK={hkeep} AK={akeep}");
-
-                    //ExpandedOutfit.Logger.LogDebug($"ACC :{i}\tID: {data.nowAccessories[i].id}\tParent: {data.nowAccessories[i].parentKey}");
-                    if (keep)
-                    {
-                        if (!outfit.HairInfo.TryGetValue(i, out var acchair))
-                        {
-                            acchair = new HairSupport.HairAccessoryInfo
-                            {
-                                HairLength = -999
-                            };
-                        }
-
-                        if (!ME_ACC_Data.TryGetValue(i, out var accmat))
-                        {
-                            accmat = new MaterialEditorProperties();
-                        }
-
-
-                        //Settings.Logger.LogDebug($"Keep from 1stpass: Acc {outfitnum}-{i}; {Intermediate[i]}");
-
-                        outfit.Succession.Keep(atype, acclist[i], acchair, accmat);
-                    }
-                }
+                outfit.Import(src);
             }
         }
 

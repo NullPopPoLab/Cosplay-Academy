@@ -59,6 +59,8 @@ namespace CosplayParty
                 //    return;
                 //}
                 ThisOutfitData.Heroine = heroine;
+
+#if false // for KoiChance 
                 if (__instance.MapNo == 46)
                 {
                     if (ThisOutfitData.ChangeKoiToClub)
@@ -125,7 +127,7 @@ namespace CosplayParty
                     ThisOutfitData.ChangeKoiToClub = false;
                 }
                 //ExpandedOutfit.Logger.LogDebug($"SetWait2 success: {Chara.chaCtrl.fileParam.fullname} is waiting at {Chara.mapNo}");
-
+#endif
             }
             catch (Exception ex)
             {
@@ -151,6 +153,7 @@ namespace CosplayParty
                     }
 #endif
 
+#if false // for KoiChance 
                     if (wp == null || _npc == null || !Settings.StoryModeChange.Value)
                     {
                         return;
@@ -208,7 +211,8 @@ namespace CosplayParty
                             //ThisOutfitData.ChangeKoiToClub = true;
 
                         }
-                    }
+                }
+#endif
                 }
                 catch (Exception ex)
                 {

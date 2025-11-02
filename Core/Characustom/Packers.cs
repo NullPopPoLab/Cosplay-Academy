@@ -285,7 +285,7 @@ namespace CosplayParty
                             {
                                 continue;
                             }
-                            outfit.HairAccessories = original[i];
+                            outfit.Current.HairAccessories = original[i];
                         }
                     }
                 }
