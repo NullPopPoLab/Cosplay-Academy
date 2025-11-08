@@ -45,7 +45,13 @@ namespace CosplayParty
             else
             {
                 var ThisCoordinate = ThisOutfitData.ChaControl.chaFile.coordinate[Index];
+#if false // 別口ロード実験
+                var Coordinate = new ChaFileCoordinate();
+                var IsReady = Coordinate.LoadFile(path);
+                IsLoaded = ThisCoordinate.LoadBytes(Coordinate.SaveBytes(), Coordinate.loadVersion);
+#else
                 IsLoaded = ThisCoordinate.LoadFile(path);//in case it fails
+#endif
             }
         }
     }
@@ -309,7 +315,7 @@ namespace CosplayParty
             }
         }
 
-        public void Apply()
+        public void Apply4CoordCard()
         {
             // データ適用動作 
             var MaterialEditorData = ExtendedSave.GetExtendedDataById(Target.Chafile, "com.deathweasel.bepinex.materialeditor");
@@ -439,6 +445,355 @@ namespace CosplayParty
 
                 //ControllerCoordReload_Loop(Type.GetType("KK_Plugins.HairAccessoryCustomizer+HairAccessoryController, KK_HairAccessoryCustomizer", false), ChaControl, coordinate);
             }
+        }
+
+        public void Apply4Randomize()
+        {
+            var outfit = Target.Outfits[Index];
+
+            if (!Target.FinalMaterials.Coordinates.TryGetValue(Index, out var ME_coord))
+            {
+                Target.FinalMaterials.Coordinates[Index] = ME_coord = new ME_Coordinate();
+            }
+
+            Target.ChaControl.fileStatus.coordinateType = Index;
+            //UnderwearProcessed[outfitnum] = new bool[9];
+            var ThisCoordinate = Target.ChaControl.chaFile.coordinate[Index];
+
+            #region Queue accessories to keep
+
+            var UnderClothingKeep = new bool[9];
+
+            #endregion
+            //Load new outfit
+
+            //ValidOutfits[outfitnum] = load_outfit;
+            if (outfit.Outer.IsLoaded)
+            {
+#if false // Additional_Card_Info 廃止予定 
+                ME_coord.SoftClear(PersonalClothingBools);
+#else
+                ME_coord.SoftClear(new bool[9]);
+#endif
+            }
+
+            var keptacce = outfit.Current.Succession.KeptAccessories;
+
+            outfit.ProcInfo.Reset();
+
+            var UnderwearAccessoryStart = keptacce.Count;
+            #region MakeUp
+            if (outfit.MakeUpKeep)
+            {
+                ThisCoordinate.enableMakeup = outfit.Original_Coordinate.enableMakeup;
+                ThisCoordinate.makeup = outfit.Original_Coordinate.makeup;
+            }
+            #endregion
+            var HairToColor = new List<int>();
+            #region Reassign Existing Accessories
+
+#if false // Additional_Card_Info 廃止予定 
+            var ExpandedData = ExtendedSave.GetExtendedDataById(ThisCoordinate, "Additional_Card_Info");
+            if (ExpandedData != null)
+            {
+                switch (ExpandedData.version)
+                {
+                    case 0:
+                        if (ExpandedData.data.TryGetValue("CoordinateSaveBools", out var bytedata) && bytedata != null)
+                        {
+                            UnderClothingKeep = MessagePackSerializer.Deserialize<bool[]>((byte[])bytedata);
+                        }
+                        if (ExpandedData.data.TryGetValue("HairAcc", out bytedata) && bytedata != null)
+                        {
+                            HairToColor = MessagePackSerializer.Deserialize<List<int>>((byte[])bytedata);
+                        }
+                        if (ExpandedData.data.TryGetValue("ClothNot", out bytedata) && bytedata != null)
+                        {
+                            Underwearbools[outfitnum] = MessagePackSerializer.Deserialize<bool[]>((byte[])bytedata);
+                        }
+                        break;
+                    case 1:
+
+                        if (ExpandedData.data.TryGetValue("CoordinateInfo", out bytedata) && bytedata != null)
+                        {
+                            var coordinfo = MessagePackSerializer.Deserialize<Additional_Card_Info.CoordinateInfo>((byte[])bytedata);
+                            UnderClothingKeep = coordinfo.CoordinateSaveBools;
+                            HairToColor = coordinfo.HairAcc;
+                            Underwearbools[outfitnum] = coordinfo.ClothNotData;
+                        }
+                        break;
+                    default:
+                        OutdatedMessage("Additional_Card_Info", false);
+                        break;
+                }
+            }
+            else
+#endif
+
+            if (Settings.HairMatch.Value && !MakerAPI.InsideMaker && Settings.DestinationHeadAccs.Value)
+            {
+                // 頭に載っている髪パーツのみ対象とする 
+                for (var i = 0; i < ThisCoordinate.accessory.parts.Length; ++i)
+                {
+                    var p = ThisCoordinate.accessory.parts[i];
+                    if (!Constants.HeadAcceSet.Contains(p.parentKey) && !Constants.HatAcceSet.Contains(p.parentKey)) continue;
+                    HairToColor.Add(i);
+                }
+            }
+            if (UnderClothingKeep == null) UnderClothingKeep = new bool[9];
+            if (HairToColor == null) HairToColor = new List<int>();
+            //if (Underwearbools[outfitnum] == null) Underwearbools[outfitnum] = new bool[3];
+#if false // Additional_Card_Info 廃止予定 
+            for (var i = 0; i < 9; i++)
+            {
+                if (PersonalClothingBools[i])
+                {
+                    UnderClothingKeep[i] = true;
+                }
+            }
+#endif
+            outfit.ProcInfo.UnderClothingKeep = UnderClothingKeep;
+
+            var Inputdata = ExtendedSave.GetExtendedDataById(ThisCoordinate, "com.deathweasel.bepinex.hairaccessorycustomizer");
+            var HairAccInfo = outfit.Current.HairAccessories;
+            if (Inputdata != null)
+            {
+                if (Inputdata.version == 0)
+                {
+                    if (Inputdata.data.TryGetValue("CoordinateHairAccessories", out var loadedHairAccessories) && loadedHairAccessories != null)
+                        HairAccInfo = MessagePackSerializer.Deserialize<Dictionary<int, HairSupport.HairAccessoryInfo>>((byte[])loadedHairAccessories);
+                }
+                else
+                {
+                    ClothingLoader.OutdatedMessage("hairaccessorycustomizer", true);
+                }
+            }
+            #region ME Acc Import
+            var MaterialEditorData = ExtendedSave.GetExtendedDataById(ThisCoordinate, "com.deathweasel.bepinex.materialeditor");
+            Target.FinalMaterials.LoadCoordinate(MaterialEditorData, Target, Index);
+            var Import_ME_Data = new MaterialEditorProperties();
+            #endregion
+
+            var parts = new List<ChaFileAccessory.PartsInfo>();
+            // ロード対象アクセのみ選択 
+            for (var i = 0; i < ThisCoordinate.accessory.parts.Length; ++i)
+            {
+                var p = ThisCoordinate.accessory.parts[i];
+                if (!Settings.DestinationHeadAccs.Value && Constants.HeadAcceSet.Contains(p.parentKey)) continue;
+                if (!Settings.DestinationForeheadAccs.Value && Constants.ForeheadAcceSet.Contains(p.parentKey)) continue;
+                if (!Settings.DestinationHatAccs.Value && Constants.HatAcceSet.Contains(p.parentKey)) continue;
+                if (!Settings.DestinationEarAccs.Value && Constants.EarAcceSet.Contains(p.parentKey)) continue;
+                if (!Settings.DestinationEyeAccs.Value && Constants.EyeAcceSet.Contains(p.parentKey)) continue;
+                if (!Settings.DestinationNoseAccs.Value && Constants.NoseAcceSet.Contains(p.parentKey)) continue;
+                if (!Settings.DestinationMouthAccs.Value && Constants.MouthAcceSet.Contains(p.parentKey)) continue;
+                if (!Settings.DestinationTailAccs.Value && Constants.TailAcceSet.Contains(p.parentKey)) continue;
+                parts.Add(p);
+            }
+
+            if (outfit.Inner.IsLoaded)
+            {
+#if false // 再検討; 下着可換 
+                //var underwearbools = Underwearbools[outfitnum];
+                var processed = outfit.Outer.UnderwearProcessed;
+                Underwear_ME_Data.ChangeCoord(outfitnum);
+                var Local_Underwear_ACC_Info = new List<ChaFileAccessory.PartsInfo>(Underwear_PartsInfos);
+                var ObjectTypeList = new List<ObjectType>() { ObjectType.Accessory };
+                for (var i = 0; i < Local_Underwear_ACC_Info.Count; i++)
+                {
+                    if (Local_Underwear_ACC_Info[i].type > 120)
+                    {
+                        var ACCdata = new HairSupport.HairAccessoryInfo
+                        {
+                            HairLength = -999
+                        };
+                        if (Settings.HairMatch.Value)
+                        {
+                            ACCdata.ColorMatch = true;
+                        }
+                        HairKeepQueue.Enqueue(false);
+                        ACCKeepqueue.Enqueue(false);
+
+                        MaterialEditorProperties editorProperties;
+                        if (!Underwear_ME_Data.AccessoryProperties.TryGetValue(i, out editorProperties))
+                        {
+                            editorProperties = new MaterialEditorProperties();
+                        }
+                        ME_Queue.Enqueue(editorProperties);
+                        PartsQueue.Enqueue(Local_Underwear_ACC_Info[i]);
+                        HairQueue.Enqueue(ACCdata);
+                    }
+                }
+                //var forceunder = Settings.ForceRandomUnderwear.Value;
+
+                //When Top is not empty and bra is not kept
+                var underclothesparts = Underwear.clothes.parts;
+                var clothes_mainsubpart = ThisCoordinate.clothes.subPartsId[0];
+                var clothespart = ThisCoordinate.clothes.parts;
+                var CharacterClothingKeep_Coordinate = this.CharacterClothingKeep_Coordinate[outfitnum];
+
+                if (/*!Constants.IgnoredTopIDs_Main.Contains(clothespart[0].id) && (!Constants.IgnoredTopIDs_A.TryGetValue(clothespart[0].id, out var list) || !list.Contains(clothes_mainsubpart)) &&*/ !CharacterClothingKeep_Coordinate[2])
+                {
+                    if (!UnderClothingKeep[2] /*&& !underwearbools[1] && !underwearbools[2]*/ && (clothespart[2].id != 0 /*|| forceunder*/))
+                    {
+                        processed[2] = true;
+                        clothespart[2] = underclothesparts[2];
+                        Additional_Clothing_Process(2, outfitnum, Underwear_ME_Data);
+                    }
+
+                    //if (underwearbools[0])
+                    {
+                        if (!UnderClothingKeep[3] /*&& !underwearbools[2]*/ && (clothespart[3].id != 0 /*|| forceunder*/))
+                        {
+                            processed[3] = true;
+                            clothespart[3] = underclothesparts[3];
+                            Additional_Clothing_Process(3, outfitnum, Underwear_ME_Data);
+                        }
+                    }
+                }
+
+                //When bot is not empty and underwear is not kept
+                if (!Constants.IgnoredBotsIDs_Main.Contains(clothespart[1].id) && !underwearbools[0] && !CharacterClothingKeep_Coordinate[3])
+                {
+                    if (!UnderClothingKeep[3] && !underwearbools[2] && (clothespart[3].id != 0 || forceunder))
+                    {
+                        processed[3] = true;
+                        clothespart[3] = underclothesparts[3];
+                        Additional_Clothing_Process(3, outfitnum, Underwear_ME_Data);
+                    }
+                }
+
+                if (outfitnum != 3)
+                {
+                    if (!CharacterClothingKeep_Coordinate[5] && (clothespart[5].id != 0 || forceunder))
+                    {
+                        if (!UnderClothingKeep[5])
+                        {
+                            processed[5] = true;
+                            clothespart[5] = underclothesparts[5];
+                            Additional_Clothing_Process(5, outfitnum, Underwear_ME_Data);
+                        }
+                        if (!UnderClothingKeep[6] && !CharacterClothingKeep_Coordinate[6])
+                        {
+                            processed[6] = true;
+                            clothespart[6] = underclothesparts[6];
+                            Additional_Clothing_Process(6, outfitnum, Underwear_ME_Data);
+                        }
+                    }
+
+                    if (!UnderClothingKeep[6] && !CharacterClothingKeep_Coordinate[6] && (clothespart[6].id != 0 || forceunder))
+                    {
+                        processed[6] = true;
+                        clothespart[6] = underclothesparts[6];
+                        Additional_Clothing_Process(6, outfitnum, Underwear_ME_Data);
+                    }
+                }
+#endif
+            }
+
+
+#if false // たぶん無意味どころか変える必要ないところまで変わる 
+            var haircolor = new Color[] { ChaControl.fileHair.parts[1].baseColor, ChaControl.fileHair.parts[1].startColor, ChaControl.fileHair.parts[1].endColor, ChaControl.fileHair.parts[1].outlineColor };
+            if (Settings.HairMatch.Value && !MakerAPI.InsideMaker)
+            {
+                foreach (var item in HairToColor)
+                {
+                    if (item < parts.Count)
+                        HairMatchProcess(outfitnum, item, haircolor, parts);
+                }
+            }
+#endif
+
+            var insert = 0;
+            var ACCpostion = 0;
+            var Empty = false;
+            var print = true;
+            //Don't Skip if inside Maker
+
+            var aidx = 0;
+            if (MakerAPI.InsideMaker)
+            {
+                //Normal
+                for (var n = parts.Count; aidx < keptacce.Count && ACCpostion < n; ACCpostion++)
+                {
+                    Empty = ThisCoordinate.accessory.parts[ACCpostion].type < 121;
+                    if (Empty) //120 is empty/default
+                    {
+                        if (insert++ >= UnderwearAccessoryStart)
+                        {
+                            outfit.ProcInfo.UnderwearAccessoriesLocations.Add(ACCpostion);
+                        }
+
+                        var acce = keptacce[aidx++];
+
+                        parts[ACCpostion] = acce.Parts;
+                        if (acce.Hair.HairLength > -998)
+                        {
+                            HairAccInfo[ACCpostion] = acce.Hair;
+                        }
+                        else
+                        {
+                            HairAccInfo.Remove(ACCpostion);
+                        }
+
+                        outfit.ProcInfo.ACCKeepReturn.Add(ACCpostion);
+                        ME_coord.AddAccessory(Index, ACCpostion, acce.Material);
+                    }
+#if false // たぶん無意味どころか変える必要ないところまで変わる 
+                    if (Settings.HairMatch.Value && HairAccInfo.TryGetValue(ACCpostion, out var info))
+                    {
+                        info.ColorMatch = true;
+                        HairMatchProcess(outfitnum, ACCpostion, haircolor, parts);
+                    }
+#endif
+                }
+            }
+
+            //original accessories
+            while (aidx < keptacce.Count)
+            {
+                if (print)
+                {
+                    Settings.Logger.LogDebug($"Ran out of space in new coordinate adding {keptacce.Count}");
+                    print = false;
+                }
+                if (insert++ >= UnderwearAccessoryStart)
+                {
+                    outfit.ProcInfo.UnderwearAccessoriesLocations.Add(ACCpostion);
+                }
+
+                var acce = keptacce[aidx++];
+
+                parts.Add(acce.Parts);
+                if (acce.Hair == null)
+                {
+                    HairAccInfo.Remove(ACCpostion);
+                }
+                else if (acce.Hair.HairLength > -998)
+                {
+                    var HairInfo = acce.Hair;
+#if false // たぶん無意味どころか変える必要ないところまで変わる 
+                    if (Settings.HairMatch.Value)
+                    {
+                        HairInfo.ColorMatch = true;
+                        HairMatchProcess(outfitnum, ACCpostion, haircolor, parts);
+                    }
+#endif
+                    HairAccInfo[ACCpostion] = HairInfo;
+                }
+                else
+                {
+                    HairAccInfo.Remove(ACCpostion);
+                }
+
+                outfit.ProcInfo.ACCKeepReturn.Add(ACCpostion);
+                ME_coord.AddAccessory(Index, ACCpostion, acce.Material);
+                ACCpostion++;
+            }
+
+            ThisCoordinate.accessory.parts = parts.ToArray();
+
+            //outfit.Outer.HairAccessories = HairAccInfo;
+            #endregion
         }
     }
 }

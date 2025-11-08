@@ -138,6 +138,11 @@ namespace CosplayParty
 
         public void GeneralizedLoad(int outfitnum)
         {
+#if true
+            var ThisCoordinate = ChaControl.chaFile.coordinate[outfitnum];
+            var outfit = ThisOutfitData.Outfits[outfitnum];
+            outfit.Override4Randomize(ThisCoordinate, null);
+#else
 #if TRACE
             var Start = TimeWatch[1].ElapsedMilliseconds;
             TimeWatch[1].Start();
@@ -175,7 +180,7 @@ namespace CosplayParty
             outfit.ProcInfo.Reset();
 
             var UnderwearAccessoryStart = keptacce.Count;
-#region MakeUp
+            #region MakeUp
             if (outfit.MakeUpKeep)
             {
                 ThisCoordinate.enableMakeup = outfit.Original_Coordinate.enableMakeup;
@@ -261,7 +266,7 @@ namespace CosplayParty
                     OutdatedMessage("hairaccessorycustomizer", true);
                 }
             }
-#region ME Acc Import
+            #region ME Acc Import
             var MaterialEditorData = ExtendedSave.GetExtendedDataById(ThisCoordinate, "com.deathweasel.bepinex.materialeditor");
             ThisOutfitData.FinalMaterials.LoadCoordinate(MaterialEditorData, ThisOutfitData, outfitnum);
             var Import_ME_Data = new MaterialEditorProperties();
@@ -494,6 +499,7 @@ namespace CosplayParty
             Average[1].Add(temp);
             Settings.Logger.LogDebug($"\t{(ChaFileDefine.CoordinateType)outfitnum} GeneralLoad: Total elapsed time {TimeWatch[1].ElapsedMilliseconds}ms\n\tRun {Average[1].Count}: {temp}ms\n\tAverage: {Average[1].Average()}ms");
 #endif
+#endif
         }
 
         //! コーデカードのロード 
@@ -517,7 +523,7 @@ namespace CosplayParty
 
             var outfitnum = chacontrol.fileStatus.coordinateType;
             var outfit = ThisOutfitData.Outfits[outfitnum];
-            outfit.Override(coordinate,null);
+            outfit.Override4CoordCard(coordinate,null);
         }
 
         private void Additional_Clothing_Process(int index, int outfitnum, ME_Coordinate ME_Data)

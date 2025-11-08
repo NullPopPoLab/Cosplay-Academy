@@ -270,7 +270,7 @@ namespace CosplayParty
                     ChaControl.fileStatus.coordinateType = HoldOutfit;
                     var temp = (ChaInfo)ChaControl;
                     var next = (ChaFileDefine.CoordinateType)temp.fileStatus.coordinateType;
-#if true // コーデタイプ切り替え実験 
+#if false // コーデタイプ切り替え実験 
                     switch (next)
                     {
 #if KK
@@ -286,7 +286,7 @@ namespace CosplayParty
                     }
 #endif
                     Settings.Logger.LogDebug("next Coord type: " + next);
-                    ChaControl.ChangeCoordinateType(next, true); //forces cutscene characters to use outfits
+                    ChaControl.ChangeCoordinateType(next, false); //forces cutscene characters to use outfits
                 }
             }
             catch(Exception e)
