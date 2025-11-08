@@ -78,7 +78,7 @@ namespace CosplayParty
 
             foreach (var item in CharaEvent.ChaDefaults)
             {
-                item.processed = false;
+                item.NeedProcess();
             }
 
             for (var role = 0; role < roleSet.Length; ++role)

@@ -21,7 +21,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>Game\BepInEx\plugins\!myworks\</OutputPath>
-    <DefineConstants>DEBUG;KKS</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;KKS</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>

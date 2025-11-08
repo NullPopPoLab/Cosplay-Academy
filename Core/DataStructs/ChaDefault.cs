@@ -18,11 +18,27 @@ namespace CosplayParty
 
         /*! @note 初期処理を要するときtrueにする
         */
-        internal bool firstpass = true;
+        //internal bool firstpass = true;
+        public int RefreshedRevision { get; private set; }
+        public static int RefreshingRevision { get; private set; } = 1;
+        internal static void NeedRefresh() {
+            ++RefreshingRevision;
+            Settings.Logger.LogDebug($"NeedRefresh rev={RefreshingRevision}");
+        }
+        public bool IsRefreshed { get { return RefreshedRevision == RefreshingRevision; } }
+        internal void MarkRefreshed() { RefreshedRevision = RefreshingRevision; }
 
-        /*! @note コーデの再選択を行うときtrueにする
+        /*! @note コーデの再選択を行うときfalseにする
         */
-        internal bool processed = false;
+        //internal bool processed = false;
+        public int ProcessedRevision { get; private set; }
+        public int ProcessingRevision { get; private set; } = 1;
+        internal void NeedProcess() {
+            ++ProcessingRevision;
+            Settings.Logger.LogDebug($"NeedProcess rev={ProcessingRevision} for {Chafile.charaFileName}");
+        }
+        public bool IsProcessed { get { return ProcessedRevision == ProcessingRevision; } }
+        internal void MarkProcessed() { ProcessedRevision = ProcessingRevision; }
 
         internal readonly ChaOutfit[] Outfits;
 
@@ -57,9 +73,13 @@ namespace CosplayParty
             }
         }
 
-        public ChaDefault(ChaControl chaControl)
+        public ChaDefault(ChaControl chaControl,ChaFileControl chaFile, SaveData.Heroine heroine)
         {
             ChaControl = chaControl;
+            Chafile = chaFile;
+            Parameter = ChaControl.fileParam;
+            Heroine = heroine;
+
             ClothingLoader = new ClothingLoader(this);
             FinalMaterials = new ME_List(Outfit_Size);
 

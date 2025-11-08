@@ -7,6 +7,8 @@ namespace CosplayParty
 {
     public static class Constants
     {
+        public const int ClothSlots = 9;
+
         private static readonly char sep = System.IO.Path.DirectorySeparatorChar;
 
         internal static void PluginCheck()

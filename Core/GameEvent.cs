@@ -11,6 +11,8 @@ namespace CosplayParty
 
         protected override void OnPeriodChange(Cycle.Type period)
         {
+            Settings.Logger.LogDebug($"OnPeriodChange({period})");
+
             CurrentPeriod = period;
 
             var changing = false;
@@ -18,7 +20,7 @@ namespace CosplayParty
             switch (period)
             {
 #if KK
-                case Cycle.Type.GotoSchool:
+                case Cycle.Type.Morning:
                     NextCoordType = ChaFileDefine.CoordinateType.School01;
                     break;
 
@@ -87,13 +89,8 @@ namespace CosplayParty
 
             if(changing)
             {
+                Settings.Logger.LogDebug($"reset outfits CoordType={NextCoordType} SelectByPeriod={OutfitDecider.SelectByPeriod}");
                 OutfitDecider.ResetDecider();
-
-                // 時間帯別設定 
-                Settings.Logger.LogDebug($"set for {period}: " + OutfitDecider.SelectByPeriod);
-            }
-            else{
-                Settings.Logger.LogDebug($"skip at {period}");
             }
 
 #if false // for KoiChance 
@@ -107,6 +104,8 @@ namespace CosplayParty
 
         protected override void OnDayChange(Cycle.Week day)
         {
+            Settings.Logger.LogDebug("OnDayChange");
+            ChaDefault.NeedRefresh();
 #if KK
             if ((Cycle.Week.Monday == day && Settings.UpdateFrequency.Value == OutfitUpdate.Weekly) || Cycle.Week.Holiday == day && Settings.SundayDate.Value)
             {

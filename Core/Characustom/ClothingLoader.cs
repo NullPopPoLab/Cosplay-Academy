@@ -25,14 +25,14 @@ namespace CosplayParty
 #endif
         private static bool InsideMaker = false;
 
-        #region Underwear stuff
+#if false // 再検討; 下着可換 
         public readonly ChaFileCoordinate Underwear = new ChaFileCoordinate();
         //private readonly Dictionary<int, bool[]> Underwearbools = new Dictionary<int, bool[]>(); //0: not bot; 1: notbra; 2: notshorts
         private List<ChaFileAccessory.PartsInfo> Underwear_PartsInfos = new List<ChaFileAccessory.PartsInfo>();
         private ME_Coordinate Underwear_ME_Data;
-        #endregion
+#endif
 
-        #region ACI_Data
+#region ACI_Data
 #if false // Additional_Card_Info 廃止予定 
         public Additional_Card_Info.Cardinfo CardInfo { get; internal set; }
         internal bool[] PersonalClothingBools => CardInfo.PersonalClothingBools;
@@ -40,13 +40,13 @@ namespace CosplayParty
 #endif
 
         internal Dictionary<int, bool[]> CharacterClothingKeep_Coordinate = new Dictionary<int, bool[]>();
-        #endregion
+#endregion
 #if TRACE
-        #region StopWatches
+#region StopWatches
         private static bool TimeProcess = true;
         private static readonly Stopwatch[] TimeWatch = new Stopwatch[4];
         private static List<long>[] Average;
-        #endregion
+#endregion
 #endif
         //private readonly Dictionary<int, bool> ValidOutfits = new Dictionary<int, bool>();
         //private readonly Dictionary<int, bool> ValidUnderwears = new Dictionary<int, bool>();
@@ -86,9 +86,11 @@ namespace CosplayParty
             //Underwear.LoadFile(ThisOutfitData.allunderwearpaths[underwearindex].GetFullPath());
             //Settings.Logger.LogDebug($"loaded underwear " + ThisOutfitData.allunderwearpaths[underwearindex]);
 
+#if false // 再検討; 下着可換 
             Underwear_ME_Data = new ME_Coordinate(ExtendedSave.GetExtendedDataById(Underwear, "com.deathweasel.bepinex.materialeditor"), ThisOutfitData, 0);
             Underwear_PartsInfos = new List<ChaFileAccessory.PartsInfo>(Underwear.accessory.parts);
             //Underwear_PartsInfos.AddRange(Support.MoreAccessories.Coordinate_Accessory_Extract(Underwear));
+#endif
 
             for (var i = 0; i < Constants.GameCoordinateSize; i++)
             {
@@ -179,7 +181,7 @@ namespace CosplayParty
                 ThisCoordinate.enableMakeup = outfit.Original_Coordinate.enableMakeup;
                 ThisCoordinate.makeup = outfit.Original_Coordinate.makeup;
             }
-#endregion
+            #endregion
             var HairToColor = new List<int>();
             #region Reassign Existing Accessories
 
@@ -455,7 +457,11 @@ namespace CosplayParty
                 var acce = keptacce[aidx++];
 
                 parts.Add(acce.Parts);
-                if (acce.Hair.HairLength > -998)
+                if (acce.Hair == null)
+                {
+                    HairAccInfo.Remove(ACCpostion);
+                }
+                else if (acce.Hair.HairLength > -998)
                 {
                     var HairInfo = acce.Hair;
 #if false // たぶん無意味どころか変える必要ないところまで変わる 
@@ -491,212 +497,27 @@ namespace CosplayParty
         }
 
         //! コーデカードのロード 
-        public void CoordinateLoad(ChaFileCoordinate coordinate, ChaControl chacontrol)
+        public void CoordinateLoad(ChaFileCoordinate coordinate, ChaControl chacontrol, ChaFileControl chafile)
         {
             Settings.Logger.LogDebug($"CoordinateLoad({coordinate?.coordinateFileName},{chacontrol?.name})");
 
+            if (chacontrol != ThisOutfitData.ChaControl)
+            {
+                Settings.Logger.LogWarning($"ChaControl mismatch({chacontrol.name},{ThisOutfitData.ChaControl.name})");
+            }
+            if (chafile != ThisOutfitData.Chafile)
+            {
+                Settings.Logger.LogWarning($"ChaFile mismatch({chafile.charaFileName},{ThisOutfitData.Chafile.charaFileName})");
+            }
+
             ChaControl = chacontrol;
-            ChaFile = ThisOutfitData.Chafile;
+            ChaFile = chafile;
+
             InsideMaker = MakerAPI.InsideMaker;
-
-
-#region Queue accessories to keep
 
             var outfitnum = chacontrol.fileStatus.coordinateType;
             var outfit = ThisOutfitData.Outfits[outfitnum];
-
-            var keptacce = outfit.Current.Succession.KeptAccessories;
-
-            var HairKeepResult = new List<int>();
-            var ACCKeepResult = new List<int>();
-
-            #region ME Acc Import
-            var MaterialEditorData = ExtendedSave.GetExtendedDataById(coordinate, "com.deathweasel.bepinex.materialeditor");
-
-            var Coordinate_ME_Data = new ME_Coordinate(MaterialEditorData, ThisOutfitData, outfitnum);
-            #endregion
-
-            #endregion
-
-            //Apply pre-existing Accessories in any open slot or final slots.
-
-            var OriginalData = chacontrol.nowCoordinate.accessory.parts.ToList();
-
-            #region Reassign Existing Accessories
-
-            var Inputdata = ExtendedSave.GetExtendedDataById(coordinate, "com.deathweasel.bepinex.hairaccessorycustomizer");
-            var HairACCDictionary = new Dictionary<int, HairSupport.HairAccessoryInfo>();
-            if (Inputdata != null)
-                if (Inputdata.data.TryGetValue("CoordinateHairAccessories", out var loadedHairAccessories) && loadedHairAccessories != null)
-                    HairACCDictionary = MessagePackSerializer.Deserialize<Dictionary<int, HairSupport.HairAccessoryInfo>>((byte[])loadedHairAccessories);
-
-            var aidx = 0;
-            var ACCpostion = 0;
-            bool Empty;
-            for (var n = OriginalData.Count; aidx< keptacce.Count && ACCpostion < n; ACCpostion++)
-            {
-                Empty = OriginalData[ACCpostion].type == 120;
-                if (Empty) //120 is empty/default
-                {
-                    var acce = keptacce[aidx++];
-
-                    OriginalData[ACCpostion] = acce.Parts;
-                    if (acce.Hair.HairLength > -998)
-                    {
-                        HairACCDictionary[ACCpostion] = acce.Hair;
-                    }
-                    else
-                    {
-                        HairACCDictionary.Remove(ACCpostion);
-                    }
-
-                    ACCKeepResult.Add(ACCpostion);
-                    Coordinate_ME_Data.AddAccessory(outfitnum, ACCpostion, acce.Material);
-                }
-                if (Settings.HairMatch.Value && HairACCDictionary.TryGetValue(ACCpostion, out var info))
-                {
-                    info.ColorMatch = true;
-                }
-            }
-
-            var print = true;
-
-            while (aidx< keptacce.Count)
-            {
-                if (print)
-                {
-                    Settings.Logger.LogDebug($"Ran out of space in new coordiante adding {keptacce.Count}");
-                    print = false;
-                }
-
-                var acce = keptacce[aidx++];
-
-                OriginalData.Add(acce.Parts);
-                if (acce.Hair.HairLength > -998)
-                {
-                    var HairInfo = acce.Hair;
-                    if (Settings.HairMatch.Value)
-                    {
-                        HairInfo.ColorMatch = true;
-                    }
-                    HairACCDictionary[ACCpostion] = HairInfo;
-                }
-                else
-                {
-                    HairACCDictionary.Remove(ACCpostion);
-                }
-
-                //if (InsideMaker)
-                {
-                    ACCKeepResult.Add(ACCpostion);
-                    Coordinate_ME_Data.AddAccessory(outfitnum, ACCpostion, acce.Material);
-                }
-                ACCpostion++;
-            }
-
-            chacontrol.nowCoordinate.accessory.parts = OriginalData.ToArray();
-
-            MoreAccessoriesKOI.MoreAccessories.ArraySync(chacontrol);
-            #endregion
-
-            #region Pack
-            var SaveData = new PluginData();
-
-            Coordinate_ME_Data.AllProperties(out var rendererProperties, out var materialFloatProperties, out var materialColorProperties, out var materialShaders, out var materialTextureProperties);
-
-            var TextureDictionary = ThisOutfitData.ME.TextureDictionary.Where(pair => materialTextureProperties.Any(x => x.TexID == pair.Key)).ToDictionary(pair => pair.Key, pair => pair.Value.Data);
-            if (TextureDictionary.Count > 0)
-                SaveData.data.Add("TextureDictionary", MessagePackSerializer.Serialize(TextureDictionary));
-            else
-                SaveData.data.Add("TextureDictionary", null);
-
-            if (rendererProperties.Count > 0)
-                SaveData.data.Add("RendererPropertyList", MessagePackSerializer.Serialize(rendererProperties));
-            else
-                SaveData.data.Add("RendererPropertyList", null);
-
-            if (materialFloatProperties.Count > 0)
-                SaveData.data.Add("MaterialFloatPropertyList", MessagePackSerializer.Serialize(materialFloatProperties));
-            else
-                SaveData.data.Add("MaterialFloatPropertyList", null);
-
-            if (materialColorProperties.Count > 0)
-                SaveData.data.Add("MaterialColorPropertyList", MessagePackSerializer.Serialize(materialColorProperties));
-            else
-                SaveData.data.Add("MaterialColorPropertyList", null);
-
-            if (materialTextureProperties.Count > 0)
-                SaveData.data.Add("MaterialTexturePropertyList", MessagePackSerializer.Serialize(materialTextureProperties));
-            else
-                SaveData.data.Add("MaterialTexturePropertyList", null);
-
-            if (materialShaders.Count > 0)
-                SaveData.data.Add("MaterialShaderList", MessagePackSerializer.Serialize(materialShaders));
-            else
-                SaveData.data.Add("MaterialShaderList", null);
-
-            ExtendedSave.SetExtendedDataById(coordinate, "com.deathweasel.bepinex.materialeditor", SaveData);
-
-#if false // Additional_Card_Info 廃止予定 
-            if (InsideMaker && Constants.PluginResults["Additional_Card_Info"])
-            {
-                SaveData = new PluginData() { version = 1 };
-
-                var NowCoordinateInfo = new Additional_Card_Info.CoordinateInfo();
-                var NowRestrictionInfo = NowCoordinateInfo.RestrictionInfo;
-
-                Inputdata = ExtendedSave.GetExtendedDataById(coordinate, "Additional_Card_Info");
-                if (Inputdata != null)
-                {
-                    switch (Inputdata.version)
-                    {
-                        case 0:
-                            {
-                                NowCoordinateInfo = Additional_Card_Info.Migrator.CoordinateMigrateV0(Inputdata);
-                                NowRestrictionInfo = NowCoordinateInfo.RestrictionInfo;
-                            }
-                            break;
-                        case 1:
-                            if (Inputdata.data.TryGetValue("CoordinateInfo", out var ByteData) && ByteData != null)
-                            {
-                                NowCoordinateInfo = MessagePackSerializer.Deserialize<Additional_Card_Info.CoordinateInfo>((byte[])ByteData);
-                                NowRestrictionInfo = NowCoordinateInfo.RestrictionInfo;
-                            }
-                            if (Inputdata.data.TryGetValue("RestrictionInfo", out ByteData) && ByteData != null)
-                            {
-                                NowRestrictionInfo = MessagePackSerializer.Deserialize<Additional_Card_Info.RestrictionInfo>((byte[])ByteData);
-                            }
-                            break;
-                        default:
-                            Settings.Logger.LogWarning("New Version Detected Please Update");
-                            return;
-                    }
-                }
-
-                NowCoordinateInfo.AccKeep.AddRange(ACCKeepResult);
-                NowCoordinateInfo.HairAcc.AddRange(HairKeepResult);
-
-                SaveData.data.Add("CoordinateInfo", MessagePackSerializer.Serialize(NowCoordinateInfo));
-                SaveData.data.Add("RestrictionInfo", MessagePackSerializer.Serialize(NowRestrictionInfo));
-
-                ExtendedSave.SetExtendedDataById(coordinate, "Additional_Card_Info", SaveData);
-                //ControllerCoordReload_Loop(Type.GetType("Additional_Card_Info.CharaEvent, Additional_Card_Info", false), ChaControl, coordinate);
-            }
-#endif
-
-            #endregion
-
-            //ControllerCoordReload_Loop(typeof(KK_Plugins.MaterialEditor.MaterialEditorCharaController), ChaControl, coordinate);
-
-            if (Settings.HairMatch.Value)
-            {
-                var Plugdata = new PluginData();
-
-                Plugdata.data.Add("CoordinateHairAccessories", MessagePackSerializer.Serialize(HairACCDictionary));
-                ExtendedSave.SetExtendedDataById(coordinate, "com.deathweasel.bepinex.hairaccessorycustomizer", Plugdata);
-
-                //ControllerCoordReload_Loop(Type.GetType("KK_Plugins.HairAccessoryCustomizer+HairAccessoryController, KK_HairAccessoryCustomizer", false), ChaControl, coordinate);
-            }
+            outfit.Override(coordinate,null);
         }
 
         private void Additional_Clothing_Process(int index, int outfitnum, ME_Coordinate ME_Data)

@@ -371,6 +371,7 @@ namespace CosplayParty
             }
             var originalclothdict = Clothdict.ToNewDictionary();
 
+#if false // 再検討; 下着可換 
             var UnderwearSavedData = ExtendedSave.GetExtendedDataById(Underwear, "KCOX");
             var underweardict = new Dictionary<string, ClothesTexData>();
 
@@ -388,6 +389,7 @@ namespace CosplayParty
                     OutdatedMessage("Illusion Clothing Overlays", true);
                 }
             }
+#endif
 
             for (var outfitnum = 0; outfitnum < ThisOutfitData.Outfit_Size; outfitnum++)
             {
@@ -544,6 +546,7 @@ namespace CosplayParty
             var originaltop = Top.ToNewDictionary();
 
             Pushup.ClothData UnderBra = null;
+#if false // 再検討; 下着可換 
             Extended = ExtendedSave.GetExtendedDataById(Underwear, "com.deathweasel.bepinex.pushup");
             if (Extended != null)
             {
@@ -552,6 +555,7 @@ namespace CosplayParty
                     UnderBra = MessagePackSerializer.Deserialize<Pushup.ClothData>((byte[])bytes);
                 }
             }
+#endif
 
             PluginData SavedData;
             for (var outfitnum = 0; outfitnum < ThisOutfitData.Outfit_Size; outfitnum++)
@@ -801,6 +805,7 @@ namespace CosplayParty
             var UnderwearTrigger = new List<AccStateSync.TriggerProperty>();
             var UnderwearGroups = new List<AccStateSync.TriggerGroup>();
 
+#if false // 再検討; 下着可換 
             ExtendedData = ExtendedSave.GetExtendedDataById(Underwear, "madevil.kk.ass");
             if (ExtendedData != null)
             {
@@ -844,6 +849,7 @@ namespace CosplayParty
                 if (UnderwearTrigger == null) UnderwearTrigger = new List<AccStateSync.TriggerProperty>();
                 if (UnderwearGroups == null) UnderwearGroups = new List<AccStateSync.TriggerGroup>();
             }
+#endif
 
             for (int outfitnum = 0, nn = ThisOutfitData.Outfit_Size; outfitnum < nn; outfitnum++)
             {
@@ -1348,8 +1354,9 @@ namespace CosplayParty
                 }
             }
             Coordinate = data.Coordinate;
-            var underwear = new Accessory_States.CoordinateData();
 
+#if false // 再検討; 下着可換 
+            var underwear = new Accessory_States.CoordinateData();
             var State_data = ExtendedSave.GetExtendedDataById(Underwear, "Accessory_States");
             if (State_data != null)
             {
@@ -1369,6 +1376,7 @@ namespace CosplayParty
                         break;
                 }
             }
+#endif
 
             for (var outfitnum = 0; outfitnum < ThisOutfitData.Outfit_Size; outfitnum++)
             {
@@ -1383,17 +1391,17 @@ namespace CosplayParty
                 {
                     data.Clearoutfit(outfitnum);
 
-                    State_data = ExtendedSave.GetExtendedDataById(ChaControl.chaFile.coordinate[outfitnum], "Accessory_States");
+                    var State_data_outer = ExtendedSave.GetExtendedDataById(ChaControl.chaFile.coordinate[outfitnum], "Accessory_States");
 
-                    if (State_data != null)
+                    if (State_data_outer != null)
                     {
-                        switch (State_data.version)
+                        switch (State_data_outer.version)
                         {
                             case 0:
-                                data.Coordinate[outfitnum] = Accessory_States.Migrator.CoordinateMigrateV0(State_data);
+                                data.Coordinate[outfitnum] = Accessory_States.Migrator.CoordinateMigrateV0(State_data_outer);
                                 break;
                             case 1:
-                                if (State_data.data.TryGetValue("CoordinateData", out var ByteData) && ByteData != null)
+                                if (State_data_outer.data.TryGetValue("CoordinateData", out var ByteData) && ByteData != null)
                                 {
                                     data.Coordinate[outfitnum] = MessagePackSerializer.Deserialize<Accessory_States.CoordinateData>((byte[])ByteData);
                                 }

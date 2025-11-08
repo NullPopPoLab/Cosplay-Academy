@@ -23,8 +23,7 @@ namespace CosplayParty
         Standard,
 
         //! 体と一体化 
-        /*! 猫耳とか尻尾とか。 @n
-            キャラカードに載っているものはコーデを差し替えても常に残す。 @n
+        /*! キャラカードに載っているものはコーデを差し替えても常に残す。 @n
             差し替え先のコーデについているものは Standard と同じ扱い。 @n
         */
         Bodyfit,
@@ -37,10 +36,21 @@ namespace CosplayParty
         */
         HairStyle,
 
-        //! 髪型連動アクセ 
-        /*! 髪色反映しない以外は髪型とセットで扱う。 @n
+        //! アホ毛 
+        /*! HairStyle と同じ扱いだが、差し替え先のコーデに帽子があれば一時的に除去し、
+            その後の差し替えで帽子がないとき戻す。 @n
         */
-        HairOrnament,
+        Ahoge,
+
+        //! 髪型連動アクセ 
+        /*! 髪色反映しない以外は HairStyle と同じ扱い。 @n
+        */
+        Hairfit,
+
+        //! 帽子 
+        /*! 扱いは通常通りだが、差し替え先のコーデに含まれるときアホ毛は除去される。 @n
+        */
+        Hat,
 
         //! 眼鏡 
         /*! コーデを差し替えても残すが、差し替え先のコーデに眼鏡があれば一時的に付け替え、
@@ -59,11 +69,49 @@ namespace CosplayParty
             その後の差し替えでマスクがないとき戻す。 @n
         */
         Mask,
+
+        //! 獣耳等 
+        /*! コーデを差し替えても残すが、差し替え先のコーデに獣耳等があれば一時的に付け替え、
+            その後の差し替えで獣耳等がないとき戻す。 @n
+            また、差し替え先のコーデに含まれるときピアスは除去される。 @n
+        */
+        Ears,
+
+        //! 尻尾 
+        /*! コーデを差し替えても残すが、差し替え先のコーデに尻尾があれば一時的に付け替え、
+            その後の差し替えで尻尾がないとき戻す。 @n
+        */
+        Tail,
+
+        //! 翼 
+        /*! コーデを差し替えても残すが、差し替え先のコーデに翼があれば一時的に付け替え、
+            その後の差し替えで翼がないとき戻す。 @n
+        */
+        Wing,
     }
 
     //! 服情報 
     public class ClothInfo
     {
+        public ChaFileClothes.PartsInfo Parts;
+
+        public ClothInfo(ChaFileClothes.PartsInfo val)
+        {
+            Parts = val;
+        }
+
+        public static List<ClothInfo> Build(ChaFileCoordinate coordinate)
+        {
+            var dst = new List<ClothInfo>();
+            var src = coordinate.clothes.parts;
+            for (var i = 0; i < src.Length; ++i)
+            {
+                var cinfo = new ClothInfo(src[i]);
+
+                dst.Add(cinfo);
+            }
+            return dst;
+        }
     }
 
     //! アクセ情報 
@@ -72,11 +120,64 @@ namespace CosplayParty
         public ChaFileAccessory.PartsInfo Parts;
         public AccessoryType Type;
         public HairSupport.HairAccessoryInfo Hair;
-        public ME.MaterialEditorProperties Material;
+        public MaterialEditorProperties Material;
+
+        public bool IsEmpty { get { return Parts.type < 121; } }
 
         public AccessoryInfo(ChaFileAccessory.PartsInfo val)
         {
             Parts = val;
+        }
+
+        public static List<AccessoryInfo> Build(ChaFileCoordinate coordinate, Dictionary<int, HairSupport.HairAccessoryInfo> hair, ME_Coordinate mat)
+        {
+            var matprop = mat?.AccessoryProperties;
+            //var ME_ACC_Storage = outfit.Original_Accessory_Data;
+
+            var dst = new List<AccessoryInfo>();
+            //var src = new List<ChaFileAccessory.PartsInfo>();
+            var src = coordinate.accessory.parts;
+            for (var i = 0; i < src.Length; ++i)
+            {
+                var ainfo = new AccessoryInfo(src[i]);
+
+                var ishair = (hair != null) && hair.TryGetValue(i, out ainfo.Hair);
+#if false
+                if (!ishair)
+                {
+                    ainfo.Hair = new HairSupport.HairAccessoryInfo
+                    {
+                        HairLength = -999
+                    };
+                }
+#endif
+
+                if (matprop == null || !matprop.TryGetValue(i, out ainfo.Material))
+                {
+                    ainfo.Material = new MaterialEditorProperties();
+                }
+
+                dst.Add(ainfo);
+
+                /*! @todo コーデのアクセ毎に設定を追加
+                    @todo AccState参照
+                 */
+
+                if (ainfo.Type == AccessoryType.Auto)
+                {
+                    ainfo.Type = AccessoryType.Standard;
+                    if (ainfo.Type == AccessoryType.Standard && !Settings.DestinationHeadAccs.Value && Constants.HeadAcceSet.Contains(src[i].parentKey)) ainfo.Type = ishair ? AccessoryType.HairStyle: AccessoryType.Hairfit;
+                    if (ainfo.Type == AccessoryType.Standard && !Settings.DestinationForeheadAccs.Value && Constants.ForeheadAcceSet.Contains(src[i].parentKey)) ainfo.Type = ishair ? AccessoryType.HairStyle : AccessoryType.Hairfit;
+                    if (ainfo.Type == AccessoryType.Standard && !Settings.DestinationHatAccs.Value && Constants.HatAcceSet.Contains(src[i].parentKey)) ainfo.Type = ishair ? AccessoryType.HairStyle : AccessoryType.Hairfit;
+                    if (ainfo.Type == AccessoryType.Standard && !Settings.DestinationEarAccs.Value && Constants.EarAcceSet.Contains(src[i].parentKey)) ainfo.Type = AccessoryType.Pias;
+                    if (ainfo.Type == AccessoryType.Standard && !Settings.DestinationEyeAccs.Value && Constants.EyeAcceSet.Contains(src[i].parentKey)) ainfo.Type = AccessoryType.Glasses;
+                    if (ainfo.Type == AccessoryType.Standard && !Settings.DestinationNoseAccs.Value && Constants.NoseAcceSet.Contains(src[i].parentKey)) ainfo.Type = AccessoryType.Mask;
+                    if (ainfo.Type == AccessoryType.Standard && !Settings.DestinationMouthAccs.Value && Constants.MouthAcceSet.Contains(src[i].parentKey)) ainfo.Type = AccessoryType.Mask;
+                    if (ainfo.Type == AccessoryType.Standard && !Settings.DestinationTailAccs.Value && Constants.TailAcceSet.Contains(src[i].parentKey)) ainfo.Type = AccessoryType.Tail;
+                }
+            }
+
+            return dst;
         }
     }
 
@@ -106,9 +207,14 @@ namespace CosplayParty
 
     public class CoordInfo : IDisposable
     {
+        public List<ClothInfo> ClothList = new List<ClothInfo>();
         public List<AccessoryInfo> AcceList = new List<AccessoryInfo>();
 
         public readonly CoordinateSuccession Succession = new CoordinateSuccession();
+
+        public ChaFileCoordinate Coordinate;
+        public Dictionary<int, HairSupport.HairAccessoryInfo> Hair;
+        public ME_Coordinate Material;
 
         /*! @note シリアライズ向けにアクセ情報がまとめて保持される。
         */
@@ -139,48 +245,19 @@ namespace CosplayParty
                     }
 #endif
 
+            Coordinate = coordinate;
+            Hair = hair;
+            Material = mat;
+
+            ClothList = ClothInfo.Build(coordinate);
+            AcceList = AccessoryInfo.Build(coordinate,hair,mat);
+
             // 強制的に保持するか 
             var xkeep = Settings.ExtremeAccKeeper.Value;
 
-            var matprop = mat.AccessoryProperties;
-            //var ME_ACC_Storage = outfit.Original_Accessory_Data;
-
-            //var acclist = new List<ChaFileAccessory.PartsInfo>();
-            var acclist = coordinate.accessory.parts.ToList();
-            for (var i = 0; i < acclist.Count; ++i)
+            for(var i = 0; i < AcceList.Count; ++i)
             {
-                var ainfo = new AccessoryInfo(acclist[i]);
-
-                if (!hair.TryGetValue(i, out ainfo.Hair))
-                {
-                    ainfo.Hair = new HairSupport.HairAccessoryInfo
-                    {
-                        HairLength = -999
-                    };
-                }
-
-                if (!matprop.TryGetValue(i, out ainfo.Material))
-                {
-                    ainfo.Material = new MaterialEditorProperties();
-                }
-
-                AcceList.Add(ainfo);
-
-                /*! @todo コーデのアクセ毎に設定を追加
-                 */
-
-                if(ainfo.Type== AccessoryType.Auto)
-                {
-                    ainfo.Type = AccessoryType.Standard;
-                    if (ainfo.Type == AccessoryType.Standard && !Settings.DestinationHeadAccs.Value && Constants.HeadAcceSet.Contains(acclist[i].parentKey)) ainfo.Type = AccessoryType.HairOrnament;
-                    if (ainfo.Type == AccessoryType.Standard && !Settings.DestinationForeheadAccs.Value && Constants.ForeheadAcceSet.Contains(acclist[i].parentKey)) ainfo.Type = AccessoryType.HairOrnament;
-                    if (ainfo.Type == AccessoryType.Standard && !Settings.DestinationHatAccs.Value && Constants.HatAcceSet.Contains(acclist[i].parentKey)) ainfo.Type = AccessoryType.HairOrnament;
-                    if (ainfo.Type == AccessoryType.Standard && !Settings.DestinationEarAccs.Value && Constants.EarAcceSet.Contains(acclist[i].parentKey)) ainfo.Type = AccessoryType.Pias;
-                    if (ainfo.Type == AccessoryType.Standard && !Settings.DestinationEyeAccs.Value && Constants.EyeAcceSet.Contains(acclist[i].parentKey)) ainfo.Type = AccessoryType.Glasses;
-                    if (ainfo.Type == AccessoryType.Standard && !Settings.DestinationNoseAccs.Value && Constants.NoseAcceSet.Contains(acclist[i].parentKey)) ainfo.Type = AccessoryType.Mask;
-                    if (ainfo.Type == AccessoryType.Standard && !Settings.DestinationMouthAccs.Value && Constants.MouthAcceSet.Contains(acclist[i].parentKey)) ainfo.Type = AccessoryType.Mask;
-                    if (ainfo.Type == AccessoryType.Standard && !Settings.DestinationTailAccs.Value && Constants.TailAcceSet.Contains(acclist[i].parentKey)) ainfo.Type = AccessoryType.Bodyfit;
-                }
+                var ainfo = AcceList[i];
 
                 // アクセを残すか 
                 var keep = xkeep || ainfo.Type != AccessoryType.Standard;

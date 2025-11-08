@@ -22,8 +22,8 @@ namespace CosplayParty
     {
         public static List<ChaDefault> ChaDefaults = new List<ChaDefault>();
 
-        internal ChaDefault ThisOutfitData;
-        private ClothingLoader ClothingLoader => ThisOutfitData.ClothingLoader;
+        internal ChaDefault ThisOutfitData { get; private set; }
+        private ClothingLoader ClothingLoader => ThisOutfitData?.ClothingLoader;
 
         public static List<SaveData.Heroine> FreeHHeroines { get; internal set; } = new List<SaveData.Heroine>();
 
@@ -79,24 +79,29 @@ namespace CosplayParty
 #endif
 #if TRACE
             var Start = Time.ElapsedMilliseconds;
-            if (ThisOutfitData == null || !ThisOutfitData.processed || currentGameMode == GameMode.Maker)
+            if (ThisOutfitData == null || !ThisOutfitData.IsProcessed || currentGameMode == GameMode.Maker)
             {
                 Time.Start();
             }
 #endif
-            if (/*IsMaker || !IsMaker &&*/ (ThisOutfitData == null || ThisOutfitData != null && !ThisOutfitData.processed))
+            if (/*IsMaker || !IsMaker &&*/ (ThisOutfitData == null || ThisOutfitData != null && !ThisOutfitData.IsProcessed))
             {
                 Process(currentGameMode);
 
                 ThisOutfitData.ClothingLoader.Reload_RePacks(ChaControl, inH);
+
+                Settings.Logger.LogDebug($"ChaDefault chk4; id={GetInstanceID()} ChaControl={ChaControl.name}:{ThisOutfitData.ChaControl.name} ChaFile={ChaFileControl.GetFancyCharacterName()}:{ThisOutfitData.Chafile.GetFancyCharacterName()}");
             }
-            else if (ThisOutfitData != null && ThisOutfitData.processed
+            else if (ThisOutfitData != null && ThisOutfitData.IsProcessed
 #if !KKS
                 && GameAPI.InsideHScene
 #endif
                 )
             {
+                Settings.Logger.LogDebug($"ChaDefault chk5; id={GetInstanceID()} ChaControl={ChaControl.name}:{ThisOutfitData.ChaControl.name} ChaFile={ChaFileControl.GetFancyCharacterName()}:{ThisOutfitData.Chafile.GetFancyCharacterName()}");
+
                 ThisOutfitData.Chafile = ChaFileControl;
+
                 ThisOutfitData.ClothingLoader.Run_Repacks(ChaControl);
 
                 ThisOutfitData.ClothingLoader.Reload_RePacks(ChaControl, inH);
@@ -135,17 +140,16 @@ namespace CosplayParty
                 Settings.Logger.LogError($"Heroine Not found for {ChaControl.fileParam.fullname}");
 #endif
 
-            ThisOutfitData = ChaDefaults.Find(x => x.Heroine == heroine);
+            // 本編専用 
+            // フリーHでは heroine==null なので不可 
+            if (ThisOutfitData == null && heroine != null)
+            {
+                ThisOutfitData = ChaDefaults.Find(x => x.Heroine == heroine);
+            }
 
             if (ThisOutfitData == null)
             {
-                ThisOutfitData = new ChaDefault(ChaControl)
-                {
-                    Parameter = ChaControl.fileParam,
-                    Chafile = ChaFileControl,
-                    ChaControl = ChaControl,
-                    Heroine = heroine
-                };
+                ThisOutfitData = new ChaDefault(ChaControl, ChaFileControl, heroine);
 #if DEBUG
                 //Settings.Logger.LogDebug($"Heroine null? {heroine == null}\nInH? {inH}");
 #endif
@@ -161,7 +165,6 @@ namespace CosplayParty
         {
             try
             {
-
                 // disabled them 
                 switch (currentGameMode)
                 {
@@ -177,11 +180,10 @@ namespace CosplayParty
                         break;
                 }
 
-                Settings.Logger.LogDebug($"Process({currentGameMode})");
-
                 // この時点で ThisOutfitData 未生成のケースがあり、ここで生成される 
                 ThisOutfitDataProcess();
 
+                Settings.Logger.LogDebug($"Process({currentGameMode}) rev={ThisOutfitData.RefreshedRevision}/{ChaDefault.RefreshingRevision}");
 #if KK
                 if (ThisOutfitData.Heroine != null && ThisOutfitData.Heroine.isTeacher && !Settings.TeacherDress.Value)
                 {
@@ -203,9 +205,10 @@ namespace CosplayParty
             }
 #endif
 
-                if (ThisOutfitData.firstpass) //Save all accessories to avoid duplicating head accessories each load and be reuseable
+                if (!ThisOutfitData.IsRefreshed) //Save all accessories to avoid duplicating head accessories each load and be reuseable
                 {
-                    Settings.Logger.LogDebug("Do firstpass: " + ThisOutfitData.Chafile.GetFancyCharacterName());
+                    Settings.Logger.LogDebug($"Refresh: " + ThisOutfitData.Chafile.GetFancyCharacterName());
+                    ThisOutfitData.MarkRefreshed();
 
                     ThisOutfitData.Clear_Firstpass();
                     ThisOutfitData.Reset_Firstpass();
@@ -252,16 +255,15 @@ namespace CosplayParty
                 ClothingLoader.CharacterClothingKeep_Coordinate = CoordinateInfo.ToDictionary(x => x.Key, x => x.Value.CoordinateSaveBools);
 #endif
                     #endregion
-                    ThisOutfitData.firstpass = false;
                 }
 
                 if (ChaControl.sex == 1)//run the following if female
                 {
-                    if (currentGameMode == GameMode.MainGame && !ThisOutfitData.processed /*|| Settings.ChangeOutfit.Value && GameMode.Maker == currentGameMode*/)
+                    if (currentGameMode == GameMode.MainGame && !ThisOutfitData.IsProcessed /*|| Settings.ChangeOutfit.Value && GameMode.Maker == currentGameMode*/)
                     {
                         Settings.Logger.LogDebug("Processing: " + ThisOutfitData.Chafile.GetFancyCharacterName());
                         OutfitDecider.Decision(ChaControl.fileParam.fullname, ThisOutfitData);//Generate outfits
-                        ThisOutfitData.processed = true;
+                        ThisOutfitData.MarkProcessed();
                     }
                     var HoldOutfit = ChaControl.fileStatus.coordinateType; //requried for Cutscene characters to wear correct outfit such as sakura's first cutscene
                     ThisOutfitData.ClothingLoader.FullLoad(ChaControl, ChaFileControl);
@@ -308,7 +310,7 @@ namespace CosplayParty
                 return;
             }
 
-            ClothingLoader.CoordinateLoad(coordinate, ChaControl);
+            ClothingLoader.CoordinateLoad(coordinate, ChaControl, ChaFileControl);
         }
     }
 }
