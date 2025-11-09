@@ -183,13 +183,13 @@ namespace CosplayParty
                 var type = acce.IsEmpty ? "Empty" : acce.Type.ToString();
                 if (use)
                 {
-                    Settings.Logger.LogDebug($"New Accessory {i + 1} (as {type}) allowed; " + acce.Parts.id);
+                    //Settings.Logger.LogDebug($"New Accessory {i + 1} (as {type}) allowed; " + acce.Parts.id);
 
                     modify.Parts = acce.Parts;
                 }
                 else
                 {
-                    Settings.Logger.LogDebug($"New Accessory {i + 1} (as {type}) denied; " + acce.Parts.id);
+                    //Settings.Logger.LogDebug($"New Accessory {i + 1} (as {type}) denied; " + acce.Parts.id);
 
                     // 空にする 
                     acce.Parts.type = 120;
@@ -261,7 +261,7 @@ namespace CosplayParty
                 var type = acce.IsEmpty ? "Empty" : acce.Type.ToString();
                 if (use)
                 {
-                    Settings.Logger.LogDebug($"Kept Accessory {aidx + 1} (as {type}) allowed; " + acce.Parts.id);
+                    //Settings.Logger.LogDebug($"Kept Accessory {aidx + 1} (as {type}) allowed; " + acce.Parts.id);
 
                     ProcInfo.ACCKeepReturn.Add(aidx);
 
@@ -272,7 +272,7 @@ namespace CosplayParty
                 }
                 else
                 {
-                    Settings.Logger.LogDebug($"Kept Accessory {aidx + 1} (as {type}) denied; " + acce.Parts.id);
+                    //Settings.Logger.LogDebug($"Kept Accessory {aidx + 1} (as {type}) denied; " + acce.Parts.id);
                 }
             }
         }
