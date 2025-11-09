@@ -10,33 +10,21 @@ using KKAPI.Maker;
 
 namespace CosplayParty
 {
-    public class OverridingBase : IDisposable
+    public class CoordLoader
     {
-        private ChaDefault ThisOutfitData;
-        private int Index;
-
-        public ChaFileCoordinate Coordinate;
-        public bool IsLoaded;
-        public bool IsReady { get { return Selected == null || IsLoaded; } }
-
         public CardData Selected;
-
-        public OverridingBase(ChaDefault tod, int idx)
-        {
-            ThisOutfitData = tod;
-            Index = idx;
-        }
+        public ChaFileCoordinate Coordinate;
+        public bool IsLoaded { get { return Coordinate != null; } }
+        public bool IsReady { get { return Selected == null || IsLoaded; } }
 
         public virtual void Dispose()
         {
             Unload();
-            ThisOutfitData = null;
         }
 
         public virtual void Unload()
         {
             if (!IsLoaded) return;
-            IsLoaded = false;
             Coordinate = null;
         }
 
@@ -46,15 +34,17 @@ namespace CosplayParty
             else if (!path.EndsWith(".png")) Selected = null;
             else
             {
-#if true // 別口ロード実験
                 Coordinate = new ChaFileCoordinate();
                 var IsReady = Coordinate.LoadFile(path);
-                IsLoaded = true;
-#else
-                var ThisCoordinate = ThisOutfitData.ChaControl.chaFile.coordinate[Index];
-                IsLoaded = ThisCoordinate.LoadFile(path);//in case it fails
-#endif
             }
+        }
+
+        public void Select()
+        {
+            Unload();
+
+            if (Selected == null) return;
+            Load(Selected.GetFullPath());
         }
     }
 
@@ -68,36 +58,6 @@ namespace CosplayParty
     {
         public Dictionary<int, ModifiedAccessory> Accessory = new Dictionary<int, ModifiedAccessory>();
     }
-
-    public class OverridingOuter : OverridingBase
-    {
-        public OverridingOuter(ChaDefault tod, int idx) :
-            base(tod, idx)
-        {
-        }
-
-        public void Select()
-        {
-            Unload();
-
-            if (Selected == null) return;
-            Load(Selected.GetFullPath());
-        }
-    }
-
-    public class OverridingInner : OverridingBase
-    {
-        public OverridingInner(ChaDefault tod, int idx) :
-            base(tod, idx)
-        {
-        }
-
-        public void Select()
-        {
-            Unload();
-
-        }
-	}
 
     public class CoordOverrider
     {

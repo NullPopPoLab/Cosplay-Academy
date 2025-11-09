@@ -49,8 +49,8 @@ namespace CosplayParty
         private int Index;
 
         public readonly CoordInfo Current = new CoordInfo();
-        public readonly OverridingOuter Outer;
-        public readonly OverridingInner Inner;
+        public readonly CoordLoader Outer = new CoordLoader();
+        public readonly CoordLoader Inner = new CoordLoader();
 
         // このあたりの構造、ロード前のコーデ適用なんかもあるのでロードと密連動させてはならない 
         // 用途に応じて適切なタイミングで扱う必要がある。 
@@ -68,8 +68,6 @@ namespace CosplayParty
             ThisOutfitData = tod;
             Index = idx;
 
-            Outer = new OverridingOuter(tod, idx);
-            Inner = new OverridingInner(tod, idx);
             ProcInfo = new CoordinateProcessInfo();
             HairInfo = new Dictionary<int, HairSupport.HairAccessoryInfo>();
         }
