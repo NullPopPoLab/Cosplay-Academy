@@ -131,18 +131,18 @@ namespace CosplayParty
             }
         }
 
-        public void Override4CoordCard(ChaFileCoordinate outer, ChaFileCoordinate inner)
+        public void Override4Coordinate(ChaFileCoordinate outer, ChaFileCoordinate inner)
         {
             var co = new CoordOverrider(ThisOutfitData, Index);
             co.Collaborate(Current.Succession, outer, inner);
-            co.Apply4CoordCard();
+            co.Apply4Coordinate();
         }
 
-        public void Override4Randomize(ChaFileCoordinate outer, ChaFileCoordinate inner)
+        public void Override4Generalize(ChaFileCoordinate outer, ChaFileCoordinate inner)
         {
             var co = new CoordOverrider(ThisOutfitData, Index);
             co.Collaborate(Current.Succession, outer, inner);
-            co.Apply4Randomize();
+            co.Apply4Generalize(outer);
         }
     }
 }

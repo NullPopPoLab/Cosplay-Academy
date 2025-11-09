@@ -15,6 +15,7 @@ namespace CosplayParty
         private ChaDefault ThisOutfitData;
         private int Index;
 
+        public ChaFileCoordinate Coordinate;
         public bool IsLoaded;
         public bool IsReady { get { return Selected == null || IsLoaded; } }
 
@@ -36,6 +37,7 @@ namespace CosplayParty
         {
             if (!IsLoaded) return;
             IsLoaded = false;
+            Coordinate = null;
         }
 
         public void Load(string path)
@@ -44,12 +46,12 @@ namespace CosplayParty
             else if (!path.EndsWith(".png")) Selected = null;
             else
             {
-                var ThisCoordinate = ThisOutfitData.ChaControl.chaFile.coordinate[Index];
-#if false // 別口ロード実験
-                var Coordinate = new ChaFileCoordinate();
+#if true // 別口ロード実験
+                Coordinate = new ChaFileCoordinate();
                 var IsReady = Coordinate.LoadFile(path);
-                IsLoaded = ThisCoordinate.LoadBytes(Coordinate.SaveBytes(), Coordinate.loadVersion);
+                IsLoaded = true;
 #else
+                var ThisCoordinate = ThisOutfitData.ChaControl.chaFile.coordinate[Index];
                 IsLoaded = ThisCoordinate.LoadFile(path);//in case it fails
 #endif
             }
@@ -315,7 +317,7 @@ namespace CosplayParty
             }
         }
 
-        public void Apply4CoordCard()
+        public void Apply4Coordinate()
         {
             // データ適用動作 
             var MaterialEditorData = ExtendedSave.GetExtendedDataById(Target.Chafile, "com.deathweasel.bepinex.materialeditor");
@@ -444,7 +446,7 @@ namespace CosplayParty
             }
         }
 
-        public void Apply4Randomize()
+        public void Apply4Generalize(ChaFileCoordinate newouter)
         {
             var outfit = Target.Outfits[Index];
 
@@ -455,7 +457,6 @@ namespace CosplayParty
 
             Target.ChaControl.fileStatus.coordinateType = Index;
             //UnderwearProcessed[outfitnum] = new bool[9];
-            var ThisCoordinate = Target.ChaControl.chaFile.coordinate[Index];
 
             var UnderClothingKeep = new bool[9];
 
@@ -474,13 +475,6 @@ namespace CosplayParty
 //            var keptacce = outfit.Current.Succession.KeptAccessories;
 
             outfit.ProcInfo.Reset();
-
-//            var UnderwearAccessoryStart = keptacce.Count;
-            if (outfit.MakeUpKeep)
-            {
-                ThisCoordinate.enableMakeup = outfit.Original_Coordinate.enableMakeup;
-                ThisCoordinate.makeup = outfit.Original_Coordinate.makeup;
-            }
 
             var HairToColor = new List<int>();
 
@@ -522,12 +516,13 @@ namespace CosplayParty
             else
 #endif
 
+#if false
             if (Settings.HairMatch.Value && !MakerAPI.InsideMaker && Settings.DestinationHeadAccs.Value)
             {
                 // 頭に載っている髪パーツのみ対象とする 
-                for (var i = 0; i < ThisCoordinate.accessory.parts.Length; ++i)
+                for (var i = 0; i < TargetCoordinate.accessory.parts.Length; ++i)
                 {
-                    var p = ThisCoordinate.accessory.parts[i];
+                    var p = TargetCoordinate.accessory.parts[i];
                     if (!Constants.HeadAcceSet.Contains(p.parentKey) && !Constants.HatAcceSet.Contains(p.parentKey)) continue;
                     HairToColor.Add(i);
                 }
@@ -535,6 +530,8 @@ namespace CosplayParty
             if (UnderClothingKeep == null) UnderClothingKeep = new bool[9];
             if (HairToColor == null) HairToColor = new List<int>();
             //if (Underwearbools[outfitnum] == null) Underwearbools[outfitnum] = new bool[3];
+#endif
+
 #if false // Additional_Card_Info 廃止予定 
             for (var i = 0; i < 9; i++)
             {
@@ -546,7 +543,17 @@ namespace CosplayParty
 #endif
             outfit.ProcInfo.UnderClothingKeep = UnderClothingKeep;
 
-            var Inputdata = ExtendedSave.GetExtendedDataById(ThisCoordinate, "com.deathweasel.bepinex.hairaccessorycustomizer");
+            var TargetCoordinate = Target.ChaControl.chaFile.coordinate[Index];
+            TargetCoordinate.LoadBytes(newouter.SaveBytes(), newouter.loadVersion);
+
+            //            var UnderwearAccessoryStart = keptacce.Count;
+            if (outfit.MakeUpKeep)
+            {
+                TargetCoordinate.enableMakeup = outfit.Original_Coordinate.enableMakeup;
+                TargetCoordinate.makeup = outfit.Original_Coordinate.makeup;
+            }
+
+            var Inputdata = ExtendedSave.GetExtendedDataById(TargetCoordinate, "com.deathweasel.bepinex.hairaccessorycustomizer");
             var HairAccInfo = outfit.Current.HairAccessories;
             if (Inputdata != null)
             {
@@ -560,11 +567,11 @@ namespace CosplayParty
                     ClothingLoader.OutdatedMessage("hairaccessorycustomizer", true);
                 }
             }
-            var MaterialEditorData = ExtendedSave.GetExtendedDataById(ThisCoordinate, "com.deathweasel.bepinex.materialeditor");
+            var MaterialEditorData = ExtendedSave.GetExtendedDataById(TargetCoordinate, "com.deathweasel.bepinex.materialeditor");
             Target.FinalMaterials.LoadCoordinate(MaterialEditorData, Target, Index);
             var Import_ME_Data = new MaterialEditorProperties();
 
-            var OriginalAcce = ThisCoordinate.accessory.parts.ToList();
+            var OriginalAcce = TargetCoordinate.accessory.parts.ToList();
             var NewAcce=new List<ChaFileAccessory.PartsInfo>();
             var HairData = new Dictionary<int, HairSupport.HairAccessoryInfo>();
 
@@ -804,7 +811,7 @@ namespace CosplayParty
             }
 #endif
 
-            ThisCoordinate.accessory.parts = NewAcce.ToArray();
+            TargetCoordinate.accessory.parts = NewAcce.ToArray();
 
             //outfit.Outer.HairAccessories = HairAccInfo;
 
