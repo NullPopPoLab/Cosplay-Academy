@@ -135,6 +135,8 @@ namespace CosplayParty
             //var ME_ACC_Storage = outfit.Original_Accessory_Data;
 
             var dst = new List<AccessoryInfo>();
+            if (coordinate == null) return dst;
+
             //var src = new List<ChaFileAccessory.PartsInfo>();
             var src = coordinate.accessory.parts;
             for (var i = 0; i < src.Length; ++i)

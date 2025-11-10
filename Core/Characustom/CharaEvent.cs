@@ -89,8 +89,6 @@ namespace CosplayParty
                 Process(currentGameMode);
 
                 ThisOutfitData.ClothingLoader.Reload_RePacks(ChaControl, inH);
-
-                Settings.Logger.LogDebug($"ChaDefault chk4; id={GetInstanceID()} ChaControl={ChaControl.name}:{ThisOutfitData.ChaControl.name} ChaFile={ChaFileControl.GetFancyCharacterName()}:{ThisOutfitData.Chafile.GetFancyCharacterName()}");
             }
             else if (ThisOutfitData != null && ThisOutfitData.IsProcessed
 #if !KKS
@@ -98,8 +96,6 @@ namespace CosplayParty
 #endif
                 )
             {
-                Settings.Logger.LogDebug($"ChaDefault chk5; id={GetInstanceID()} ChaControl={ChaControl.name}:{ThisOutfitData.ChaControl.name} ChaFile={ChaFileControl.GetFancyCharacterName()}:{ThisOutfitData.Chafile.GetFancyCharacterName()}");
-
                 ThisOutfitData.Chafile = ChaFileControl;
 
                 ThisOutfitData.ClothingLoader.Run_Repacks(ChaControl);

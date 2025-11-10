@@ -46,7 +46,7 @@ namespace CosplayParty
         }
 
         private ChaDefault ThisOutfitData;
-        private int Index;
+        public int Index { get; private set; }
 
         public readonly CoordInfo Current = new CoordInfo();
         public readonly CoordLoader Outer = new CoordLoader();

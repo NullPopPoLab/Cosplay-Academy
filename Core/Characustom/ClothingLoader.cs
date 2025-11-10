@@ -110,6 +110,10 @@ namespace CosplayParty
                     {
                         Settings.Logger.LogDebug($"loaded {(ChaFileDefine.CoordinateType)i} Default with changed underwear");
                     }
+                    if (ThisOutfitData.Outfits[i].Inner.IsLoaded)
+                    {
+                        Settings.Logger.LogDebug($"loaded {(ChaFileDefine.CoordinateType)i} " + outfit.Inner.Selected.GetFullPath());
+                    }
                 }
                 else
                 {
@@ -139,7 +143,7 @@ namespace CosplayParty
         public void GeneralizedLoad(int outfitnum)
         {
             var outfit = ThisOutfitData.Outfits[outfitnum];
-            outfit.Override4Generalize(outfit.Outer.Coordinate, null);
+            outfit.Override4Generalize(outfit.Outer.Coordinate, outfit.Inner.Coordinate);
         }
 
         //! コーデカードのロード 
