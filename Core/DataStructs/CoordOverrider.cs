@@ -13,9 +13,10 @@ namespace CosplayParty
     public class CoordLoader
     {
         public CardData Selected;
+        public string Path = "";
         public ChaFileCoordinate Coordinate;
         public bool IsLoaded { get { return Coordinate != null; } }
-        public bool IsReady { get { return Selected == null || IsLoaded; } }
+        public bool IsReady { get { return IsLoaded || String.IsNullOrEmpty(Path); } }
 
         public virtual void Dispose()
         {
@@ -26,16 +27,22 @@ namespace CosplayParty
         {
             if (!IsLoaded) return;
             Coordinate = null;
+            Path = "";
         }
 
         public void Load(string path)
         {
-            if (String.IsNullOrEmpty(path)) Selected = null;
-            else if (!path.EndsWith(".png")) Selected = null;
+            Unload();
+
+            Path = path;
+            if (String.IsNullOrEmpty(path)) Coordinate = null;
+            else if (!path.EndsWith(".png")) Coordinate = null;
             else
             {
                 Coordinate = new ChaFileCoordinate();
-                var IsReady = Coordinate.LoadFile(path);
+                if (!Coordinate.LoadFile(path)) Coordinate = null;
+
+                Settings.Logger.LogDebug($"CoordLoader {(IsLoaded ? "Ready" : "Failure")} for {path}");
             }
         }
 
@@ -48,6 +55,10 @@ namespace CosplayParty
         }
     }
 
+    public class ModifiedCloth
+    {
+        public ChaFileClothes.PartsInfo Parts;
+    }
     public class ModifiedAccessory
     {
         public ChaFileAccessory.PartsInfo Parts;
@@ -56,6 +67,7 @@ namespace CosplayParty
     }
     public class ModifiedCoord
     {
+        public ModifiedCloth[] Clothes = new ModifiedCloth[Constants.ClothSlots];
         public Dictionary<int, ModifiedAccessory> Accessory = new Dictionary<int, ModifiedAccessory>();
     }
 

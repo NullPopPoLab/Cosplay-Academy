@@ -104,7 +104,7 @@ namespace CosplayParty
                     GeneralizedLoad(i);
                     if (ThisOutfitData.Outfits[i].Outer.IsLoaded)
                     {
-                        Settings.Logger.LogDebug($"loaded {(ChaFileDefine.CoordinateType)i} " + outfit.Outer.Selected.GetFullPath());
+                        Settings.Logger.LogDebug($"loaded {(ChaFileDefine.CoordinateType)i} " + outfit.Outer.Path);
                     }
                     else
                     {
@@ -112,7 +112,7 @@ namespace CosplayParty
                     }
                     if (ThisOutfitData.Outfits[i].Inner.IsLoaded)
                     {
-                        Settings.Logger.LogDebug($"loaded {(ChaFileDefine.CoordinateType)i} " + outfit.Inner.Selected.GetFullPath());
+                        Settings.Logger.LogDebug($"loaded {(ChaFileDefine.CoordinateType)i} " + outfit.Inner.Path);
                     }
                 }
                 else
