@@ -12,11 +12,11 @@ namespace CosplayParty
 {
     public class CoordLoader
     {
-        public CardData Selected;
         public string Path = "";
         public ChaFileCoordinate Coordinate;
+        public bool IsSelected { get { return !String.IsNullOrEmpty(Path); } }
         public bool IsLoaded { get { return Coordinate != null; } }
-        public bool IsReady { get { return IsLoaded || String.IsNullOrEmpty(Path); } }
+        public bool IsReady { get { return IsLoaded || !IsSelected; } }
 
         public virtual void Dispose()
         {
@@ -30,28 +30,26 @@ namespace CosplayParty
             Path = "";
         }
 
-        public void Load(string path)
+        public void Load()
         {
             Unload();
 
-            Path = path;
-            if (String.IsNullOrEmpty(path)) Coordinate = null;
-            else if (!path.EndsWith(".png")) Coordinate = null;
+            if (String.IsNullOrEmpty(Path)) Coordinate = null;
+            else if (!Path.EndsWith(".png")) Coordinate = null;
             else
             {
                 Coordinate = new ChaFileCoordinate();
-                if (!Coordinate.LoadFile(path)) Coordinate = null;
+                if (!Coordinate.LoadFile(Path)) Coordinate = null;
 
-                Settings.Logger.LogDebug($"CoordLoader {(IsLoaded ? "Ready" : "Failure")} for {path}");
+                Settings.Logger.LogDebug($"CoordLoader {(IsLoaded ? "Ready" : "Failure")} for {Path}");
             }
         }
 
-        public void Select()
+        public void Select(string path)
         {
             Unload();
 
-            if (Selected == null) return;
-            Load(Selected.GetFullPath());
+            Path=path;
         }
     }
 

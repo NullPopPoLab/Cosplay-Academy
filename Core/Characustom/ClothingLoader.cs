@@ -96,8 +96,8 @@ namespace CosplayParty
             {
                 var outfit = ThisOutfitData.Outfits[i];
 
-                outfit.Outer.Select();
-                outfit.Inner.Select();
+                outfit.Outer.Load();
+                outfit.Inner.Load();
 
                 if (outfit.Outer.IsLoaded || outfit.Inner.IsLoaded)
                 {

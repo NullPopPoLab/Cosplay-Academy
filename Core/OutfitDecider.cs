@@ -232,8 +232,8 @@ namespace CosplayParty
                 // フリーH らしい 
                 if (!Settings.EnableInFreeH.Value)
                 {
-                    outfit.Outer.Selected = null;
-                    outfit.Inner.Selected = null;
+                    outfit.Outer.Path = "";
+                    outfit.Inner.Path = "";
                     return;
                 }
             }
@@ -242,8 +242,8 @@ namespace CosplayParty
             if (ft == null)
             {
                 Settings.Logger.LogWarning($"Generalized_Assignment: FilterBySets[{sets}] is null");
-                outfit.Outer.Selected = null;
-                outfit.Inner.Selected = null;
+                outfit.Outer.Path = "";
+                outfit.Inner.Path = "";
                 return;
             }
 #if KKS
@@ -258,7 +258,7 @@ namespace CosplayParty
             var src0 = Settings.RandomizeOutfit.Value ? roleSet[0].CoordSet : null;
             if (src0 == null)
             {
-                outfit.Outer.Selected = null;
+                outfit.Outer.Path = "";
                 //Settings.Logger.LogWarning($"Generalized_Assignment: outfits CoordSet is null");
 #if false
                 return;
@@ -282,7 +282,7 @@ namespace CosplayParty
             }
             if (src1 == null)
             {
-                outfit.Inner.Selected = null;
+                outfit.Inner.Path = "";
                 //Settings.Logger.LogWarning($"Generalized_Assignment: underwears CoordSet is null");
             }
 
@@ -304,15 +304,15 @@ namespace CosplayParty
 
             if (src0 != null)
             {
-                outfit.Outer.Selected = src0.Random(filter);
-                Settings.Logger.LogDebug($"Generalized_Assignment: outer={outfit.Outer.Selected?.GetFullPath()}");
+                outfit.Outer.Select(src0.Random(filter)?.GetFullPath());
+                Settings.Logger.LogDebug($"Generalized_Assignment: outer={outfit.Outer.Path}");
             }
             if (src1 != null)
             {
                 filter.SubDir = "";
                 filter.Unexclude = 0;
-                outfit.Inner.Selected = src1.Random(filter);
-                Settings.Logger.LogDebug($"Generalized_Assignment: inner={outfit.Inner.Selected?.GetFullPath()}");
+                outfit.Inner.Select(src1.Random(filter)?.GetFullPath());
+                Settings.Logger.LogDebug($"Generalized_Assignment: inner={outfit.Inner.Path}");
             }
         }
     }
