@@ -115,6 +115,28 @@ namespace CosplayParty
                 }
             }
 
+            // インナー差し替え 
+            if (inner != null)
+            {
+                /*! @todo select slots by coord settings */
+                var enablity = new bool[] { false, false, true/*bra*/, true/*shorts*/, false, true/*panst*/, false, false, false };
+
+                for(var i=0;i< inner.clothes.parts.Length; ++i)
+                {
+                    if (!enablity[i])
+                    {
+                        _modify.Clothes[i] = null;
+                        continue;
+                    }
+
+                    var parts = inner.clothes.parts[i];
+                    var ci = new ModifiedCloth();
+                    ci.Parts = parts;
+
+                    _modify.Clothes[i] = ci;
+                }
+            }
+
             var have_hat = false;
             var have_grasses = false;
             var have_pias = false;
@@ -293,7 +315,14 @@ namespace CosplayParty
             var MaterialEditorData = ExtendedSave.GetExtendedDataById(Target.Chafile, "com.deathweasel.bepinex.materialeditor");
             var Coordinate_ME_Data = new ME_Coordinate(MaterialEditorData, Target, Index);
             var HairData = new Dictionary<int, HairSupport.HairAccessoryInfo>();
+            var TargetCloth = Target.ChaControl.nowCoordinate.clothes.parts;
             var TargetAcce = Target.ChaControl.nowCoordinate.accessory.parts.ToList();
+
+            for (var i = 0; i < _modify.Clothes.Length; ++i)
+            {
+                if (_modify.Clothes[i] == null) continue;
+                TargetCloth[i] = _modify.Clothes[i].Parts;
+            }
 
             foreach (var acce in _modify.Accessory)
             {
@@ -698,6 +727,7 @@ namespace CosplayParty
             outfit.ProcInfo.UnderClothingKeep = UnderClothingKeep;
 
             var TargetCoordinate = Target.ChaControl.chaFile.coordinate[Index];
+            if (newouter == null) newouter = TargetCoordinate;
             var TargetAcce = newouter.accessory.parts.ToList();
 
             //            var UnderwearAccessoryStart = keptacce.Count;
@@ -728,6 +758,13 @@ namespace CosplayParty
             //            var OriginalAcce = TargetCoordinate.accessory.parts.ToList();
             //            var NewAcce=new List<ChaFileAccessory.PartsInfo>();
             var HairData = new Dictionary<int, HairSupport.HairAccessoryInfo>();
+            var TargetCloth = Target.ChaControl.nowCoordinate.clothes.parts;
+
+            for (var i = 0; i < _modify.Clothes.Length; ++i)
+            {
+                if (_modify.Clothes[i] == null) continue;
+                TargetCloth[i] = _modify.Clothes[i].Parts;
+            }
 
             foreach (var acce in _modify.Accessory)
             {

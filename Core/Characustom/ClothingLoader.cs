@@ -167,7 +167,16 @@ namespace CosplayParty
 
             var outfitnum = chacontrol.fileStatus.coordinateType;
             var outfit = ThisOutfitData.Outfits[outfitnum];
-            outfit.Override4Coordinate(coordinate,null);
+            if (Settings.RandomizeUnderwear.Value)
+            {
+                OutfitDecider.SelectInner(outfitnum);
+                outfit.Inner.Load();
+                if (outfit.Inner.IsLoaded)
+                {
+                    Settings.Logger.LogDebug($"loaded {(ChaFileDefine.CoordinateType)outfitnum} " + outfit.Inner.Path);
+                }
+            }
+            outfit.Override4Coordinate(coordinate,outfit.Inner.Coordinate);
         }
 
         private void Additional_Clothing_Process(int index, int outfitnum, ME_Coordinate ME_Data)
