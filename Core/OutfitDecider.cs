@@ -223,72 +223,11 @@ namespace CosplayParty
             }
         }
 
-        private static void Generalized_Assignment(int sets)
+        private static SpecialCoordFilter _setupFilter(Filter ft)
         {
-            var outfit = ThisOutfitData.Outfits[sets];
-
-            if (ThisOutfitData.Heroine == null)
-            {
-                // フリーH らしい 
-                if (!Settings.EnableInFreeH.Value)
-                {
-                    outfit.Outer.Path = "";
-                    outfit.Inner.Path = "";
-                    return;
-                }
-            }
-
-            var ft = filterBySets[sets];
-            if (ft == null)
-            {
-                Settings.Logger.LogWarning($"Generalized_Assignment: FilterBySets[{sets}] is null");
-                outfit.Outer.Path = "";
-                outfit.Inner.Path = "";
-                return;
-            }
-#if KKS
-            if (sets==0 && SelectByPeriod >=0 && filterByPeriods[SelectByPeriod].Folder!=null)
-            {
-                // 時間帯別設定優先 
-                ft = filterByPeriods[SelectByPeriod];
-            }
-#endif
-
-            var status = ThisOutfitData.ChaControl.fileParam;
-            var src0 = Settings.RandomizeOutfit.Value ? roleSet[0].CoordSet : null;
-            if (src0 == null)
-            {
-                outfit.Outer.Path = "";
-                //Settings.Logger.LogWarning($"Generalized_Assignment: outfits CoordSet is null");
-#if false
-                return;
-#endif
-            }
-
-            var src1 = Settings.RandomizeUnderwear.Value ? roleSet[1].CoordSet : null;
-            // 下着除外 
-            switch (sets)
-            {
-#if KK
-                case 3: // 水着 
-                    src1 = null;
-                    break;
-#elif KKS
-                case 1: // 水着 
-                case 3: // 風呂場 
-                    src1 = null;
-                    break;
-#endif
-            }
-            if (src1 == null)
-            {
-                outfit.Inner.Path = "";
-                //Settings.Logger.LogWarning($"Generalized_Assignment: underwears CoordSet is null");
-            }
-
             var filter = new SpecialCoordFilter();
-            filter.SubDir = ft.Order;
-            filter.Unexclude = (ft.Folder == null) ? 0 : ft.Folder.SpecialType.Excluded;
+            filter.SubDir = (ft==null)?"":ft.Order;
+            filter.Unexclude = (ft == null || ft.Folder == null) ? 0 : ft.Folder.SpecialType.Excluded;
             filter.HeightGrade = ThisOutfitData.ChaControl.GetHeightCategory();
             filter.BustGrade = ThisOutfitData.ChaControl.GetBustCategory();
             if (ThisOutfitData.Heroine != null)
@@ -299,21 +238,82 @@ namespace CosplayParty
 #endif
                 filter.Lewd = ThisOutfitData.Heroine.HExperience == SaveData.Heroine.HExperienceKind.淫乱;
             }
+            return filter;
+        }
 
-            Settings.Logger.LogDebug($"Generalized_Assignment: sets:{sets} filter:{filter}");
+        public static void SelectOuter(int sets)
+        {
+            var outfit = ThisOutfitData.Outfits[sets];
 
-            if (src0 != null)
+            outfit.Outer.Unload();
+
+            if (!Settings.RandomizeOutfit.Value) return;
+            if (ThisOutfitData.Heroine == null)
             {
-                outfit.Outer.Select(src0.Random(filter)?.GetFullPath());
-                Settings.Logger.LogDebug($"Generalized_Assignment: outer={outfit.Outer.Path}");
+                // フリーH らしい 
+                if (!Settings.EnableInFreeH.Value) return;
             }
-            if (src1 != null)
+
+            var src0 = roleSet[0].CoordSet;
+            if (src0 == null) return;
+
+            var ft = filterBySets[sets];
+            if (ft == null)
             {
-                filter.SubDir = "";
-                filter.Unexclude = 0;
-                outfit.Inner.Select(src1.Random(filter)?.GetFullPath());
-                Settings.Logger.LogDebug($"Generalized_Assignment: inner={outfit.Inner.Path}");
+                Settings.Logger.LogWarning($"Generalized_Assignment: FilterBySets[{sets}] is null");
+                return;
             }
+            else
+            {
+#if KKS
+                if (sets == 0 && SelectByPeriod >= 0 && filterByPeriods[SelectByPeriod].Folder != null)
+                {
+                    // 時間帯別設定優先 
+                    ft = filterByPeriods[SelectByPeriod];
+                }
+#endif
+            }
+
+            var filter = _setupFilter(ft);
+            outfit.Outer.Select(src0.Random(filter)?.GetFullPath());
+            Settings.Logger.LogDebug($"Generalized_Assignment: outer={outfit.Outer.Path}");
+        }
+
+        public static void SelectInner(int sets)
+        {
+            var outfit = ThisOutfitData.Outfits[sets];
+
+            outfit.Inner.Unload();
+
+            if (!Settings.RandomizeUnderwear.Value) return;
+
+            var src1 = roleSet[1].CoordSet;
+            if (src1 == null) return;
+
+            // 下着除外 
+            switch (outfit.Index)
+            {
+#if KK
+                case 3: // 水着 
+                    src1 = null;
+                    return null;
+#elif KKS
+                case 1: // 水着 
+                case 3: // 風呂場 
+                    src1 = null;
+                    return;
+#endif
+            }
+
+            var filter = _setupFilter(null);
+            outfit.Inner.Select(src1.Random(filter)?.GetFullPath());
+            Settings.Logger.LogDebug($"Generalized_Assignment: inner={outfit.Inner.Path}");
+        }
+
+        private static void Generalized_Assignment(int sets)
+        {
+            SelectOuter(sets);
+            SelectInner(sets);
         }
     }
 }
