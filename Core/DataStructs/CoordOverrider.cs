@@ -758,7 +758,7 @@ namespace CosplayParty
             //            var OriginalAcce = TargetCoordinate.accessory.parts.ToList();
             //            var NewAcce=new List<ChaFileAccessory.PartsInfo>();
             var HairData = new Dictionary<int, HairSupport.HairAccessoryInfo>();
-            var TargetCloth = Target.ChaControl.nowCoordinate.clothes.parts;
+            var TargetCloth = newouter.clothes.parts;
 
             for (var i = 0; i < _modify.Clothes.Length; ++i)
             {
@@ -787,6 +787,7 @@ namespace CosplayParty
                 if (acce.Value.Material != null) ME_coord.AddAccessory(Index, acce.Key, acce.Value.Material);
             }
 
+            newouter.clothes.parts = TargetCloth;
             newouter.accessory.parts = TargetAcce.ToArray();
             TargetCoordinate.LoadBytes(newouter.SaveBytes(), newouter.loadVersion);
             MoreAccessoriesKOI.MoreAccessories.ArraySync(Target.ChaControl);

@@ -47,14 +47,14 @@ namespace CosplayParty
                     return;
                 }
                 var ThisOutfitData = CharaEvent.ChaDefaults.Find(x => x.Parameter.Compare(Chara.chaCtrl.fileParam));
-                if (ThisOutfitData == null || !ThisOutfitData.processed)
+                if (ThisOutfitData == null || !ThisOutfitData.IsProcessed)
                 {
                     return;
                 }
                 var heroine = Chara.heroine;
                 //ChaFileParameter ChaPara = Chara.chaCtrl.fileParam;
                 //var ThisOutfitData = CharaEvent.ChaDefaults.Find(x => ChaPara.personality == x.Personality && x.FullName == ChaPara.fullname && x.BirthDay == ChaPara.strBirthDay);
-                //if (ThisOutfitData == null || !ThisOutfitData.processed)
+                //if (ThisOutfitData == null || !ThisOutfitData.IsProcessed)
                 //{
                 //    return;
                 //}

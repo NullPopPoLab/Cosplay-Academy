@@ -296,7 +296,7 @@ namespace CosplayParty
 #if KK
                 case 3: // 水着 
                     src1 = null;
-                    return null;
+                    return;
 #elif KKS
                 case 1: // 水着 
                 case 3: // 風呂場 
