@@ -751,9 +751,9 @@ namespace CosplayParty
                     ClothingLoader.OutdatedMessage("hairaccessorycustomizer", true);
                 }
             }
-            var MaterialEditorData = ExtendedSave.GetExtendedDataById(newouter, "com.deathweasel.bepinex.materialeditor");
-            Target.FinalMaterials.LoadCoordinate(MaterialEditorData, Target, Index);
-            var Import_ME_Data = new MaterialEditorProperties();
+            //var MaterialEditorData = ExtendedSave.GetExtendedDataById(newouter, "com.deathweasel.bepinex.materialeditor");
+            //Target.FinalMaterials.LoadCoordinate(MaterialEditorData, Target, Index);
+            //var Import_ME_Data = new MaterialEditorProperties();
 
             //            var OriginalAcce = TargetCoordinate.accessory.parts.ToList();
             //            var NewAcce=new List<ChaFileAccessory.PartsInfo>();
