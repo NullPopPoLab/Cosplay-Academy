@@ -1,6 +1,6 @@
-﻿#if KK
-using ActionGame;
+﻿using ActionGame;
 using ActionGame.Chara;
+using ActionGame.Communication;
 using Extensions;
 using HarmonyLib;
 using Illusion.Extensions;
@@ -15,9 +15,9 @@ namespace CosplayParty
         public static void Init()
         {
             Harmony.CreateAndPatchAll(typeof(Hooks));
-            Harmony.CreateAndPatchAll(typeof(SetNextOutfitAtMove));
         }
 
+#if KK
         //private static void ShowTypeInfo(Type t)
         //{
         //    Settings.Logger.LogDebug($"Name: {t.Name}");
@@ -135,6 +135,125 @@ namespace CosplayParty
             }
         }
 
+        //[HarmonyPatch]
+        //static class FirstActionPatch
+        //{
+        //    public static MethodBase TargetMethod() => AccessTools.Method(AccessTools.TypeByName("ActionGame.ActionControl+DesireInfo, Assembly-CSharp"), "FirstAction",new Type[] { typeof(SaveData.Heroine),AccessTools.TypeByName("ActionGame.ActionControl+DesireInfo, Assembly-CSharp")});//Assembly Name because it hates me now that I didn't want to use it
+        //    static void Prefix(int _mapNo, NPC _npc, ActionControl __instance, SaveData.Heroine _heroine)
+        //    {
+        //        if (_mapNo == 22)
+        //        {
+
+        //        }
+        //    }
+        //}
+
+        [HarmonyPostfix]
+        [HarmonyPatch(typeof(NPC), nameof(NPC.ReStart))]
+        internal static void NPCRestart(NPC __instance)
+        {
+            try
+            {
+                var ThisOutfitData = CharaEvent.ChaDefaults.Find(x => x.Parameter.Compare(__instance.chaCtrl.fileParam));
+#if false // おそらく廃止 
+                if (ThisOutfitData == null || ThisOutfitData.processed || __instance.heroine.isTeacher || !Settings.StoryModeChange.Value)
+                {
+                    if (Settings.StoryModeChange.Value && Settings.ChangeToClubatKoi.Value && __instance.mapNo == 22)
+                    {
+                        __instance.chaCtrl.ChangeCoordinateTypeAndReload(ChaFileDefine.CoordinateType.Club);
+                        __instance.heroine.coordinates[0] = 4;
+                    }
+                    return;
+                }
+                ThisOutfitData.ChangeKoiToClub = false;
+                ThisOutfitData.ChangeClubToKoi = false;
+                if (__instance.mapNo == 22 && UnityEngine.Random.Range(1, 101) <= Settings.KoiChance.Value)
+                {
+                    ThisOutfitData.ClubOutfitPath = ThisOutfitData.outfitpaths[4];
+                    ThisOutfitData.outfitpaths[4] = ThisOutfitData.KoiOutfitpath;
+                    ThisOutfitData.ClothingLoader.GeneralizedLoad(4, ThisOutfitData.outfitpaths[4].EndsWith(".png"));
+                    __instance.heroine.coordinates[0] = 4;
+                    ThisOutfitData.SkipFirstPriority = ThisOutfitData.ChangeKoiToClub = true;
+                    ThisOutfitData.ClothingLoader.Reload_RePacks(__instance.chaCtrl, true);
+                    __instance.chaCtrl.ChangeCoordinateTypeAndReload(ChaFileDefine.CoordinateType.Club);
+                    //__instance.chaCtrl.SetAccessoryStateAll(true);
+                    //ExpandedOutfit.Logger.LogError(__instance.chaCtrl.fileParam.fullname + " Action NO: " + __instance.AI.actionNo + " " + ThisOutfitData.heroine.clubActivities + " " + ThisOutfitData.heroine.coordinates.Length);
+                }
+#endif
+            }
+            catch (Exception ex)
+            {
+
+                Settings.Logger.LogError("ReStart fail - " + ex);
+            }
+            //change NPC's who start at club room to a koi outfit
+        }
+
+#if false // おそらく廃止 
+        [HarmonyPostfix]
+        [HarmonyPatch(typeof(HSceneProc), nameof(HSceneProc.SetState))]
+        internal static void LoadSethook(HSceneProc __instance)
+        {
+            if (__instance.flags.isFreeH)
+                CharaEvent.FreeHHeroines = __instance.flags.lstHeroine;
+        }
+#endif
+#endif
+
+        [HarmonyPrefix]
+        [HarmonyPatch(typeof(ChaControl), "ChangeCoordinateType", new Type[]
+        {
+            typeof(bool)
+        })]
+        private static bool ChangeCoordinateTypePrefix(ChaControl __instance, bool changeBackCoordinateType)
+        {
+            Settings.Logger.LogDebug($"{__instance?.chaFile?.parameter.fullname}.ChangeCoordinateTypePrefix({changeBackCoordinateType})");
+            return true;
+        }
+
+        [HarmonyPrefix]
+        [HarmonyPatch(typeof(ChaControl), "ChangeCoordinateType", new Type[]
+        {
+            typeof(ChaFileDefine.CoordinateType),
+            typeof(bool)
+        })]
+        private static bool ChangeCoordinateTypePrefix(ChaControl __instance, ref ChaFileDefine.CoordinateType type, bool changeBackCoordinateType)
+        {
+            Settings.Logger.LogDebug($"{__instance?.chaFile?.parameter.fullname}.ChangeCoordinateTypePrefix({type},{changeBackCoordinateType})");
+            return true;
+        }
+
+        [HarmonyPrefix]
+        [HarmonyPatch(typeof(ChaControl), "ChangeCoordinateTypeAndReload", new Type[]
+        {
+            typeof(bool)
+        })]
+        private static bool ChangeCoordinateTypeAndReloadPrefix(ChaControl __instance, bool changeBackCoordinateType)
+        {
+            Settings.Logger.LogDebug($"{__instance?.chaFile?.parameter.fullname}.ChangeCoordinateTypeAndReloadPrefix({changeBackCoordinateType})");
+            return true;
+        }
+
+        [HarmonyPrefix]
+        [HarmonyPatch(typeof(ChaControl), "ChangeCoordinateTypeAndReload", new Type[]
+        {
+            typeof(ChaFileDefine.CoordinateType),
+            typeof(bool)
+        })]
+        private static bool ChangeCoordinateTypeAndReloadPrefix(ChaControl __instance, ref ChaFileDefine.CoordinateType type, bool changeBackCoordinateType)
+        {
+            Settings.Logger.LogDebug($"{__instance?.chaFile?.parameter.fullname}.ChangeCoordinateTypeAndReloadPrefix({type},{changeBackCoordinateType})");
+            return true;
+        }
+
+        [HarmonyPostfix]
+        [HarmonyPatch(typeof(NPC), "SynchroCoordinate")]
+        private static void SynchroCoordinatePostfix(NPC __instance, bool isRemove)
+        {
+            Settings.Logger.LogDebug($"{__instance?.charaData?.Name}.SynchroCoordinatePostfix({isRemove})");
+        }
+
+#if false
         [HarmonyPatch]
         static class SetNextOutfitAtMove
         {
@@ -220,70 +339,6 @@ namespace CosplayParty
                 }
             }
         }
-
-        //[HarmonyPatch]
-        //static class FirstActionPatch
-        //{
-        //    public static MethodBase TargetMethod() => AccessTools.Method(AccessTools.TypeByName("ActionGame.ActionControl+DesireInfo, Assembly-CSharp"), "FirstAction",new Type[] { typeof(SaveData.Heroine),AccessTools.TypeByName("ActionGame.ActionControl+DesireInfo, Assembly-CSharp")});//Assembly Name because it hates me now that I didn't want to use it
-        //    static void Prefix(int _mapNo, NPC _npc, ActionControl __instance, SaveData.Heroine _heroine)
-        //    {
-        //        if (_mapNo == 22)
-        //        {
-
-        //        }
-        //    }
-        //}
-
-        [HarmonyPostfix]
-        [HarmonyPatch(typeof(NPC), nameof(NPC.ReStart))]
-        internal static void NPCRestart(NPC __instance)
-        {
-            try
-            {
-                var ThisOutfitData = CharaEvent.ChaDefaults.Find(x => x.Parameter.Compare(__instance.chaCtrl.fileParam));
-#if false // おそらく廃止 
-                if (ThisOutfitData == null || ThisOutfitData.processed || __instance.heroine.isTeacher || !Settings.StoryModeChange.Value)
-                {
-                    if (Settings.StoryModeChange.Value && Settings.ChangeToClubatKoi.Value && __instance.mapNo == 22)
-                    {
-                        __instance.chaCtrl.ChangeCoordinateTypeAndReload(ChaFileDefine.CoordinateType.Club);
-                        __instance.heroine.coordinates[0] = 4;
-                    }
-                    return;
-                }
-                ThisOutfitData.ChangeKoiToClub = false;
-                ThisOutfitData.ChangeClubToKoi = false;
-                if (__instance.mapNo == 22 && UnityEngine.Random.Range(1, 101) <= Settings.KoiChance.Value)
-                {
-                    ThisOutfitData.ClubOutfitPath = ThisOutfitData.outfitpaths[4];
-                    ThisOutfitData.outfitpaths[4] = ThisOutfitData.KoiOutfitpath;
-                    ThisOutfitData.ClothingLoader.GeneralizedLoad(4, ThisOutfitData.outfitpaths[4].EndsWith(".png"));
-                    __instance.heroine.coordinates[0] = 4;
-                    ThisOutfitData.SkipFirstPriority = ThisOutfitData.ChangeKoiToClub = true;
-                    ThisOutfitData.ClothingLoader.Reload_RePacks(__instance.chaCtrl, true);
-                    __instance.chaCtrl.ChangeCoordinateTypeAndReload(ChaFileDefine.CoordinateType.Club);
-                    //__instance.chaCtrl.SetAccessoryStateAll(true);
-                    //ExpandedOutfit.Logger.LogError(__instance.chaCtrl.fileParam.fullname + " Action NO: " + __instance.AI.actionNo + " " + ThisOutfitData.heroine.clubActivities + " " + ThisOutfitData.heroine.coordinates.Length);
-                }
-#endif
-            }
-            catch (Exception ex)
-            {
-
-                Settings.Logger.LogError("ReStart fail - " + ex);
-            }
-            //change NPC's who start at club room to a koi outfit
-        }
-
-#if false // おそらく廃止 
-        [HarmonyPostfix]
-        [HarmonyPatch(typeof(HSceneProc), nameof(HSceneProc.SetState))]
-        internal static void LoadSethook(HSceneProc __instance)
-        {
-            if (__instance.flags.isFreeH)
-                CharaEvent.FreeHHeroines = __instance.flags.lstHeroine;
-        }
 #endif
     }
 }
-#endif

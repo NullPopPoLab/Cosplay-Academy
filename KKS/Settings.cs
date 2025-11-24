@@ -20,6 +20,7 @@ namespace CosplayParty
             }
 
             StandardSettings();
+            Hooks.Init();
 
             //Dresscode
             SpecificCategories[0] = Config.Bind("Dresscode", "Casual", "", "specified coordinate subfolder name or randomize");
