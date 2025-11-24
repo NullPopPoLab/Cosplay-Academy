@@ -215,13 +215,13 @@ namespace CosplayParty
                 var type = acce.IsEmpty ? "Empty" : acce.Type.ToString();
                 if (use)
                 {
-                    //Settings.Logger.LogDebug($"New Accessory {i + 1} (as {type}) allowed; " + acce.Parts.id);
+                    Settings.Logger.LogDebug($"New Accessory {i + 1} (as {type}) allowed; " + acce.Parts.id);
 
                     modify.Parts = acce.Parts;
                 }
                 else
                 {
-                    //Settings.Logger.LogDebug($"New Accessory {i + 1} (as {type}) denied; " + acce.Parts.id);
+                    Settings.Logger.LogDebug($"New Accessory {i + 1} (as {type}) denied; " + acce.Parts.id);
 
                     // 空にする 
                     acce.Parts.type = 120;
@@ -293,7 +293,7 @@ namespace CosplayParty
                 var type = acce.IsEmpty ? "Empty" : acce.Type.ToString();
                 if (use)
                 {
-                    //Settings.Logger.LogDebug($"Kept Accessory {aidx + 1} (as {type}) allowed; " + acce.Parts.id);
+                    Settings.Logger.LogDebug($"Kept Accessory {aidx + 1} (as {type}) allowed; " + acce.Parts.id);
 
                     ProcInfo.ACCKeepReturn.Add(aidx);
 
@@ -304,7 +304,7 @@ namespace CosplayParty
                 }
                 else
                 {
-                    //Settings.Logger.LogDebug($"Kept Accessory {aidx + 1} (as {type}) denied; " + acce.Parts.id);
+                    Settings.Logger.LogDebug($"Kept Accessory {aidx + 1} (as {type}) denied; " + acce.Parts.id);
                 }
             }
         }
@@ -725,8 +725,13 @@ namespace CosplayParty
 #endif
             outfit.ProcInfo.UnderClothingKeep = UnderClothingKeep;
 
-            var TargetCoordinate = Target.ChaControl.chaFile.coordinate[Index];
-            if (newouter == null) newouter = TargetCoordinate;
+            //var TargetCoordinate = Target.ChaControl.chaFile.coordinate[Index];
+            var TargetCoordinate = Target.ChaControl.nowCoordinate;
+            if (newouter == null)
+            {
+                newouter = new ChaFileCoordinate();
+                newouter.LoadBytes(TargetCoordinate.SaveBytes(), TargetCoordinate.loadVersion);
+            }
             var TargetAcce = newouter.accessory.parts.ToList();
 
             //            var UnderwearAccessoryStart = keptacce.Count;
