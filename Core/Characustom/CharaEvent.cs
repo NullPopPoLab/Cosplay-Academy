@@ -282,7 +282,7 @@ namespace CosplayParty
                     }
 #endif
                     Settings.Logger.LogDebug("next Coord type: " + next);
-                    ChaControl.ChangeCoordinateType(next, false); //forces cutscene characters to use outfits
+                    ChaControl.ChangeCoordinateType(next, true); //forces cutscene characters to use outfits
                 }
             }
             catch(Exception e)
