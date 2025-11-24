@@ -57,7 +57,7 @@ namespace CosplayParty
             var Start = TimeWatch[2].ElapsedMilliseconds;
             TimeWatch[2].Start();
 #endif
-            MoreAccessoriesKOI.MoreAccessories.ArraySync(character);
+            //MoreAccessoriesKOI.MoreAccessories.ArraySync(character);
 
             for (var i = 0; i < ThisOutfitData.Outfit_Size; i++)
             {

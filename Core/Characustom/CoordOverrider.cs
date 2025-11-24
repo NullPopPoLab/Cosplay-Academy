@@ -346,7 +346,7 @@ namespace CosplayParty
             }
 
             Target.ChaControl.nowCoordinate.accessory.parts = TargetAcce.ToArray();
-            MoreAccessoriesKOI.MoreAccessories.ArraySync(Target.ChaControl);
+            //MoreAccessoriesKOI.MoreAccessories.ArraySync(Target.ChaControl);
 
             var SaveData = new PluginData();
 
@@ -454,7 +454,6 @@ namespace CosplayParty
                 Target.FinalMaterials.Coordinates[Index] = ME_coord = new ME_Coordinate();
             }
 
-            Target.ChaControl.fileStatus.coordinateType = Index;
             //UnderwearProcessed[outfitnum] = new bool[9];
 
             var UnderClothingKeep = new bool[9];
@@ -790,7 +789,7 @@ namespace CosplayParty
             newouter.clothes.parts = TargetCloth;
             newouter.accessory.parts = TargetAcce.ToArray();
             TargetCoordinate.LoadBytes(newouter.SaveBytes(), newouter.loadVersion);
-            MoreAccessoriesKOI.MoreAccessories.ArraySync(Target.ChaControl);
+            //MoreAccessoriesKOI.MoreAccessories.ArraySync(Target.ChaControl);
 
             //outfit.Outer.HairAccessories = HairAccInfo;
 

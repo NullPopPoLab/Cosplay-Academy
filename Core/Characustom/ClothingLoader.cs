@@ -102,7 +102,7 @@ namespace CosplayParty
                 if (outfit.Outer.IsLoaded || outfit.Inner.IsLoaded)
                 {
                     GeneralizedLoad(i);
-                    if (ThisOutfitData.Outfits[i].Outer.IsLoaded)
+                    if (outfit.Outer.IsLoaded)
                     {
                         Settings.Logger.LogDebug($"loaded {(ChaFileDefine.CoordinateType)i} " + outfit.Outer.Path);
                     }
@@ -110,7 +110,7 @@ namespace CosplayParty
                     {
                         Settings.Logger.LogDebug($"loaded {(ChaFileDefine.CoordinateType)i} Default with changed underwear");
                     }
-                    if (ThisOutfitData.Outfits[i].Inner.IsLoaded)
+                    if (outfit.Inner.IsLoaded)
                     {
                         Settings.Logger.LogDebug($"loaded {(ChaFileDefine.CoordinateType)i} " + outfit.Inner.Path);
                     }
@@ -122,6 +122,8 @@ namespace CosplayParty
             }
 
             ChaControl.fileStatus.coordinateType = holdoutfitstate;
+            //MoreAccessoriesKOI.MoreAccessories.ArraySync(ChaControl);
+
 #if TRACE
             TimeWatch[0].Stop();
             var temp = TimeWatch[0].ElapsedMilliseconds - Start;
@@ -142,6 +144,8 @@ namespace CosplayParty
 
         public void GeneralizedLoad(int outfitnum)
         {
+            ThisOutfitData.ChaControl.fileStatus.coordinateType = outfitnum;
+
             var outfit = ThisOutfitData.Outfits[outfitnum];
             outfit.Override4Generalize(outfit.Outer.Coordinate, outfit.Inner.Coordinate);
         }
