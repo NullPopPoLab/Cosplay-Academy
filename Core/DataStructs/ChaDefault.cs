@@ -94,7 +94,7 @@ namespace CosplayParty
 
         public void Clear_Firstpass()
         {
-            ME.Reset();
+            ME.Clear();
 
             for (int i = 0, n = Outfit_Size; i < n; i++)
             {

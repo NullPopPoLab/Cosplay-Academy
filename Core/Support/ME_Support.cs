@@ -492,7 +492,7 @@ namespace CosplayParty.ME
             ME_Common.Classify(loader, data);
         }
 
-        public void Reset()
+        public void Clear()
         {
             Cloth.Clear();
             Accessory.Clear();
@@ -744,11 +744,11 @@ namespace CosplayParty.ME
             ME_Common.Classify(loader, data);
         }
 
-        public void Reset()
+        public void Clear()
         {
             for (var i = 0; i < Coord.Count; ++i)
             {
-                Coord[i].Reset();
+                Coord[i].Clear();
             }
         }
 
