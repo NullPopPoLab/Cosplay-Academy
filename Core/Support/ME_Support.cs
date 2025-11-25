@@ -5,1052 +5,913 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
+#pragma warning disable 0162 // unreached code
+
 namespace CosplayParty.ME
 {
-
-    public class MaterialEditorProperties
+    public static class ME_Common
     {
-        public List<RendererProperty> RendererProperty = new List<RendererProperty>();
-        public List<MaterialFloatProperty> MaterialFloatProperty = new List<MaterialFloatProperty>();
-        public List<MaterialColorProperty> MaterialColorProperty = new List<MaterialColorProperty>();
-        public List<MaterialTextureProperty> MaterialTextureProperty = new List<MaterialTextureProperty>();
-        public List<MaterialShader> MaterialShader = new List<MaterialShader>();
+        public const bool Dump = false;
 
-        public MaterialEditorProperties() { }
-
-        public MaterialEditorProperties(List<RendererProperty> renderer, List<MaterialFloatProperty> floatprob, List<MaterialColorProperty> color, List<MaterialTextureProperty> texture, List<MaterialShader> shader)
+        internal static void Classify(ME_Loader loader, PluginData pluginData)
         {
-            RendererProperty = renderer;
-            MaterialColorProperty = color;
-            MaterialFloatProperty = floatprob;
-            MaterialTextureProperty = texture;
-            MaterialShader = shader;
-        }
-
-        public void Clear()
-        {
-            MaterialShader.Clear();
-            RendererProperty.Clear();
-            MaterialColorProperty.Clear();
-            MaterialFloatProperty.Clear();
-            MaterialTextureProperty.Clear();
-        }
-
-        public void Queue(out Queue<RendererProperty> rendererProperties, out Queue<MaterialFloatProperty> materialFloatProperties, out Queue<MaterialColorProperty> materialColorProperties, out Queue<MaterialShader> materialShaders, out Queue<MaterialTextureProperty> materialTextureProperties)
-        {
-            rendererProperties = new Queue<RendererProperty>(RendererProperty);
-            materialColorProperties = new Queue<MaterialColorProperty>(MaterialColorProperty);
-            materialFloatProperties = new Queue<MaterialFloatProperty>(MaterialFloatProperty);
-            materialShaders = new Queue<MaterialShader>(MaterialShader);
-            materialTextureProperties = new Queue<MaterialTextureProperty>(MaterialTextureProperty);
-        }
-    }
-
-    public class ME_List
-    {
-        public Dictionary<int, ME_Coordinate> Coordinates = new Dictionary<int, ME_Coordinate>();
-
-        //Just need empty Lists
-        public ME_List(int size)
-        {
-            for (var i = 0; i < size; i++)
+            if (pluginData == null) return;
+            if (pluginData.version != 0)
             {
-                Coordinates[i] = new ME_Coordinate();
+                ClothingLoader.OutdatedMessage("Material Editor PluginData", true);
+                return;
             }
-        }
 
-        //Copy
-        public ME_List(ME_List Original)
-        {
-            Coordinates = new Dictionary<int, ME_Coordinate>(Original.Coordinates);
-        }
-
-        //Full Chafile Accessory Load
-        public ME_List(PluginData pluginData, ChaDefault ThisOutfitData)
-        {
-            for (var i = 0; i < ThisOutfitData.Outfit_Size; i++)
+            if (pluginData.data.TryGetValue("TextureDictionary", out var texDic) && texDic != null)
             {
-                Coordinates[i] = new ME_Coordinate();
-            }
-            if (pluginData != null)
-            {
-                if (pluginData.version == 0)
+                foreach (var t in MessagePackSerializer.Deserialize<Dictionary<int, byte[]>>((byte[])texDic))
                 {
-                    var importDictionaryList = new Dictionary<int, int>();
-
-                    if (pluginData.data.TryGetValue("TextureDictionary", out var texDic) && texDic != null)
-                    {
-                        foreach (var x in MessagePackSerializer.Deserialize<Dictionary<int, byte[]>>((byte[])texDic))
-                            importDictionaryList[x.Key] = ThisOutfitData.ME.SetAndGetTextureID(x.Value);
-                    }
-
-                    if (pluginData.data.TryGetValue("MaterialShaderList", out var shaderProperties) && shaderProperties != null)
-                    {
-                        var properties = MessagePackSerializer.Deserialize<List<MaterialShader>>((byte[])shaderProperties);
-                        properties = properties.Where(x => x.CoordinateIndex < ThisOutfitData.Outfit_Size).ToList();
-                        for (var i = 0; i < properties.Count; i++)
-                        {
-                            var loadedProperty = properties[i];
-                            var slot = loadedProperty.Slot;
-                            var coord = Coordinates[loadedProperty.CoordinateIndex];
-                            MaterialEditorProperties editorProperties;
-                            switch (loadedProperty.ObjectType)
-                            {
-                                case ObjectType.Clothing:
-                                    if (!coord.ClothingProperties.TryGetValue(slot, out editorProperties))
-                                    {
-                                        editorProperties = coord.ClothingProperties[slot] = new MaterialEditorProperties();
-                                    }
-                                    break;
-                                case ObjectType.Accessory:
-                                    if (!coord.AccessoryProperties.TryGetValue(slot, out editorProperties))
-                                    {
-                                        editorProperties = coord.AccessoryProperties[slot] = new MaterialEditorProperties();
-                                    }
-                                    break;
-                                case ObjectType.Hair:
-                                    if (!coord.HairProperties.TryGetValue(slot, out editorProperties))
-                                    {
-                                        editorProperties = coord.HairProperties[slot] = new MaterialEditorProperties();
-                                    }
-                                    break;
-                                case ObjectType.Character:
-                                    if (!coord.CharacterProperties.TryGetValue(slot, out editorProperties))
-                                    {
-                                        editorProperties = coord.CharacterProperties[slot] = new MaterialEditorProperties();
-                                    }
-                                    break;
-                                default:
-                                    continue;
-                            }
-                            editorProperties.MaterialShader.Add(new MaterialShader(loadedProperty.ObjectType, loadedProperty.CoordinateIndex, loadedProperty.Slot, loadedProperty.MaterialName, loadedProperty.ShaderName, loadedProperty.ShaderNameOriginal, loadedProperty.RenderQueue, loadedProperty.RenderQueueOriginal));
-                        }
-                    }
-
-                    if (pluginData.data.TryGetValue("RendererPropertyList", out var rendererProperties) && rendererProperties != null)
-                    {
-                        var properties = MessagePackSerializer.Deserialize<List<RendererProperty>>((byte[])rendererProperties);
-                        properties = properties.Where(x => x.CoordinateIndex < ThisOutfitData.Outfit_Size).ToList();
-                        for (var i = 0; i < properties.Count; i++)
-                        {
-                            var loadedProperty = properties[i];
-                            var slot = loadedProperty.Slot;
-                            var coord = Coordinates[loadedProperty.CoordinateIndex];
-                            MaterialEditorProperties editorProperties;
-                            switch (loadedProperty.ObjectType)
-                            {
-                                case ObjectType.Clothing:
-                                    if (!coord.ClothingProperties.TryGetValue(slot, out editorProperties))
-                                    {
-                                        editorProperties = coord.ClothingProperties[slot] = new MaterialEditorProperties();
-                                    }
-                                    break;
-                                case ObjectType.Accessory:
-                                    if (!coord.AccessoryProperties.TryGetValue(slot, out editorProperties))
-                                    {
-                                        editorProperties = coord.AccessoryProperties[slot] = new MaterialEditorProperties();
-                                    }
-                                    break;
-                                case ObjectType.Hair:
-                                    if (!coord.HairProperties.TryGetValue(slot, out editorProperties))
-                                    {
-                                        editorProperties = coord.HairProperties[slot] = new MaterialEditorProperties();
-                                    }
-                                    break;
-                                case ObjectType.Character:
-                                    if (!coord.CharacterProperties.TryGetValue(slot, out editorProperties))
-                                    {
-                                        editorProperties = coord.CharacterProperties[slot] = new MaterialEditorProperties();
-                                    }
-                                    break;
-                                default:
-                                    continue;
-                            }
-                            editorProperties.RendererProperty.Add(new RendererProperty(loadedProperty.ObjectType, loadedProperty.CoordinateIndex, loadedProperty.Slot, loadedProperty.RendererName, loadedProperty.Property, loadedProperty.Value, loadedProperty.ValueOriginal));
-                        }
-                    }
-
-                    if (pluginData.data.TryGetValue("MaterialFloatPropertyList", out var materialFloatProperties) && materialFloatProperties != null)
-                    {
-                        var properties = MessagePackSerializer.Deserialize<List<MaterialFloatProperty>>((byte[])materialFloatProperties);
-                        properties = properties.Where(x => x.CoordinateIndex < ThisOutfitData.Outfit_Size).ToList();
-                        for (var i = 0; i < properties.Count; i++)
-                        {
-                            var loadedProperty = properties[i];
-                            var slot = loadedProperty.Slot;
-                            var coord = Coordinates[loadedProperty.CoordinateIndex];
-                            MaterialEditorProperties editorProperties;
-                            switch (loadedProperty.ObjectType)
-                            {
-                                case ObjectType.Clothing:
-                                    if (!coord.ClothingProperties.TryGetValue(slot, out editorProperties))
-                                    {
-                                        editorProperties = coord.ClothingProperties[slot] = new MaterialEditorProperties();
-                                    }
-                                    break;
-                                case ObjectType.Accessory:
-                                    if (!coord.AccessoryProperties.TryGetValue(slot, out editorProperties))
-                                    {
-                                        editorProperties = coord.AccessoryProperties[slot] = new MaterialEditorProperties();
-                                    }
-                                    break;
-                                case ObjectType.Hair:
-                                    if (!coord.HairProperties.TryGetValue(slot, out editorProperties))
-                                    {
-                                        editorProperties = coord.HairProperties[slot] = new MaterialEditorProperties();
-                                    }
-                                    break;
-                                case ObjectType.Character:
-                                    if (!coord.CharacterProperties.TryGetValue(slot, out editorProperties))
-                                    {
-                                        editorProperties = coord.CharacterProperties[slot] = new MaterialEditorProperties();
-                                    }
-                                    break;
-                                default:
-                                    continue;
-                            }
-                            editorProperties.MaterialFloatProperty.Add(new MaterialFloatProperty(loadedProperty.ObjectType, loadedProperty.CoordinateIndex, loadedProperty.Slot, loadedProperty.MaterialName, loadedProperty.Property, loadedProperty.Value, loadedProperty.ValueOriginal));
-                        }
-                    }
-
-                    if (pluginData.data.TryGetValue("MaterialColorPropertyList", out var materialColorProperties) && materialColorProperties != null)
-                    {
-                        var properties = MessagePackSerializer.Deserialize<List<MaterialColorProperty>>((byte[])materialColorProperties);
-                        properties = properties.Where(x => x.CoordinateIndex < ThisOutfitData.Outfit_Size).ToList();
-
-                        for (var i = 0; i < properties.Count; i++)
-                        {
-                            var loadedProperty = properties[i];
-                            var slot = loadedProperty.Slot;
-                            var coord = Coordinates[loadedProperty.CoordinateIndex];
-                            MaterialEditorProperties editorProperties;
-                            switch (loadedProperty.ObjectType)
-                            {
-                                case ObjectType.Clothing:
-                                    if (!coord.ClothingProperties.TryGetValue(slot, out editorProperties))
-                                    {
-                                        editorProperties = coord.ClothingProperties[slot] = new MaterialEditorProperties();
-                                    }
-                                    break;
-                                case ObjectType.Accessory:
-                                    if (!coord.AccessoryProperties.TryGetValue(slot, out editorProperties))
-                                    {
-                                        editorProperties = coord.AccessoryProperties[slot] = new MaterialEditorProperties();
-                                    }
-                                    break;
-                                case ObjectType.Hair:
-                                    if (!coord.HairProperties.TryGetValue(slot, out editorProperties))
-                                    {
-                                        editorProperties = coord.HairProperties[slot] = new MaterialEditorProperties();
-                                    }
-                                    break;
-                                case ObjectType.Character:
-                                    if (!coord.CharacterProperties.TryGetValue(slot, out editorProperties))
-                                    {
-                                        editorProperties = coord.CharacterProperties[slot] = new MaterialEditorProperties();
-                                    }
-                                    break;
-                                default:
-                                    continue;
-                            }
-                            editorProperties.MaterialColorProperty.Add(new MaterialColorProperty(loadedProperty.ObjectType, loadedProperty.CoordinateIndex, loadedProperty.Slot, loadedProperty.MaterialName, loadedProperty.Property, loadedProperty.Value, loadedProperty.ValueOriginal));
-                        }
-                    }
-
-                    if (pluginData.data.TryGetValue("MaterialTexturePropertyList", out var materialTextureProperties) && materialTextureProperties != null)
-                    {
-                        var properties = MessagePackSerializer.Deserialize<List<MaterialTextureProperty>>((byte[])materialTextureProperties);
-                        properties = properties.Where(x => x.CoordinateIndex < ThisOutfitData.Outfit_Size).ToList();
-
-                        for (var i = 0; i < properties.Count; i++)
-                        {
-                            var loadedProperty = properties[i];
-                            int? texID = null;
-                            if (loadedProperty.TexID != null)
-                                texID = importDictionaryList[(int)loadedProperty.TexID];
-                            var slot = loadedProperty.Slot;
-                            var coord = Coordinates[loadedProperty.CoordinateIndex];
-                            MaterialEditorProperties editorProperties;
-                            switch (loadedProperty.ObjectType)
-                            {
-                                case ObjectType.Clothing:
-                                    if (!coord.ClothingProperties.TryGetValue(slot, out editorProperties))
-                                    {
-                                        editorProperties = coord.ClothingProperties[slot] = new MaterialEditorProperties();
-                                    }
-                                    break;
-                                case ObjectType.Accessory:
-                                    if (!coord.AccessoryProperties.TryGetValue(slot, out editorProperties))
-                                    {
-                                        editorProperties = coord.AccessoryProperties[slot] = new MaterialEditorProperties();
-                                    }
-                                    break;
-                                case ObjectType.Hair:
-                                    if (!coord.HairProperties.TryGetValue(slot, out editorProperties))
-                                    {
-                                        editorProperties = coord.HairProperties[slot] = new MaterialEditorProperties();
-                                    }
-                                    break;
-                                case ObjectType.Character:
-                                    if (!coord.CharacterProperties.TryGetValue(slot, out editorProperties))
-                                    {
-                                        editorProperties = coord.CharacterProperties[slot] = new MaterialEditorProperties();
-                                    }
-                                    break;
-                                default:
-                                    continue;
-                            }
-                            editorProperties.MaterialTextureProperty.Add(new MaterialTextureProperty(loadedProperty.ObjectType, loadedProperty.CoordinateIndex, loadedProperty.Slot, loadedProperty.MaterialName, loadedProperty.Property, texID, loadedProperty.Offset, loadedProperty.OffsetOriginal, loadedProperty.Scale, loadedProperty.ScaleOriginal));
-                        }
-                    }
-
-                    return;
-                }
-                else
-                {
-                    ClothingLoader.OutdatedMessage("Material Editor", true);
+                    var tid = t.Key;
+                    var pid = loader.Target.RegisterTexture(t.Value);
+                    loader.TIDConv[tid] = pid;
+                    if (Dump) Settings.Logger.LogDebug($"TexImage: tid={tid}=>{pid}");
                 }
             }
-        }
 
-        //Add Data to Return (Generalized Load)
-        public void LoadCoordinate(PluginData pluginData, ChaDefault ThisOutfitData, int outfitnum)
-        {
-            if (!Coordinates.TryGetValue(outfitnum, out var coord))
+            if (pluginData.data.TryGetValue("MaterialTexturePropertyList", out var materialTextureProperties) && materialTextureProperties != null)
             {
-                Coordinates[outfitnum] = coord = new ME_Coordinate();
-            }
-            coord.SoftClear();
-            if (pluginData != null)
-            {
-                if (pluginData.version == 0)
+                foreach (var t in MessagePackSerializer.Deserialize<List<MaterialTextureProperty>>((byte[])materialTextureProperties))
                 {
-                    var importDictionaryList = new Dictionary<int, int>();
+                    // TexID is managed by a chara 
+                    // for replace from others, it must renumber to merge them  
+                    int? tid = t.TexID;
+                    int? pid = null;
+                    if (tid != null && loader.TIDConv.ContainsKey(tid.Value)) pid = loader.TIDConv[tid.Value];
 
-                    if (pluginData.data.TryGetValue("TextureDictionary", out var texDic) && texDic != null)
-                    {
-                        foreach (var x in MessagePackSerializer.Deserialize<Dictionary<int, byte[]>>((byte[])texDic))
-                            importDictionaryList[x.Key] = ThisOutfitData.ME.SetAndGetTextureID(x.Value);
-                    }
-
-                    if (pluginData.data.TryGetValue("MaterialShaderList", out var shaderProperties) && shaderProperties != null)
-                    {
-                        var properties = MessagePackSerializer.Deserialize<List<MaterialShader>>((byte[])shaderProperties);
-                        properties = properties.Where(x => x.CoordinateIndex < ThisOutfitData.Outfit_Size).ToList();
-                        for (var i = 0; i < properties.Count; i++)
-                        {
-                            var loadedProperty = properties[i];
-                            var slot = loadedProperty.Slot;
-                            MaterialEditorProperties editorProperties;
-                            switch (loadedProperty.ObjectType)
-                            {
-                                case ObjectType.Clothing:
-                                    if (!coord.ClothingProperties.TryGetValue(slot, out editorProperties))
-                                    {
-                                        coord.ClothingProperties[slot] = editorProperties = new MaterialEditorProperties();
-                                    }
-                                    break;
-                                case ObjectType.Accessory:
-                                    if (!coord.AccessoryProperties.TryGetValue(slot, out editorProperties))
-                                    {
-                                        coord.AccessoryProperties[slot] = editorProperties = new MaterialEditorProperties();
-                                    }
-                                    break;
-                                case ObjectType.Hair:
-                                    if (!coord.HairProperties.TryGetValue(slot, out editorProperties))
-                                    {
-                                        coord.HairProperties[slot] = editorProperties = new MaterialEditorProperties();
-                                    }
-                                    break;
-                                case ObjectType.Character:
-                                    if (!coord.CharacterProperties.TryGetValue(slot, out editorProperties))
-                                    {
-                                        coord.CharacterProperties[slot] = editorProperties = new MaterialEditorProperties();
-                                    }
-                                    break;
-                                default:
-                                    continue;
-                            }
-                            editorProperties.MaterialShader.Add(new MaterialShader(loadedProperty.ObjectType, outfitnum, loadedProperty.Slot, loadedProperty.MaterialName, loadedProperty.ShaderName, loadedProperty.ShaderNameOriginal, loadedProperty.RenderQueue, loadedProperty.RenderQueueOriginal));
-                        }
-                    }
-
-                    if (pluginData.data.TryGetValue("RendererPropertyList", out var rendererProperties) && rendererProperties != null)
-                    {
-                        var properties = MessagePackSerializer.Deserialize<List<RendererProperty>>((byte[])rendererProperties);
-                        properties = properties.Where(x => x.CoordinateIndex < ThisOutfitData.Outfit_Size).ToList();
-                        for (var i = 0; i < properties.Count; i++)
-                        {
-                            var loadedProperty = properties[i];
-                            var slot = loadedProperty.Slot;
-                            MaterialEditorProperties editorProperties;
-                            switch (loadedProperty.ObjectType)
-                            {
-                                case ObjectType.Clothing:
-                                    if (!coord.ClothingProperties.TryGetValue(slot, out editorProperties))
-                                    {
-                                        coord.ClothingProperties[slot] = editorProperties = new MaterialEditorProperties();
-                                    }
-                                    break;
-                                case ObjectType.Accessory:
-                                    if (!coord.AccessoryProperties.TryGetValue(slot, out editorProperties))
-                                    {
-                                        coord.AccessoryProperties[slot] = editorProperties = new MaterialEditorProperties();
-                                    }
-                                    break;
-                                case ObjectType.Hair:
-                                    if (!coord.HairProperties.TryGetValue(slot, out editorProperties))
-                                    {
-                                        coord.HairProperties[slot] = editorProperties = new MaterialEditorProperties();
-                                    }
-                                    break;
-                                case ObjectType.Character:
-                                    if (!coord.CharacterProperties.TryGetValue(slot, out editorProperties))
-                                    {
-                                        coord.CharacterProperties[slot] = editorProperties = new MaterialEditorProperties();
-                                    }
-                                    break;
-                                default:
-                                    continue;
-                            }
-                            editorProperties.RendererProperty.Add(new RendererProperty(loadedProperty.ObjectType, outfitnum, loadedProperty.Slot, loadedProperty.RendererName, loadedProperty.Property, loadedProperty.Value, loadedProperty.ValueOriginal));
-                        }
-                    }
-
-                    if (pluginData.data.TryGetValue("MaterialFloatPropertyList", out var materialFloatProperties) && materialFloatProperties != null)
-                    {
-                        var properties = MessagePackSerializer.Deserialize<List<MaterialFloatProperty>>((byte[])materialFloatProperties);
-                        properties = properties.Where(x => x.CoordinateIndex < ThisOutfitData.Outfit_Size).ToList();
-                        for (var i = 0; i < properties.Count; i++)
-                        {
-                            var loadedProperty = properties[i];
-                            var slot = loadedProperty.Slot;
-                            MaterialEditorProperties editorProperties;
-                            switch (loadedProperty.ObjectType)
-                            {
-                                case ObjectType.Clothing:
-                                    if (!coord.ClothingProperties.TryGetValue(slot, out editorProperties))
-                                    {
-                                        coord.ClothingProperties[slot] = editorProperties = new MaterialEditorProperties();
-                                    }
-                                    break;
-                                case ObjectType.Accessory:
-                                    if (!coord.AccessoryProperties.TryGetValue(slot, out editorProperties))
-                                    {
-                                        coord.AccessoryProperties[slot] = editorProperties = new MaterialEditorProperties();
-                                    }
-                                    break;
-                                case ObjectType.Hair:
-                                    if (!coord.HairProperties.TryGetValue(slot, out editorProperties))
-                                    {
-                                        coord.HairProperties[slot] = editorProperties = new MaterialEditorProperties();
-                                    }
-                                    break;
-                                case ObjectType.Character:
-                                    if (!coord.CharacterProperties.TryGetValue(slot, out editorProperties))
-                                    {
-                                        coord.CharacterProperties[slot] = editorProperties = new MaterialEditorProperties();
-                                    }
-                                    break;
-                                default:
-                                    continue;
-                            }
-                            editorProperties.MaterialFloatProperty.Add(new MaterialFloatProperty(loadedProperty.ObjectType, outfitnum, loadedProperty.Slot, loadedProperty.MaterialName, loadedProperty.Property, loadedProperty.Value, loadedProperty.ValueOriginal));
-                        }
-                    }
-
-                    if (pluginData.data.TryGetValue("MaterialColorPropertyList", out var materialColorProperties) && materialColorProperties != null)
-                    {
-                        var properties = MessagePackSerializer.Deserialize<List<MaterialColorProperty>>((byte[])materialColorProperties);
-                        properties = properties.Where(x => x.CoordinateIndex < ThisOutfitData.Outfit_Size).ToList();
-                        for (var i = 0; i < properties.Count; i++)
-                        {
-                            var loadedProperty = properties[i];
-                            var slot = loadedProperty.Slot;
-                            MaterialEditorProperties editorProperties;
-                            switch (loadedProperty.ObjectType)
-                            {
-                                case ObjectType.Clothing:
-                                    if (!coord.ClothingProperties.TryGetValue(slot, out editorProperties))
-                                    {
-                                        coord.ClothingProperties[slot] = editorProperties = new MaterialEditorProperties();
-                                    }
-                                    break;
-                                case ObjectType.Accessory:
-                                    if (!coord.AccessoryProperties.TryGetValue(slot, out editorProperties))
-                                    {
-                                        coord.AccessoryProperties[slot] = editorProperties = new MaterialEditorProperties();
-                                    }
-                                    break;
-                                case ObjectType.Hair:
-                                    if (!coord.HairProperties.TryGetValue(slot, out editorProperties))
-                                    {
-                                        coord.HairProperties[slot] = editorProperties = new MaterialEditorProperties();
-                                    }
-                                    break;
-                                case ObjectType.Character:
-                                    if (!coord.CharacterProperties.TryGetValue(slot, out editorProperties))
-                                    {
-                                        coord.CharacterProperties[slot] = editorProperties = new MaterialEditorProperties();
-                                    }
-                                    break;
-                                default:
-                                    continue;
-                            }
-                            editorProperties.MaterialColorProperty.Add(new MaterialColorProperty(loadedProperty.ObjectType, outfitnum, loadedProperty.Slot, loadedProperty.MaterialName, loadedProperty.Property, loadedProperty.Value, loadedProperty.ValueOriginal));
-                        }
-                    }
-
-                    if (pluginData.data.TryGetValue("MaterialTexturePropertyList", out var materialTextureProperties) && materialTextureProperties != null)
-                    {
-                        var properties = MessagePackSerializer.Deserialize<List<MaterialTextureProperty>>((byte[])materialTextureProperties);
-                        properties = properties.Where(x => x.CoordinateIndex < ThisOutfitData.Outfit_Size).ToList();
-                        for (var i = 0; i < properties.Count; i++)
-                        {
-                            var loadedProperty = properties[i];
-                            if (loadedProperty.ObjectType != ObjectType.Unknown)
-                            {
-                                int? texID = null;
-                                if (loadedProperty.TexID != null)
-                                    texID = importDictionaryList[(int)loadedProperty.TexID];
-                                var slot = loadedProperty.Slot;
-                                MaterialEditorProperties editorProperties;
-                                switch (loadedProperty.ObjectType)
-                                {
-                                    case ObjectType.Clothing:
-                                        if (!coord.ClothingProperties.TryGetValue(slot, out editorProperties))
-                                        {
-                                            coord.ClothingProperties[slot] = editorProperties = new MaterialEditorProperties();
-                                        }
-                                        break;
-                                    case ObjectType.Accessory:
-                                        if (!coord.AccessoryProperties.TryGetValue(slot, out editorProperties))
-                                        {
-                                            coord.AccessoryProperties[slot] = editorProperties = new MaterialEditorProperties();
-                                        }
-                                        break;
-                                    case ObjectType.Hair:
-                                        if (!coord.HairProperties.TryGetValue(slot, out editorProperties))
-                                        {
-                                            coord.HairProperties[slot] = editorProperties = new MaterialEditorProperties();
-                                        }
-                                        break;
-                                    case ObjectType.Character:
-                                        if (!coord.CharacterProperties.TryGetValue(slot, out editorProperties))
-                                        {
-                                            coord.CharacterProperties[slot] = editorProperties = new MaterialEditorProperties();
-                                        }
-                                        break;
-                                    default:
-                                        continue;
-                                }
-
-                                var newTextureProperty = new MaterialTextureProperty(loadedProperty.ObjectType, outfitnum, loadedProperty.Slot, loadedProperty.MaterialName, loadedProperty.Property, texID, loadedProperty.Offset, loadedProperty.OffsetOriginal, loadedProperty.Scale, loadedProperty.ScaleOriginal);
-                                editorProperties.MaterialTextureProperty.Add(newTextureProperty);
-                            }
-                        }
-                    }
-                }
-                else
-                {
-                    ClothingLoader.OutdatedMessage("Material Editor", true);
+                    if (Dump) Settings.Logger.LogDebug($"Texture: type={t.ObjectType} coord={t.CoordinateIndex} slot={t.Slot} tex={tid}=>{pid} mat={t.MaterialName} prop={t.Property}");
+                    var u = new MaterialTextureProperty(t.ObjectType, t.CoordinateIndex, t.Slot, t.MaterialName, t.Property, pid, t.Offset, t.OffsetOriginal, t.Scale, t.ScaleOriginal);
+                    loader.Target.AddTextureProp(u);
                 }
             }
-        }
 
-        public void SoftClear()
-        {
-            foreach (var item in Coordinates.Values)
+            if (pluginData.data.TryGetValue("MaterialShaderList", out var shaderProperties) && shaderProperties != null)
             {
-                item.SoftClear();
+                foreach (var t in MessagePackSerializer.Deserialize<List<MaterialShader>>((byte[])shaderProperties))
+                {
+                    if (Dump) Settings.Logger.LogDebug($"Shader: type={t.ObjectType} coord={t.CoordinateIndex} slot={t.Slot} mat={t.MaterialName} shad={t.ShaderName}");
+                    loader.Target.AddShaderProp(t);
+                }
             }
-        }
 
-        public void AllProperties(out List<RendererProperty> rendererProperties, out List<MaterialFloatProperty> materialFloatProperties, out List<MaterialColorProperty> materialColorProperties, out List<MaterialShader> materialShaders, out List<MaterialTextureProperty> materialTextureProperties)
-        {
-            rendererProperties = new List<RendererProperty>();
-            materialFloatProperties = new List<MaterialFloatProperty>();
-            materialColorProperties = new List<MaterialColorProperty>();
-            materialShaders = new List<MaterialShader>();
-            materialTextureProperties = new List<MaterialTextureProperty>();
-
-            foreach (var outfit in Coordinates.Values)
+            if (pluginData.data.TryGetValue("RendererPropertyList", out var rendererProperties) && rendererProperties != null)
             {
-                foreach (var slot in outfit.AccessoryProperties.Values)
+                foreach (var t in MessagePackSerializer.Deserialize<List<RendererProperty>>((byte[])rendererProperties))
                 {
-                    rendererProperties.AddRange(slot.RendererProperty);
-                    materialFloatProperties.AddRange(slot.MaterialFloatProperty);
-                    materialColorProperties.AddRange(slot.MaterialColorProperty);
-                    materialShaders.AddRange(slot.MaterialShader);
-                    materialTextureProperties.AddRange(slot.MaterialTextureProperty);
+                    if (Dump) Settings.Logger.LogDebug($"Renderer: type={t.ObjectType} coord={t.CoordinateIndex} slot={t.Slot} name={t.RendererName} val={t.Value}");
+                    loader.Target.AddRendererProp(t);
                 }
-                foreach (var slot in outfit.ClothingProperties.Values)
+            }
+
+            if (pluginData.data.TryGetValue("MaterialColorPropertyList", out var materialColorProperties) && materialColorProperties != null)
+            {
+                foreach (var t in MessagePackSerializer.Deserialize<List<MaterialColorProperty>>((byte[])materialColorProperties))
                 {
-                    rendererProperties.AddRange(slot.RendererProperty);
-                    materialFloatProperties.AddRange(slot.MaterialFloatProperty);
-                    materialColorProperties.AddRange(slot.MaterialColorProperty);
-                    materialShaders.AddRange(slot.MaterialShader);
-                    materialTextureProperties.AddRange(slot.MaterialTextureProperty);
+                    if (Dump) Settings.Logger.LogDebug($"Color: type={t.ObjectType} coord={t.CoordinateIndex} slot={t.Slot} mat={t.MaterialName} {t.Property}={t.Value}");
+                    loader.Target.AddColorProp(t);
                 }
-                foreach (var slot in outfit.HairProperties.Values)
+            }
+
+            if (pluginData.data.TryGetValue("MaterialFloatPropertyList", out var materialFloatProperties) && materialFloatProperties != null)
+            {
+                foreach (var t in MessagePackSerializer.Deserialize<List<MaterialFloatProperty>>((byte[])materialFloatProperties))
                 {
-                    rendererProperties.AddRange(slot.RendererProperty);
-                    materialFloatProperties.AddRange(slot.MaterialFloatProperty);
-                    materialColorProperties.AddRange(slot.MaterialColorProperty);
-                    materialShaders.AddRange(slot.MaterialShader);
-                    materialTextureProperties.AddRange(slot.MaterialTextureProperty);
-                }
-                foreach (var slot in outfit.CharacterProperties.Values)
-                {
-                    rendererProperties.AddRange(slot.RendererProperty);
-                    materialFloatProperties.AddRange(slot.MaterialFloatProperty);
-                    materialColorProperties.AddRange(slot.MaterialColorProperty);
-                    materialShaders.AddRange(slot.MaterialShader);
-                    materialTextureProperties.AddRange(slot.MaterialTextureProperty);
+                    if (Dump) Settings.Logger.LogDebug($"Float: type={t.ObjectType} coord={t.CoordinateIndex} slot={t.Slot} mat={t.MaterialName} {t.Property}={t.Value}");
+                    loader.Target.AddFloatProp(t);
                 }
             }
         }
     }
 
-    public class ME_Coordinate
+    public interface IClassifiable
     {
-        public Dictionary<int, MaterialEditorProperties> AccessoryProperties = new Dictionary<int, MaterialEditorProperties>();
-        public Dictionary<int, MaterialEditorProperties> ClothingProperties = new Dictionary<int, MaterialEditorProperties>();
-        public Dictionary<int, MaterialEditorProperties> HairProperties = new Dictionary<int, MaterialEditorProperties>();
-        public Dictionary<int, MaterialEditorProperties> CharacterProperties = new Dictionary<int, MaterialEditorProperties>();
+        //! Register to TexturePool 
+        /*! @param tid texid in a card
+            @retval poolid in a TexturePool
+            @note a TexturePool is shared by a ChaFile and wearable outfits. @n
+                and must be managed to avoid conflicting from each outfits. @n
+        */
+        int RegisterTexture(byte[] img);
 
-        public ME_Coordinate() { }
+        //! add texture property 
+        void AddTextureProp(MaterialTextureProperty prop);
 
-        public ME_Coordinate(PluginData pluginData, ChaDefault ThisOutfitData, int outfitnum)
+        //! add shader property 
+        void AddShaderProp(MaterialShader prop);
+
+        //! add renderer property 
+        void AddRendererProp(RendererProperty prop);
+
+        //! add color property 
+        void AddColorProp(MaterialColorProperty prop);
+
+        //! add float property 
+        void AddFloatProp(MaterialFloatProperty prop);
+    }
+
+    internal class ME_Loader
+    {
+        public IClassifiable Target { get; private set; }
+        public Dictionary<int, int> TIDConv = new Dictionary<int, int>();
+
+        public ME_Loader(IClassifiable target)
         {
-            if (pluginData != null)
+            Target = target;
+        }
+    }
+
+    internal class ME_Saver
+    {
+        public Dictionary<int, byte[]> Images = new Dictionary<int, byte[]>();
+        public List<MaterialTextureProperty> Texture = new List<MaterialTextureProperty>();
+        public List<MaterialShader> Shader = new List<MaterialShader>();
+        public List<RendererProperty> Renderer = new List<RendererProperty>();
+        public List<MaterialFloatProperty> Float = new List<MaterialFloatProperty>();
+        public List<MaterialColorProperty> Color = new List<MaterialColorProperty>();
+    }
+
+    public class ME_TexturePool
+    {
+        private class Entry
+        {
+            internal byte[] _image;
+            internal int _refcount;
+
+            public Entry(byte[] img)
             {
-                if (pluginData.version == 0)
-                {
-                    var importDictionaryList = new Dictionary<int, int>();
-
-                    if (pluginData.data.TryGetValue("TextureDictionary", out var texDic) && texDic != null)
-                    {
-                        foreach (var x in MessagePackSerializer.Deserialize<Dictionary<int, byte[]>>((byte[])texDic))
-                            importDictionaryList[x.Key] = ThisOutfitData.ME.SetAndGetTextureID(x.Value);
-                    }
-
-                    if (pluginData.data.TryGetValue("MaterialShaderList", out var shaderProperties) && shaderProperties != null)
-                    {
-                        var properties = MessagePackSerializer.Deserialize<List<MaterialShader>>((byte[])shaderProperties);
-                        for (var i = 0; i < properties.Count; i++)
-                        {
-                            var loadedProperty = properties[i];
-                            var slot = loadedProperty.Slot;
-                            MaterialEditorProperties editorProperties;
-                            switch (loadedProperty.ObjectType)
-                            {
-                                case ObjectType.Clothing:
-                                    if (!ClothingProperties.TryGetValue(slot, out editorProperties))
-                                    {
-                                        editorProperties = ClothingProperties[slot] = new MaterialEditorProperties();
-                                    }
-                                    break;
-                                case ObjectType.Accessory:
-                                    if (!AccessoryProperties.TryGetValue(slot, out editorProperties))
-                                    {
-                                        editorProperties = AccessoryProperties[slot] = new MaterialEditorProperties();
-                                    }
-                                    break;
-                                case ObjectType.Hair:
-                                    if (!HairProperties.TryGetValue(slot, out editorProperties))
-                                    {
-                                        editorProperties = HairProperties[slot] = new MaterialEditorProperties();
-                                    }
-                                    break;
-                                case ObjectType.Character:
-                                    if (!CharacterProperties.TryGetValue(slot, out editorProperties))
-                                    {
-                                        editorProperties = CharacterProperties[slot] = new MaterialEditorProperties();
-                                    }
-                                    break;
-                                default:
-                                    continue;
-                            }
-                            editorProperties.MaterialShader.Add(new MaterialShader(loadedProperty.ObjectType, outfitnum, loadedProperty.Slot, loadedProperty.MaterialName, loadedProperty.ShaderName, loadedProperty.ShaderNameOriginal, loadedProperty.RenderQueue, loadedProperty.RenderQueueOriginal));
-                        }
-                    }
-
-                    if (pluginData.data.TryGetValue("RendererPropertyList", out var rendererProperties) && rendererProperties != null)
-                    {
-                        var properties = MessagePackSerializer.Deserialize<List<RendererProperty>>((byte[])rendererProperties);
-                        for (var i = 0; i < properties.Count; i++)
-                        {
-                            var loadedProperty = properties[i];
-                            var slot = loadedProperty.Slot;
-                            MaterialEditorProperties editorProperties;
-                            switch (loadedProperty.ObjectType)
-                            {
-                                case ObjectType.Clothing:
-                                    if (!ClothingProperties.TryGetValue(slot, out editorProperties))
-                                    {
-                                        editorProperties = ClothingProperties[slot] = new MaterialEditorProperties();
-                                    }
-                                    break;
-                                case ObjectType.Accessory:
-                                    if (!AccessoryProperties.TryGetValue(slot, out editorProperties))
-                                    {
-                                        editorProperties = AccessoryProperties[slot] = new MaterialEditorProperties();
-                                    }
-                                    break;
-                                case ObjectType.Hair:
-                                    if (!HairProperties.TryGetValue(slot, out editorProperties))
-                                    {
-                                        editorProperties = HairProperties[slot] = new MaterialEditorProperties();
-                                    }
-                                    break;
-                                case ObjectType.Character:
-                                    if (!CharacterProperties.TryGetValue(slot, out editorProperties))
-                                    {
-                                        editorProperties = CharacterProperties[slot] = new MaterialEditorProperties();
-                                    }
-                                    break;
-                                default:
-                                    continue;
-                            }
-                            editorProperties.RendererProperty.Add(new RendererProperty(loadedProperty.ObjectType, outfitnum, loadedProperty.Slot, loadedProperty.RendererName, loadedProperty.Property, loadedProperty.Value, loadedProperty.ValueOriginal));
-                        }
-                    }
-
-                    if (pluginData.data.TryGetValue("MaterialFloatPropertyList", out var materialFloatProperties) && materialFloatProperties != null)
-                    {
-                        var properties = MessagePackSerializer.Deserialize<List<MaterialFloatProperty>>((byte[])materialFloatProperties);
-                        for (var i = 0; i < properties.Count; i++)
-                        {
-                            var loadedProperty = properties[i];
-                            var slot = loadedProperty.Slot;
-                            MaterialEditorProperties editorProperties;
-                            switch (loadedProperty.ObjectType)
-                            {
-                                case ObjectType.Clothing:
-                                    if (!ClothingProperties.TryGetValue(slot, out editorProperties))
-                                    {
-                                        editorProperties = ClothingProperties[slot] = new MaterialEditorProperties();
-                                    }
-                                    break;
-                                case ObjectType.Accessory:
-                                    if (!AccessoryProperties.TryGetValue(slot, out editorProperties))
-                                    {
-                                        editorProperties = AccessoryProperties[slot] = new MaterialEditorProperties();
-                                    }
-                                    break;
-                                case ObjectType.Hair:
-                                    if (!HairProperties.TryGetValue(slot, out editorProperties))
-                                    {
-                                        editorProperties = HairProperties[slot] = new MaterialEditorProperties();
-                                    }
-                                    break;
-                                case ObjectType.Character:
-                                    if (!CharacterProperties.TryGetValue(slot, out editorProperties))
-                                    {
-                                        editorProperties = CharacterProperties[slot] = new MaterialEditorProperties();
-                                    }
-                                    break;
-                                default:
-                                    continue;
-                            }
-                            editorProperties.MaterialFloatProperty.Add(new MaterialFloatProperty(loadedProperty.ObjectType, outfitnum, loadedProperty.Slot, loadedProperty.MaterialName, loadedProperty.Property, loadedProperty.Value, loadedProperty.ValueOriginal));
-                        }
-                    }
-
-                    if (pluginData.data.TryGetValue("MaterialColorPropertyList", out var materialColorProperties) && materialColorProperties != null)
-                    {
-                        var properties = MessagePackSerializer.Deserialize<List<MaterialColorProperty>>((byte[])materialColorProperties);
-                        for (var i = 0; i < properties.Count; i++)
-                        {
-                            var loadedProperty = properties[i];
-                            var slot = loadedProperty.Slot;
-                            MaterialEditorProperties editorProperties;
-                            switch (loadedProperty.ObjectType)
-                            {
-                                case ObjectType.Clothing:
-                                    if (!ClothingProperties.TryGetValue(slot, out editorProperties))
-                                    {
-                                        editorProperties = ClothingProperties[slot] = new MaterialEditorProperties();
-                                    }
-                                    break;
-                                case ObjectType.Accessory:
-                                    if (!AccessoryProperties.TryGetValue(slot, out editorProperties))
-                                    {
-                                        editorProperties = AccessoryProperties[slot] = new MaterialEditorProperties();
-                                    }
-                                    break;
-                                case ObjectType.Hair:
-                                    if (!HairProperties.TryGetValue(slot, out editorProperties))
-                                    {
-                                        editorProperties = HairProperties[slot] = new MaterialEditorProperties();
-                                    }
-                                    break;
-                                case ObjectType.Character:
-                                    if (!CharacterProperties.TryGetValue(slot, out editorProperties))
-                                    {
-                                        editorProperties = CharacterProperties[slot] = new MaterialEditorProperties();
-                                    }
-                                    break;
-                                default:
-                                    continue;
-                            }
-                            editorProperties.MaterialColorProperty.Add(new MaterialColorProperty(loadedProperty.ObjectType, outfitnum, loadedProperty.Slot, loadedProperty.MaterialName, loadedProperty.Property, loadedProperty.Value, loadedProperty.ValueOriginal));
-                        }
-                    }
-
-                    if (pluginData.data.TryGetValue("MaterialTexturePropertyList", out var materialTextureProperties) && materialTextureProperties != null)
-                    {
-                        var properties = MessagePackSerializer.Deserialize<List<MaterialTextureProperty>>((byte[])materialTextureProperties);
-                        for (var i = 0; i < properties.Count; i++)
-                        {
-                            var loadedProperty = properties[i];
-                            int? texID = null;
-                            if (loadedProperty.TexID != null)
-                                texID = importDictionaryList[(int)loadedProperty.TexID];
-                            var slot = loadedProperty.Slot;
-                            MaterialEditorProperties editorProperties;
-                            switch (loadedProperty.ObjectType)
-                            {
-                                case ObjectType.Clothing:
-                                    if (!ClothingProperties.TryGetValue(slot, out editorProperties))
-                                    {
-                                        editorProperties = ClothingProperties[slot] = new MaterialEditorProperties();
-                                    }
-                                    break;
-                                case ObjectType.Accessory:
-                                    if (!AccessoryProperties.TryGetValue(slot, out editorProperties))
-                                    {
-                                        editorProperties = AccessoryProperties[slot] = new MaterialEditorProperties();
-                                    }
-                                    break;
-                                case ObjectType.Hair:
-                                    if (!HairProperties.TryGetValue(slot, out editorProperties))
-                                    {
-                                        editorProperties = HairProperties[slot] = new MaterialEditorProperties();
-                                    }
-                                    break;
-                                case ObjectType.Character:
-                                    if (!CharacterProperties.TryGetValue(slot, out editorProperties))
-                                    {
-                                        editorProperties = CharacterProperties[slot] = new MaterialEditorProperties();
-                                    }
-                                    break;
-                                default:
-                                    continue;
-                            }
-                            editorProperties.MaterialTextureProperty.Add(new MaterialTextureProperty(loadedProperty.ObjectType, outfitnum, loadedProperty.Slot, loadedProperty.MaterialName, loadedProperty.Property, texID, loadedProperty.Offset, loadedProperty.OffsetOriginal, loadedProperty.Scale, loadedProperty.ScaleOriginal));
-                        }
-                    }
-                }
-                else
-                {
-                    ClothingLoader.OutdatedMessage("Material Editor", true);
-                }
+                _image = img;
             }
         }
 
-        internal void SoftClear(bool[] clothingkeep)
+        private List<Entry> _pool = new List<Entry>();
+        public int Count { get { return _pool.Count; } }
+
+        internal int CountRef(int pid)
         {
-            AccessoryProperties.Clear();
-            for (var i = 0; i < clothingkeep.Length; i++)
-            {
-                if (!clothingkeep[i])
-                    ClothingProperties.Remove(i);
-            }
+            if (pid < 0) return 0;
+            if (pid >= _pool.Count) return 0;
+            return _pool[pid]._refcount;
         }
 
-        internal void SoftClear()
+        internal void IncRef(int pid)
         {
-            AccessoryProperties.Clear();
-            ClothingProperties.Clear();
+            if (pid < 0) return;
+            if (pid >= _pool.Count) return;
+            ++_pool[pid]._refcount;
         }
 
-        internal void HardClear()
+        internal void DecRef(int pid)
         {
-            AccessoryProperties.Clear();
-            ClothingProperties.Clear();
-            HairProperties.Clear();
-            CharacterProperties.Clear();
+            if (pid < 0) return;
+            if (pid >= _pool.Count) return;
+            if (_pool[pid]._refcount<1)
+            {
+                Settings.Logger.LogWarning($"pid {pid} reference underflow");
+                return;
+            }
+            --_pool[pid]._refcount;
         }
 
-        internal void AddAccessory(int outfitnum, int slot, MaterialEditorProperties materialEditorProperties)
+        public int Register(byte[] img)
         {
-            var color = materialEditorProperties.MaterialColorProperty;
-            var floatprop = materialEditorProperties.MaterialFloatProperty;
-            var shader = materialEditorProperties.MaterialShader;
-            var texture = materialEditorProperties.MaterialTextureProperty;
-            var render = materialEditorProperties.RendererProperty;
-
-            foreach (var item in color)
+            for(var i = 0; i < _pool.Count; ++i)
             {
-                item.CoordinateIndex = outfitnum;
-                item.Slot = slot;
-            }
-            foreach (var item in floatprop)
-            {
-                item.CoordinateIndex = outfitnum;
-                item.Slot = slot;
-            }
-            foreach (var item in shader)
-            {
-                item.CoordinateIndex = outfitnum;
-                item.Slot = slot;
-            }
-            foreach (var item in texture)
-            {
-                item.CoordinateIndex = outfitnum;
-                item.Slot = slot;
-            }
-            foreach (var item in render)
-            {
-                item.CoordinateIndex = outfitnum;
-                item.Slot = slot;
+                if (_pool[i]._refcount < 1) continue;
+                if (!img.SequenceEqual(_pool[i]._image)) continue;
+                return i;
             }
 
-            AccessoryProperties[slot] = new MaterialEditorProperties(render, floatprop, color, texture, shader);
+            int id = _pool.Count;
+            _pool.Add(new Entry(img));
+            return id;
         }
 
-        internal void ChangeCoord(int outfitnum)
+        public void Unregister(int pid)
         {
-            foreach (var prop in ClothingProperties.Values)
-            {
-                foreach (var slot in prop.RendererProperty)
-                {
-                    slot.CoordinateIndex = outfitnum;
-                }
-                foreach (var slot in prop.MaterialColorProperty)
-                {
-                    slot.CoordinateIndex = outfitnum;
-                }
-                foreach (var slot in prop.MaterialFloatProperty)
-                {
-                    slot.CoordinateIndex = outfitnum;
-                }
-                foreach (var slot in prop.MaterialTextureProperty)
-                {
-                    slot.CoordinateIndex = outfitnum;
-                }
-                foreach (var slot in prop.MaterialShader)
-                {
-                    slot.CoordinateIndex = outfitnum;
-                }
-            }
-            foreach (var prop in HairProperties.Values)
-            {
-                foreach (var slot in prop.RendererProperty)
-                {
-                    slot.CoordinateIndex = outfitnum;
-                }
-                foreach (var slot in prop.MaterialColorProperty)
-                {
-                    slot.CoordinateIndex = outfitnum;
-                }
-                foreach (var slot in prop.MaterialFloatProperty)
-                {
-                    slot.CoordinateIndex = outfitnum;
-                }
-                foreach (var slot in prop.MaterialTextureProperty)
-                {
-                    slot.CoordinateIndex = outfitnum;
-                }
-                foreach (var slot in prop.MaterialShader)
-                {
-                    slot.CoordinateIndex = outfitnum;
-                }
-            }
-            foreach (var prop in CharacterProperties.Values)
-            {
-                foreach (var slot in prop.RendererProperty)
-                {
-                    slot.CoordinateIndex = outfitnum;
-                }
-                foreach (var slot in prop.MaterialColorProperty)
-                {
-                    slot.CoordinateIndex = outfitnum;
-                }
-                foreach (var slot in prop.MaterialFloatProperty)
-                {
-                    slot.CoordinateIndex = outfitnum;
-                }
-                foreach (var slot in prop.MaterialTextureProperty)
-                {
-                    slot.CoordinateIndex = outfitnum;
-                }
-                foreach (var slot in prop.MaterialShader)
-                {
-                    slot.CoordinateIndex = outfitnum;
-                }
-            }
-            foreach (var prop in AccessoryProperties.Values)
-            {
-                foreach (var slot in prop.RendererProperty)
-                {
-                    slot.CoordinateIndex = outfitnum;
-                }
-                foreach (var slot in prop.MaterialColorProperty)
-                {
-                    slot.CoordinateIndex = outfitnum;
-                }
-                foreach (var slot in prop.MaterialFloatProperty)
-                {
-                    slot.CoordinateIndex = outfitnum;
-                }
-                foreach (var slot in prop.MaterialTextureProperty)
-                {
-                    slot.CoordinateIndex = outfitnum;
-                }
-                foreach (var slot in prop.MaterialShader)
-                {
-                    slot.CoordinateIndex = outfitnum;
-                }
-            }
+            if (pid < 0) return;
+            if (pid >= _pool.Count) return;
+            if (_pool[pid]._refcount < 1) return;
+            if (--_pool[pid]._refcount > 0) return;
         }
 
-        internal void AllProperties(out List<RendererProperty> rendererProperties, out List<MaterialFloatProperty> materialFloatProperties, out List<MaterialColorProperty> materialColorProperties, out List<MaterialShader> materialShaders, out List<MaterialTextureProperty> materialTextureProperties)
+        public byte[] Get(int pid, bool force)
         {
-            rendererProperties = new List<RendererProperty>();
-            materialFloatProperties = new List<MaterialFloatProperty>();
-            materialColorProperties = new List<MaterialColorProperty>();
-            materialShaders = new List<MaterialShader>();
-            materialTextureProperties = new List<MaterialTextureProperty>();
+            if (pid < 0) return null;
+            if (pid >= _pool.Count) return null;
+            if (!force && _pool[pid]._refcount < 1) return null;
+            return _pool[pid]._image;
+        }
 
-            foreach (var slot in AccessoryProperties)
+        internal void Save(ME_Saver saver, bool cleanup)
+        {
+            for (var i = 0; i < _pool.Count; ++i)
             {
-                rendererProperties.AddRange(slot.Value.RendererProperty);
-                materialFloatProperties.AddRange(slot.Value.MaterialFloatProperty);
-                materialColorProperties.AddRange(slot.Value.MaterialColorProperty);
-                materialShaders.AddRange(slot.Value.MaterialShader);
-                materialTextureProperties.AddRange(slot.Value.MaterialTextureProperty);
-            }
-            foreach (var slot in ClothingProperties)
-            {
-                rendererProperties.AddRange(slot.Value.RendererProperty);
-                materialFloatProperties.AddRange(slot.Value.MaterialFloatProperty);
-                materialColorProperties.AddRange(slot.Value.MaterialColorProperty);
-                materialShaders.AddRange(slot.Value.MaterialShader);
-                materialTextureProperties.AddRange(slot.Value.MaterialTextureProperty);
-            }
-            foreach (var slot in HairProperties)
-            {
-                rendererProperties.AddRange(slot.Value.RendererProperty);
-                materialFloatProperties.AddRange(slot.Value.MaterialFloatProperty);
-                materialColorProperties.AddRange(slot.Value.MaterialColorProperty);
-                materialShaders.AddRange(slot.Value.MaterialShader);
-                materialTextureProperties.AddRange(slot.Value.MaterialTextureProperty);
-            }
-            foreach (var slot in CharacterProperties)
-            {
-                rendererProperties.AddRange(slot.Value.RendererProperty);
-                materialFloatProperties.AddRange(slot.Value.MaterialFloatProperty);
-                materialColorProperties.AddRange(slot.Value.MaterialColorProperty);
-                materialShaders.AddRange(slot.Value.MaterialShader);
-                materialTextureProperties.AddRange(slot.Value.MaterialTextureProperty);
+                var img = Get(i, !cleanup);
+                if (img == null) continue;
+                saver.Images[i] = img;
             }
         }
     }
 
-    #region Original Stuff
+    public class ME_MaterialProps
+    {
+        public List<MaterialTextureProperty> Texture = new List<MaterialTextureProperty>();
+        public List<MaterialShader> Shader = new List<MaterialShader>();
+        public List<RendererProperty> Renderer = new List<RendererProperty>();
+        public List<MaterialColorProperty> Color = new List<MaterialColorProperty>();
+        public List<MaterialFloatProperty> Float = new List<MaterialFloatProperty>();
+
+        protected ME_TexturePool _pool;
+
+        public ME_MaterialProps(ME_TexturePool pool)
+        {
+            _pool = pool;
+        }
+
+        //! Register to TexturePool 
+        public int RegisterTexture(byte[] img)
+        {
+            return _pool.Register(img);
+        }
+
+        internal void AttachTexture(MaterialTextureProperty prop)
+        {
+            if (prop.TexID != null)
+            {
+                _pool.IncRef(prop.TexID.Value);
+                if(ME_Common.Dump)Settings.Logger.LogDebug($"IncRef: type={prop.ObjectType} coord={prop.CoordinateIndex} slot={prop.Slot} tex={prop.TexID} {_pool.CountRef(prop.TexID.Value)-1}=>{_pool.CountRef(prop.TexID.Value)}");
+            }
+            Texture.Add(prop);
+        }
+
+        //! remove texture reference 
+        internal void DetachTextures()
+        {
+            for (var i = 0; i < Texture.Count; ++i)
+            {
+                var src = Texture[i];
+                if (src.TexID == null) continue;
+
+                if (ME_Common.Dump) Settings.Logger.LogDebug($"DecRef: type={src.ObjectType} coord={src.CoordinateIndex} slot={src.Slot} tex={src.TexID} {_pool.CountRef(src.TexID.Value)}=>{_pool.CountRef(src.TexID.Value)-1}");
+                _pool.DecRef(src.TexID.Value);
+            }
+        }
+
+        internal void Merge(ME_MaterialProps src, int? coord, int? slot)
+        {
+            // used src tids 
+            var tid2pid = new int?[src._pool.Count];
+
+            for(var i = 0; i < src.Texture.Count; ++i)
+            {
+                var t = src.Texture[i];
+                int? pid = null;
+                var tid = t.TexID;
+                if (tid != null)
+                {
+                    if (tid2pid[tid.Value] != null) pid = tid2pid[tid.Value];
+                    else
+                    {
+                        tid2pid[tid.Value] = pid = _pool.Register(src._pool.Get(tid.Value, true));
+                        if (ME_Common.Dump) Settings.Logger.LogDebug($"+TexImage: tid={tid}=>{pid}");
+                    }
+                }
+                var u = new MaterialTextureProperty(t.ObjectType, 
+                    (coord != null) ? coord.Value : t.CoordinateIndex, 
+                    (slot != null) ? slot.Value : t.Slot, 
+                    t.MaterialName, t.Property, pid, t.Offset, t.OffsetOriginal, t.Scale, t.ScaleOriginal);
+                if (ME_Common.Dump) Settings.Logger.LogDebug($"+Texture: type={t.ObjectType} coord={t.CoordinateIndex}=>{u.CoordinateIndex} slot={t.Slot}=>{u.Slot} tex={t.TexID}=>{u.TexID} mat={t.MaterialName} prop={t.Property}");
+                AttachTexture(u);
+            }
+
+            for (var i = 0; i < src.Shader.Count; ++i)
+            {
+                var t = src.Shader[i];
+                var u = new MaterialShader(t.ObjectType,
+                    (coord != null) ? coord.Value : t.CoordinateIndex,
+                    (slot != null) ? slot.Value : t.Slot,
+                    t.MaterialName, t.ShaderName, t.ShaderNameOriginal, t.RenderQueue, t.RenderQueueOriginal);
+                if (ME_Common.Dump) Settings.Logger.LogDebug($"+Shader: type={t.ObjectType} coord={t.CoordinateIndex}=>{u.CoordinateIndex} slot={t.Slot}=>{u.Slot} mat={t.MaterialName} shad={t.ShaderName}");
+                Shader.Add(u);
+            }
+
+            for (var i = 0; i < src.Renderer.Count; ++i)
+            {
+                var t = src.Renderer[i];
+                var u = new RendererProperty(t.ObjectType,
+                    (coord != null) ? coord.Value : t.CoordinateIndex,
+                    (slot != null) ? slot.Value : t.Slot,
+                    t.RendererName, t.Property, t.Value, t.ValueOriginal);
+                if (ME_Common.Dump) Settings.Logger.LogDebug($"+Renderer: type={t.ObjectType} coord={t.CoordinateIndex}=>{u.CoordinateIndex} slot={t.Slot}=>{u.Slot} name={t.RendererName} val={t.Value}");
+                Renderer.Add(u);
+            }
+
+            for (var i = 0; i < src.Color.Count; ++i)
+            {
+                var t = src.Color[i];
+                var u = new MaterialColorProperty(t.ObjectType,
+                    (coord != null) ? coord.Value : t.CoordinateIndex,
+                    (slot != null) ? slot.Value : t.Slot,
+                    t.MaterialName, t.Property, t.Value, t.ValueOriginal);
+                if (ME_Common.Dump) Settings.Logger.LogDebug($"+Color: type={t.ObjectType} coord={t.CoordinateIndex}=>{u.CoordinateIndex} slot={t.Slot}=>{u.Slot} mat={t.MaterialName} {t.Property}={t.Value}");
+                Color.Add(u);
+            }
+
+            for (var i = 0; i < src.Float.Count; ++i)
+            {
+                var t = src.Float[i];
+                var u = new MaterialFloatProperty(t.ObjectType,
+                    (coord != null) ? coord.Value : t.CoordinateIndex,
+                    (slot != null) ? slot.Value : t.Slot,
+                    t.MaterialName, t.Property, t.Value, t.ValueOriginal);
+                if (ME_Common.Dump) Settings.Logger.LogDebug($"+Float: type={t.ObjectType} coord={t.CoordinateIndex}=>{u.CoordinateIndex} slot={t.Slot}=>{u.Slot} mat={t.MaterialName} {t.Property}={t.Value}");
+                Float.Add(u);
+            }
+        }
+
+        /*! @param saver saving context
+            @param coord replacing coord index or not
+            @param slot replacing slot or not
+        */
+        internal void Save(ME_Saver saver, int? coord, int? slot)
+        {
+            for (var i = 0; i < Texture.Count; ++i)
+            {
+                var src = Texture[i];
+                var dst = new MaterialTextureProperty(src.ObjectType,
+                    (coord != null) ? coord.Value : src.CoordinateIndex,
+                    (slot != null) ? slot.Value : src.Slot,
+                    src.MaterialName, src.Property,
+                    src.TexID, src.Offset, src.OffsetOriginal, src.Scale, src.ScaleOriginal);
+                saver.Texture.Add(dst);
+            }
+
+            for (var i = 0; i < Shader.Count; ++i)
+            {
+                var src = Shader[i];
+                var dst = new MaterialShader(src.ObjectType, 
+                    (coord != null) ? coord.Value : src.CoordinateIndex,
+                    (slot != null) ? slot.Value : src.Slot, 
+                    src.MaterialName, src.ShaderName, src.ShaderNameOriginal, src.RenderQueue, src.RenderQueueOriginal);
+                saver.Shader.Add(dst);
+            }
+
+            for (var i = 0; i < Renderer.Count; ++i)
+            {
+                var src = Renderer[i];
+                var dst = new RendererProperty(src.ObjectType,
+                    (coord != null) ? coord.Value : src.CoordinateIndex,
+                    (slot != null) ? slot.Value : src.Slot,
+                    src.RendererName, src.Property, src.Value, src.ValueOriginal);
+                saver.Renderer.Add(dst);
+            }
+
+            for (var i = 0; i < Color.Count; ++i)
+            {
+                var src = Color[i];
+                var dst = new MaterialColorProperty(src.ObjectType,
+                    (coord != null) ? coord.Value : src.CoordinateIndex,
+                    (slot != null) ? slot.Value : src.Slot, 
+                    src.MaterialName, src.Property, src.Value, src.ValueOriginal);
+                saver.Color.Add(dst);
+            }
+
+            for (var i = 0; i < Float.Count; ++i)
+            {
+                var src = Float[i];
+                var dst = new MaterialFloatProperty(src.ObjectType,
+                    (coord != null) ? coord.Value : src.CoordinateIndex,
+                    (slot != null) ? slot.Value : src.Slot, 
+                    src.MaterialName, src.Property, src.Value, src.ValueOriginal);
+                saver.Float.Add(dst);
+            }
+        }
+    }
+
+    public class ME_ClothProps : ME_MaterialProps
+    {
+        public ME_ClothProps(ME_TexturePool pool)
+            : base(pool)
+        {
+        }
+
+        //! add texture property 
+        public void AddTextureProp(MaterialTextureProperty prop)
+        {
+            AttachTexture(prop);
+        }
+
+        //! add shader property 
+        public void AddShaderProp(MaterialShader prop)
+        {
+            Shader.Add(prop);
+        }
+
+        //! add renderer property 
+        public void AddRendererProp(RendererProperty prop)
+        {
+            Renderer.Add(prop);
+        }
+
+        //! add color property 
+        public void AddColorProp(MaterialColorProperty prop)
+        {
+            Color.Add(prop);
+        }
+
+        //! add float property 
+        public void AddFloatProp(MaterialFloatProperty prop)
+        {
+            Float.Add(prop);
+        }
+    }
+
+    public class ME_AccessoryProps : ME_MaterialProps
+    {
+        public ME_AccessoryProps(ME_TexturePool pool)
+            : base(pool)
+        {
+        }
+
+        //! add texture property 
+        public void AddTextureProp(MaterialTextureProperty prop)
+        {
+            AttachTexture(prop);
+        }
+
+        //! add shader property 
+        public void AddShaderProp(MaterialShader prop)
+        {
+            Shader.Add(prop);
+        }
+
+        //! add renderer property 
+        public void AddRendererProp(RendererProperty prop)
+        {
+            Renderer.Add(prop);
+        }
+
+        //! add color property 
+        public void AddColorProp(MaterialColorProperty prop)
+        {
+            Color.Add(prop);
+        }
+
+        //! add float property 
+        public void AddFloatProp(MaterialFloatProperty prop)
+        {
+            Float.Add(prop);
+        }
+    }
+
+    public class ME_CoordProps: ME_MaterialProps, IClassifiable
+    {
+        public ChaFileCoordinate Source { get; private set; }
+        public Dictionary<int, ME_ClothProps> Cloth = new Dictionary<int, ME_ClothProps>();
+        public Dictionary<int, ME_AccessoryProps> Accessory = new Dictionary<int, ME_AccessoryProps>();
+
+        //! for chara internal coord 
+        public ME_CoordProps(ME_TexturePool pool)
+            : base(pool)
+        {
+        }
+
+        //! from coord card 
+        public ME_CoordProps(ChaFileCoordinate coordFile)
+            : base(new ME_TexturePool())
+        {
+            Settings.Logger.LogDebug($"ME_CoordProps({coordFile?.coordinateName})");
+            Source = coordFile;
+
+            var loader = new ME_Loader(this);
+            var data = ExtendedSave.GetExtendedDataById(coordFile, "com.deathweasel.bepinex.materialeditor");
+            ME_Common.Classify(loader, data);
+        }
+
+        public void Reset()
+        {
+            Cloth.Clear();
+            Accessory.Clear();
+        }
+
+        //! get by a cloth  
+        public ME_ClothProps GetClothProps(int idx, bool force)
+        {
+            Cloth.TryGetValue(idx, out var ret);
+            if (force && ret == null)
+            {
+                Cloth[idx] = ret = new ME_ClothProps(_pool);
+            }
+            return ret;
+        }
+
+        //! get by an accessory 
+        public ME_AccessoryProps GetAccessoryProps(int idx, bool force)
+        {
+            Accessory.TryGetValue(idx, out var ret);
+            if (force && ret == null)
+            {
+                Accessory[idx] = ret = new ME_AccessoryProps(_pool);
+            }
+            return ret;
+        }
+
+        //! remove cloth properties 
+        public void RemoveClothProps(int idx)
+        {
+            var prop = GetClothProps(idx, false);
+            if (prop == null) return;
+            if(ME_Common.Dump)Settings.Logger.LogDebug($"RemoveClothProps({idx})");
+            prop.DetachTextures();
+            Cloth.Remove(idx);
+        }
+
+        //! remove accessory properties 
+        public void RemoveAccessoryProps(int idx)
+        {
+            var prop = GetAccessoryProps(idx, false);
+            if (prop == null) return;
+            if (ME_Common.Dump) Settings.Logger.LogDebug($"RemoveAccessoryProps({idx})");
+            prop.DetachTextures();
+            Accessory.Remove(idx);
+        }
+
+        //! replace cloth properties 
+        public void SetClothProps(int? coord, int idx, ME_ClothProps src)
+        {
+            RemoveClothProps(idx);
+
+            if (src == null) return;
+            if (ME_Common.Dump) Settings.Logger.LogDebug($"SetClothProps({coord},{idx})");
+            var prop = GetClothProps(idx, true);
+            prop.Merge(src, coord, idx);
+        }
+
+        //! replace accessory properties 
+        public void SetAccessoryProps(int? coord, int idx, ME_AccessoryProps src)
+        {
+            RemoveAccessoryProps(idx);
+
+            if (src == null) return;
+            if (ME_Common.Dump) Settings.Logger.LogDebug($"SetAccessoryProps({coord},{idx})");
+            var prop = GetAccessoryProps(idx, true);
+            prop.Merge(src, coord, idx);
+        }
+
+        //! add texture property 
+        public void AddTextureProp(MaterialTextureProperty prop)
+        {
+            switch (prop.ObjectType)
+            {
+                case ObjectType.Clothing:
+                    GetClothProps(prop.Slot,true).AddTextureProp(prop);
+                    break;
+
+                case ObjectType.Accessory:
+                    GetAccessoryProps(prop.Slot,true).AddTextureProp(prop);
+                    break;
+
+                default:
+                    Settings.Logger.LogWarning($"invalid object type {prop.ObjectType}");
+                    break;
+            }
+        }
+
+        //! add shader property 
+        public void AddShaderProp(MaterialShader prop)
+        {
+            switch (prop.ObjectType)
+            {
+                case ObjectType.Clothing:
+                    GetClothProps(prop.Slot,true).AddShaderProp(prop);
+                    break;
+
+                case ObjectType.Accessory:
+                    GetAccessoryProps(prop.Slot,true).AddShaderProp(prop);
+                    break;
+
+                default:
+                    Settings.Logger.LogWarning($"invalid object type {prop.ObjectType}");
+                    break;
+            }
+        }
+
+        //! add renderer property 
+        public void AddRendererProp(RendererProperty prop)
+        {
+            switch (prop.ObjectType)
+            {
+                case ObjectType.Clothing:
+                    GetClothProps(prop.Slot,true).AddRendererProp(prop);
+                    break;
+
+                case ObjectType.Accessory:
+                    GetAccessoryProps(prop.Slot,true).AddRendererProp(prop);
+                    break;
+
+                default:
+                    Settings.Logger.LogWarning($"invalid object type {prop.ObjectType}");
+                    break;
+            }
+        }
+
+        //! add color property 
+        public void AddColorProp(MaterialColorProperty prop)
+        {
+            switch (prop.ObjectType)
+            {
+                case ObjectType.Clothing:
+                    GetClothProps(prop.Slot,true).AddColorProp(prop);
+                    break;
+
+                case ObjectType.Accessory:
+                    GetAccessoryProps(prop.Slot,true).AddColorProp(prop);
+                    break;
+
+                default:
+                    Settings.Logger.LogWarning($"invalid object type {prop.ObjectType}");
+                    break;
+            }
+        }
+
+        //! add float property 
+        public void AddFloatProp(MaterialFloatProperty prop)
+        {
+            switch (prop.ObjectType)
+            {
+                case ObjectType.Clothing:
+                    GetClothProps(prop.Slot,true).AddFloatProp(prop);
+                    break;
+
+                case ObjectType.Accessory:
+                    GetAccessoryProps(prop.Slot,true).AddFloatProp(prop);
+                    break;
+
+                default:
+                    Settings.Logger.LogWarning($"invalid object type {prop.ObjectType}");
+                    break;
+            }
+        }
+
+        internal void Save(ME_Saver saver,int? coord)
+        {
+            foreach (var t in Cloth) t.Value.Save(saver, coord, t.Key);
+            foreach (var t in Accessory) t.Value.Save(saver, coord, t.Key);
+        }
+
+        public void Save(bool cleanup)
+        {
+            var saver = new ME_Saver();
+            _pool.Save(saver, cleanup);
+            Save(saver, null);
+
+            var SaveData = new PluginData();
+
+            if (saver.Images.Count > 0)
+                SaveData.data.Add("TextureDictionary", MessagePackSerializer.Serialize(saver.Images));
+            else
+                SaveData.data.Add("TextureDictionary", null);
+
+            if (saver.Texture.Count > 0)
+                SaveData.data.Add("MaterialTexturePropertyList", MessagePackSerializer.Serialize(saver.Texture));
+            else
+                SaveData.data.Add("MaterialTexturePropertyList", null);
+
+            if (saver.Shader.Count > 0)
+                SaveData.data.Add("MaterialShaderList", MessagePackSerializer.Serialize(saver.Shader));
+            else
+                SaveData.data.Add("MaterialShaderList", null);
+
+            if (saver.Renderer.Count > 0)
+                SaveData.data.Add("RendererPropertyList", MessagePackSerializer.Serialize(saver.Renderer));
+            else
+                SaveData.data.Add("RendererPropertyList", null);
+
+            if (saver.Color.Count > 0)
+                SaveData.data.Add("MaterialColorPropertyList", MessagePackSerializer.Serialize(saver.Color));
+            else
+                SaveData.data.Add("MaterialColorPropertyList", null);
+
+            if (saver.Float.Count > 0)
+                SaveData.data.Add("MaterialFloatPropertyList", MessagePackSerializer.Serialize(saver.Float));
+            else
+                SaveData.data.Add("MaterialFloatPropertyList", null);
+
+            ExtendedSave.SetExtendedDataById(Source, "com.deathweasel.bepinex.materialeditor", SaveData);
+        }
+    }
+
+    public class ME_CharaProps : ME_MaterialProps, IClassifiable
+    {
+        public List<ME_CoordProps> Coord;
+        public ChaFileControl Source { get; private set; }
+
+#if false
+        //! create empty instance
+        public ME_CharaProps(int count)
+            : base(new ME_TexturePool())
+        {
+            Settings.Logger.LogDebug($"ME_CharaProps(empty)");
+
+            Coord = new List<ME_CoordProps>();
+            for(var i = 0; i < count; ++i)
+            {
+                // share TextureReferer between chara internal outfits 
+                Coord.Add(new ME_CoordProps(_pool));
+            }
+        }
+#endif
+
+        //! from chara card 
+        public ME_CharaProps(ChaFileControl chaFile)
+            : base(new ME_TexturePool())
+        {
+            Settings.Logger.LogDebug($"ME_CharaProps({chaFile?.parameter?.fullname})");
+            Source = chaFile;
+            Coord = new List<ME_CoordProps>();
+            for (var i = 0; i < chaFile.coordinate.Length; ++i)
+            {
+                // share TextureReferer between chara internal outfits 
+                Coord.Add(new ME_CoordProps(_pool));
+            }
+
+            var loader = new ME_Loader(this);
+            var data = ExtendedSave.GetExtendedDataById(chaFile, "com.deathweasel.bepinex.materialeditor");
+            ME_Common.Classify(loader, data);
+        }
+
+        public void Reset()
+        {
+            for (var i = 0; i < Coord.Count; ++i)
+            {
+                Coord[i].Reset();
+            }
+        }
+
+        //! add texture property 
+        public void AddTextureProp(MaterialTextureProperty prop)
+        {
+            switch (prop.ObjectType)
+            {
+                case ObjectType.Character:
+                case ObjectType.Hair:
+                    AttachTexture(prop);
+                    break;
+
+                default:
+                    var idx = prop.CoordinateIndex;
+                    if (idx < 0 || idx >= Coord.Count)
+                    {
+                        Settings.Logger.LogWarning($"invalid coord index {idx}");
+                        return;
+                    }
+                    Coord[idx].AddTextureProp(prop);
+                    break;
+            }
+        }
+
+        //! add shader property 
+        public void AddShaderProp(MaterialShader prop)
+        {
+            switch (prop.ObjectType)
+            {
+                case ObjectType.Character:
+                case ObjectType.Hair:
+                    Shader.Add(prop);
+                    break;
+
+                default:
+                    var idx = prop.CoordinateIndex;
+                    if (idx < 0 || idx >= Coord.Count)
+                    {
+                        Settings.Logger.LogWarning($"invalid coord index {idx}");
+                        return;
+                    }
+                    Coord[idx].AddShaderProp(prop);
+                    break;
+            }
+        }
+
+        //! add renderer property 
+        public void AddRendererProp(RendererProperty prop)
+        {
+            switch (prop.ObjectType)
+            {
+                case ObjectType.Character:
+                case ObjectType.Hair:
+                    Renderer.Add(prop);
+                    break;
+
+                default:
+                    var idx = prop.CoordinateIndex;
+                    if (idx < 0 || idx >= Coord.Count)
+                    {
+                        Settings.Logger.LogWarning($"invalid coord index {idx}");
+                        return;
+                    }
+                    Coord[idx].AddRendererProp(prop);
+                    break;
+            }
+        }
+
+        //! add color property 
+        public void AddColorProp(MaterialColorProperty prop)
+        {
+            switch (prop.ObjectType)
+            {
+                case ObjectType.Character:
+                case ObjectType.Hair:
+                    Color.Add(prop);
+                    break;
+
+                default:
+                    var idx = prop.CoordinateIndex;
+                    if (idx < 0 || idx >= Coord.Count)
+                    {
+                        Settings.Logger.LogWarning($"invalid coord index {idx}");
+                        return;
+                    }
+                    Coord[idx].AddColorProp(prop);
+                    break;
+            }
+        }
+
+        //! add float property 
+        public void AddFloatProp(MaterialFloatProperty prop)
+        {
+            switch (prop.ObjectType)
+            {
+                case ObjectType.Character:
+                case ObjectType.Hair:
+                    Float.Add(prop);
+                    break;
+
+                default:
+                    var idx = prop.CoordinateIndex;
+                    if (idx < 0 || idx >= Coord.Count)
+                    {
+                        Settings.Logger.LogWarning($"invalid coord index {idx}");
+                        return;
+                    }
+                    Coord[idx].AddFloatProp(prop);
+                    break;
+            }
+        }
+
+        internal void Save(ME_Saver saver)
+        {
+            base.Save(saver, null, null);
+            for (var i = 0; i < Coord.Count; ++i) Coord[i].Save(saver, i, null);
+        }
+
+        public void Save(bool cleanup)
+        {
+            var saver = new ME_Saver();
+            _pool.Save(saver, cleanup);
+            Save(saver);
+
+            var SaveData = new PluginData();
+
+            if (saver.Images.Count > 0)
+                SaveData.data.Add("TextureDictionary", MessagePackSerializer.Serialize(saver.Images));
+            else
+                SaveData.data.Add("TextureDictionary", null);
+
+            if (saver.Texture.Count > 0)
+                SaveData.data.Add("MaterialTexturePropertyList", MessagePackSerializer.Serialize(saver.Texture));
+            else
+                SaveData.data.Add("MaterialTexturePropertyList", null);
+
+            if (saver.Shader.Count > 0)
+                SaveData.data.Add("MaterialShaderList", MessagePackSerializer.Serialize(saver.Shader));
+            else
+                SaveData.data.Add("MaterialShaderList", null);
+
+            if (saver.Renderer.Count > 0)
+                SaveData.data.Add("RendererPropertyList", MessagePackSerializer.Serialize(saver.Renderer));
+            else
+                SaveData.data.Add("RendererPropertyList", null);
+
+            if (saver.Color.Count > 0)
+                SaveData.data.Add("MaterialColorPropertyList", MessagePackSerializer.Serialize(saver.Color));
+            else
+                SaveData.data.Add("MaterialColorPropertyList", null);
+
+            if (saver.Float.Count > 0)
+                SaveData.data.Add("MaterialFloatPropertyList", MessagePackSerializer.Serialize(saver.Float));
+            else
+                SaveData.data.Add("MaterialFloatPropertyList", null);
+
+            ExtendedSave.SetExtendedDataById(Source, "com.deathweasel.bepinex.materialeditor", SaveData);
+        }
+    }
+
+
+#region Original Stuff
     public class ME_Support
     {
         public Dictionary<int, TextureContainer> TextureDictionary = new Dictionary<int, TextureContainer>();
@@ -1503,5 +1364,5 @@ namespace CosplayParty.ME
         /// </summary>
         ReceiveShadows
     }
-    #endregion
+#endregion
 }

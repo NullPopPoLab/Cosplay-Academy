@@ -6,6 +6,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
+#pragma warning disable 0162 // unreached code
+
 namespace CosplayParty
 {
     //! アクセタイプ 
@@ -94,6 +96,7 @@ namespace CosplayParty
     public class ClothInfo
     {
         public ChaFileClothes.PartsInfo Parts;
+        public ME_ClothProps Material;
 
         public uint HiddenFlags {
             get
@@ -108,19 +111,19 @@ namespace CosplayParty
             }
         }
 
-        public ClothInfo(ChaFileClothes.PartsInfo val)
+        public ClothInfo(ChaFileClothes.PartsInfo val, ME_ClothProps mat)
         {
             Parts = val;
+            Material = mat;
         }
 
-        public static List<ClothInfo> Build(ChaFileCoordinate coordinate)
+        public static List<ClothInfo> Build(ChaFileCoordinate coordinate, ME_CoordProps mat)
         {
             var dst = new List<ClothInfo>();
             var src = coordinate.clothes.parts;
             for (var i = 0; i < src.Length; ++i)
             {
-                var cinfo = new ClothInfo(src[i]);
-
+                var cinfo = new ClothInfo(src[i], mat.GetClothProps(i,true));
                 dst.Add(cinfo);
             }
             return dst;
@@ -132,23 +135,23 @@ namespace CosplayParty
     {
         public ChaFileAccessory.PartsInfo Parts;
         public AccessoryType Type;
+        public ME_AccessoryProps Material;
         public HairSupport.HairAccessoryInfo Hair;
-        public MaterialEditorProperties Material;
 
         public bool IsEmpty { get { return Parts.type < 121; } }
         public string TypeName { get { return IsEmpty ? "Empty" : Type.ToString(); } }
         public string PartsID { get { return Parts.type + "-" + Parts.id; } }
+        public bool IsHair { get { return Hair!= null; } }
 
-        public AccessoryInfo(ChaFileAccessory.PartsInfo val)
+        public AccessoryInfo(ChaFileAccessory.PartsInfo val, ME_AccessoryProps mat, HairSupport.HairAccessoryInfo hair)
         {
             Parts = val;
+            Material = mat;
+            Hair = hair;
         }
 
-        public static List<AccessoryInfo> Build(ChaFileCoordinate coordinate, Dictionary<int, HairSupport.HairAccessoryInfo> hair, ME_Coordinate mat)
+        public static List<AccessoryInfo> Build(ChaFileCoordinate coordinate, Dictionary<int, HairSupport.HairAccessoryInfo> hair, ME_CoordProps mat)
         {
-            var matprop = mat?.AccessoryProperties;
-            //var ME_ACC_Storage = outfit.Original_Accessory_Data;
-
             var dst = new List<AccessoryInfo>();
             if (coordinate == null) return dst;
 
@@ -156,11 +159,11 @@ namespace CosplayParty
             var src = coordinate.accessory.parts;
             for (var i = 0; i < src.Length; ++i)
             {
-                var ainfo = new AccessoryInfo(src[i]);
+                hair.TryGetValue(i, out var h);
+                var ainfo = new AccessoryInfo(src[i], mat.GetAccessoryProps(i,true), h);
 
-                var ishair = (hair != null) && hair.TryGetValue(i, out ainfo.Hair);
 #if false
-                if (!ishair)
+                if (!ainfo.IsHair)
                 {
                     ainfo.Hair = new HairSupport.HairAccessoryInfo
                     {
@@ -169,10 +172,6 @@ namespace CosplayParty
                 }
 #endif
 
-                if (matprop == null || !matprop.TryGetValue(i, out ainfo.Material))
-                {
-                    ainfo.Material = new MaterialEditorProperties();
-                }
 
                 dst.Add(ainfo);
 
@@ -183,9 +182,9 @@ namespace CosplayParty
                 if (ainfo.Type == AccessoryType.Auto)
                 {
                     ainfo.Type = AccessoryType.Standard;
-                    if (ainfo.Type == AccessoryType.Standard && !Settings.DestinationHeadAccs.Value && Constants.HeadAcceSet.Contains(src[i].parentKey)) ainfo.Type = ishair ? AccessoryType.HairStyle: AccessoryType.Hairfit;
-                    if (ainfo.Type == AccessoryType.Standard && !Settings.DestinationForeheadAccs.Value && Constants.ForeheadAcceSet.Contains(src[i].parentKey)) ainfo.Type = ishair ? AccessoryType.HairStyle : AccessoryType.Hairfit;
-                    if (ainfo.Type == AccessoryType.Standard && !Settings.DestinationHatAccs.Value && Constants.HatAcceSet.Contains(src[i].parentKey)) ainfo.Type = ishair ? AccessoryType.HairStyle : AccessoryType.Hairfit;
+                    if (ainfo.Type == AccessoryType.Standard && !Settings.DestinationHeadAccs.Value && Constants.HeadAcceSet.Contains(src[i].parentKey)) ainfo.Type = ainfo.IsHair ? AccessoryType.HairStyle: AccessoryType.Hairfit;
+                    if (ainfo.Type == AccessoryType.Standard && !Settings.DestinationForeheadAccs.Value && Constants.ForeheadAcceSet.Contains(src[i].parentKey)) ainfo.Type = ainfo.IsHair ? AccessoryType.HairStyle : AccessoryType.Hairfit;
+                    if (ainfo.Type == AccessoryType.Standard && !Settings.DestinationHatAccs.Value && Constants.HatAcceSet.Contains(src[i].parentKey)) ainfo.Type = ainfo.IsHair ? AccessoryType.HairStyle : AccessoryType.Hairfit;
                     if (ainfo.Type == AccessoryType.Standard && !Settings.DestinationEarAccs.Value && Constants.EarAcceSet.Contains(src[i].parentKey)) ainfo.Type = AccessoryType.Pias;
                     if (ainfo.Type == AccessoryType.Standard && !Settings.DestinationEyeAccs.Value && Constants.EyeAcceSet.Contains(src[i].parentKey)) ainfo.Type = AccessoryType.Glasses;
                     if (ainfo.Type == AccessoryType.Standard && !Settings.DestinationNoseAccs.Value && Constants.NoseAcceSet.Contains(src[i].parentKey)) ainfo.Type = AccessoryType.Mask;
@@ -233,7 +232,7 @@ namespace CosplayParty
 
         public ChaFileCoordinate Coordinate;
         public Dictionary<int, HairSupport.HairAccessoryInfo> Hair;
-        public ME_Coordinate Material;
+        public ME_CoordProps Material;
 
         /*! @note シリアライズ向けにアクセ情報がまとめて保持される。
         */
@@ -252,7 +251,7 @@ namespace CosplayParty
             AcceList.Clear();
         }
 
-        public void Import(ChaFileCoordinate coordinate, Dictionary<int, HairSupport.HairAccessoryInfo> hair, ME_Coordinate mat)
+        public void Import(ChaFileCoordinate coordinate, Dictionary<int, HairSupport.HairAccessoryInfo> hair, ME_CoordProps mat)
         {
 #if false // Additional_Card_Info 廃止予定 
                     var HairKeep = new List<int>();
@@ -268,7 +267,7 @@ namespace CosplayParty
             Hair = hair;
             Material = mat;
 
-            ClothList = ClothInfo.Build(coordinate);
+            ClothList = ClothInfo.Build(coordinate,mat);
             AcceList = AccessoryInfo.Build(coordinate,hair,mat);
 
             for (var i = 0; i < ClothList.Count; ++i)

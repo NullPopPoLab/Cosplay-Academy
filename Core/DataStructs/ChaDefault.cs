@@ -7,6 +7,8 @@ using System.IO;
 using System.Linq;
 using MessagePack;
 
+#pragma warning disable 0162 // unreached code
+
 namespace CosplayParty
 {
     public class ChaDefault
@@ -54,13 +56,10 @@ namespace CosplayParty
         internal bool Changestate = false;
 #endif
 
-        //        internal bool SkipFirstPriority = false;
-        internal ME_Support ME = new ME_Support();
-
         internal ClothingLoader ClothingLoader;
-//        internal Dictionary<string, PluginData> ExtendedCharacterData = new Dictionary<string, PluginData>();
 
-        public ME_List FinalMaterials;
+
+        public ME_CharaProps ME;
 
         //! シリアライズ用 HairAccessoryInfo 群 
         public Dictionary<int, Dictionary<int, Hair.HairSupport.HairAccessoryInfo>> HairAccessoriesPack
@@ -75,13 +74,16 @@ namespace CosplayParty
 
         public ChaDefault(ChaControl chaControl,ChaFileControl chaFile, SaveData.Heroine heroine)
         {
+            Settings.Logger.LogDebug($"ChaDefault({chaFile?.parameter.fullname})");
+
             ChaControl = chaControl;
             Chafile = chaFile;
             Parameter = ChaControl.fileParam;
             Heroine = heroine;
 
+            ME = new ME_CharaProps(chaFile);
+
             ClothingLoader = new ClothingLoader(this);
-            FinalMaterials = new ME_List(Outfit_Size);
 
             Outfits = new ChaOutfit[Outfit_Size];
             for (int i = 0, n = Outfit_Size; i < n; i++)
@@ -92,23 +94,24 @@ namespace CosplayParty
 
         public void Clear_Firstpass()
         {
+            ME.Reset();
+
             for (int i = 0, n = Outfit_Size; i < n; i++)
             {
                 Outfits[i].Reset();
             }
-            ME.TextureDictionary.Clear();
-            FinalMaterials.SoftClear();
         }
 
         public void Reset_Firstpass()
         {
+            Settings.Logger.LogDebug($"ChaDefault.Reset({Chafile?.parameter.fullname})");
+
             var src = new ChaOutfit.ImportSources();
             src.Chafile = Chafile;
             src.HairExtendedData = ExtendedSave.GetExtendedDataById(Chafile, "com.deathweasel.bepinex.hairaccessorycustomizer");
             if (src.HairExtendedData != null && src.HairExtendedData.data.TryGetValue("HairAccessories", out var AllHairAccessories) && AllHairAccessories != null)
                 src.CharaHair = MessagePackSerializer.Deserialize<Dictionary<int, Dictionary<int, HairSupport.HairAccessoryInfo>>>((byte[])AllHairAccessories);
-            src.MaterialEditorData = ExtendedSave.GetExtendedDataById(Chafile, "com.deathweasel.bepinex.materialeditor");
-            src.FinalMaterials = FinalMaterials = new ME_List(src.MaterialEditorData, this);
+            src.ME = ME;
             src.Original_Coordinates = Chafile.coordinate;
 
             for (int outfitnum = 0, n = Outfit_Size; outfitnum < n; outfitnum++)

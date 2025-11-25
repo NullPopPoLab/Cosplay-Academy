@@ -41,8 +41,8 @@ namespace CosplayParty
             public ChaFileCoordinate[] Original_Coordinates;
             public Dictionary<int, Dictionary<int, HairSupport.HairAccessoryInfo>> CharaHair;
             public PluginData HairExtendedData;
-            public PluginData MaterialEditorData;
-            public ME_List FinalMaterials;
+
+            public ME_CharaProps ME;
         }
 
         private ChaDefault ThisOutfitData;
@@ -102,38 +102,24 @@ namespace CosplayParty
 
         public void Import(ImportSources src)
         {
-            var step=0;
-            try
+            Original_Coordinate = _cloneCoordinate(src.Original_Coordinates[Index]);
+            if (src.CharaHair == null)
             {
-                Original_Coordinate = _cloneCoordinate(src.Original_Coordinates[Index]);
-                step = 1;
-                if (src.CharaHair == null)
-                {
-                    src.CharaHair = new Dictionary<int, Dictionary<int, HairSupport.HairAccessoryInfo>>();
-                }
-                else if (src.CharaHair.TryGetValue(Index, out HairInfo) == false)
-                {
-                    HairInfo = new Dictionary<int, HairSupport.HairAccessoryInfo>();
-                }
-                step = 2;
-                if (!src.FinalMaterials.Coordinates.TryGetValue(Index, out var mat))
-                {
-                    mat = new ME_Coordinate();
-                }
-                step = 3;
-                Current.Import(src.Chafile.coordinate[Index], HairInfo, mat);
+                src.CharaHair = new Dictionary<int, Dictionary<int, HairSupport.HairAccessoryInfo>>();
             }
-            catch (Exception e)
+            else if (src.CharaHair.TryGetValue(Index, out HairInfo) == false)
             {
-                Settings.Logger.LogError($"ChaOutfit.Import() error at step {step}; " + e);
+                HairInfo = new Dictionary<int, HairSupport.HairAccessoryInfo>();
             }
+            var mat = src.ME.Coord[Index];
+            Current.Import(src.Chafile.coordinate[Index], HairInfo, mat);
         }
 
         public void Override4Coordinate(ChaFileCoordinate outer, ChaFileCoordinate inner)
         {
             var co = new CoordOverrider(ThisOutfitData, Index);
             co.Collaborate(Current.Succession, outer, inner);
-            co.Apply4Coordinate();
+            co.Apply4Coordinate(outer);
         }
 
         public void Override4Generalize(ChaFileCoordinate outer, ChaFileCoordinate inner)

@@ -302,52 +302,7 @@ namespace CosplayParty
 
         private void ME_RePack(ChaControl ChaControl)
         {
-            var ME_Save = ThisOutfitData.FinalMaterials;
-            var SaveData = new PluginData();
-            ME_Save.AllProperties(out var rendererProperties, out var materialFloatProperties, out var materialColorProperties, out var materialShaders, out var materialTextureProperties);
-
-            var IDsToPurge = new List<int>();
-            foreach (var texID in ThisOutfitData.ME.TextureDictionary.Keys)
-                if (materialTextureProperties.All(x => x.TexID != texID))
-                    IDsToPurge.Add(texID);
-
-            for (var i = 0; i < IDsToPurge.Count; i++)
-            {
-                var texID = IDsToPurge[i];
-                ThisOutfitData.ME.TextureDictionary.Remove(texID);
-            }
-
-            if (ThisOutfitData.ME.TextureDictionary.Count > 0)
-                SaveData.data.Add("TextureDictionary", MessagePackSerializer.Serialize(ThisOutfitData.ME.TextureDictionary.ToDictionary(pair => pair.Key, pair => pair.Value.Data)));
-            else
-                SaveData.data.Add("TextureDictionary", null);
-
-            if (rendererProperties.Count > 0)
-                SaveData.data.Add("RendererPropertyList", MessagePackSerializer.Serialize(rendererProperties));
-            else
-                SaveData.data.Add("RendererPropertyList", null);
-
-            if (materialFloatProperties.Count > 0)
-                SaveData.data.Add("MaterialFloatPropertyList", MessagePackSerializer.Serialize(materialFloatProperties));
-            else
-                SaveData.data.Add("MaterialFloatPropertyList", null);
-
-            if (materialColorProperties.Count > 0)
-                SaveData.data.Add("MaterialColorPropertyList", MessagePackSerializer.Serialize(materialColorProperties));
-            else
-                SaveData.data.Add("MaterialColorPropertyList", null);
-
-            if (materialTextureProperties.Count > 0)
-                SaveData.data.Add("MaterialTexturePropertyList", MessagePackSerializer.Serialize(materialTextureProperties));
-            else
-                SaveData.data.Add("MaterialTexturePropertyList", null);
-
-            if (materialShaders.Count > 0)
-                SaveData.data.Add("MaterialShaderList", MessagePackSerializer.Serialize(materialShaders));
-            else
-                SaveData.data.Add("MaterialShaderList", null);
-
-            SetExtendedData("com.deathweasel.bepinex.materialeditor", SaveData, ChaControl);
+            ThisOutfitData.ME.Save(true);
         }
 
         private void KCOX_RePack(ChaControl ChaControl)

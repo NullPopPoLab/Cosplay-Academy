@@ -8,6 +8,8 @@ using System.Linq;
 using MessagePack;
 using KKAPI.Maker;
 
+#pragma warning disable 0162 // unreached code
+
 namespace CosplayParty
 {
     public class CoordLoader
@@ -56,11 +58,12 @@ namespace CosplayParty
     public class ModifiedCloth
     {
         public ChaFileClothes.PartsInfo Parts;
+        public ME_ClothProps Material;
     }
     public class ModifiedAccessory
     {
         public ChaFileAccessory.PartsInfo Parts;
-        public MaterialEditorProperties Material;
+        public ME_AccessoryProps Material;
         public HairSupport.HairAccessoryInfo Hair;
     }
     public class ModifiedCoord
@@ -97,15 +100,15 @@ namespace CosplayParty
             var OriginalAcce = Target.ChaControl.nowCoordinate.accessory.parts.ToList();
 
             // ロードしたコーデ側 
-            var MaterialEditorData = ExtendedSave.GetExtendedDataById(outer, "com.deathweasel.bepinex.materialeditor");
-            var Coordinate_ME_Data = new ME_Coordinate(MaterialEditorData, Target, Index);
+            //var medata_outer = ExtendedSave.GetExtendedDataById(outer, "com.deathweasel.bepinex.materialeditor");
+            var mat_outer = new ME_CoordProps(outer);
             var HairData = new Dictionary<int, HairSupport.HairAccessoryInfo>();
             var Inputdata = ExtendedSave.GetExtendedDataById(outer, "com.deathweasel.bepinex.hairaccessorycustomizer");
             if (Inputdata != null)
                 if (Inputdata.data.TryGetValue("CoordinateHairAccessories", out var loadedHairAccessories) && loadedHairAccessories != null)
                     HairData = MessagePackSerializer.Deserialize<Dictionary<int, HairSupport.HairAccessoryInfo>>((byte[])loadedHairAccessories);
 
-            var outacce = AccessoryInfo.Build(outer, HairData, Coordinate_ME_Data);
+            var outacce = AccessoryInfo.Build(outer, HairData, mat_outer);
             var keptacce = succession.KeptAccessories;
 
             // 髪型色にするアクセリスト 
@@ -125,6 +128,9 @@ namespace CosplayParty
             // インナー差し替え 
             if (inner != null)
             {
+                //var medata_inner = ExtendedSave.GetExtendedDataById(inner, "com.deathweasel.bepinex.materialeditor");
+                var mat_inner = new ME_CoordProps(inner);
+
                 /*! @todo select slots by coord settings */
                 var enablity = new bool[] { false, false, true/*bra*/, true/*shorts*/, false, true/*panst*/, false, false, false };
 
@@ -141,6 +147,7 @@ namespace CosplayParty
 
                     var ci = new ModifiedCloth();
                     ci.Parts = parts;
+                    ci.Material = mat_inner.GetClothProps(i, false);
 
                     _modify.Clothes[i] = ci;
                 }
@@ -316,19 +323,22 @@ namespace CosplayParty
             }
         }
 
-        public void Apply4Coordinate()
+        public void Apply4Coordinate(ChaFileCoordinate coord)
         {
             // データ適用動作 
-            var MaterialEditorData = ExtendedSave.GetExtendedDataById(Target.Chafile, "com.deathweasel.bepinex.materialeditor");
-            var Coordinate_ME_Data = new ME_Coordinate(MaterialEditorData, Target, Index);
+            //var medata_outer = ExtendedSave.GetExtendedDataById(coord, "com.deathweasel.bepinex.materialeditor");
+            var mat_outer = new ME_CoordProps(coord);
+
             var HairData = new Dictionary<int, HairSupport.HairAccessoryInfo>();
-            var TargetCloth = Target.ChaControl.nowCoordinate.clothes.parts;
-            var TargetAcce = Target.ChaControl.nowCoordinate.accessory.parts.ToList();
+            var TargetCloth = coord.clothes.parts;
+            var TargetAcce = coord.accessory.parts.ToList();
 
             for (var i = 0; i < _modify.Clothes.Length; ++i)
             {
-                if (_modify.Clothes[i] == null) continue;
-                TargetCloth[i] = _modify.Clothes[i].Parts;
+                var cloth = _modify.Clothes[i];
+                if (cloth == null) continue;
+                TargetCloth[i] = cloth.Parts;
+                mat_outer.SetClothProps(Index, i, cloth.Material);
             }
 
             foreach (var acce in _modify.Accessory)
@@ -349,48 +359,14 @@ namespace CosplayParty
                              HairLength = -999
                          };
 
-                if (acce.Value.Material!=null) Coordinate_ME_Data.AddAccessory(Index, acce.Key, acce.Value.Material);
+                mat_outer.SetAccessoryProps(Index, acce.Key, acce.Value.Material);
             }
 
             Target.ChaControl.nowCoordinate.accessory.parts = TargetAcce.ToArray();
             //MoreAccessoriesKOI.MoreAccessories.ArraySync(Target.ChaControl);
 
-            var SaveData = new PluginData();
-
-            Coordinate_ME_Data.AllProperties(out var rendererProperties, out var materialFloatProperties, out var materialColorProperties, out var materialShaders, out var materialTextureProperties);
-
-            var TextureDictionary = Target.ME.TextureDictionary.Where(pair => materialTextureProperties.Any(x => x.TexID == pair.Key)).ToDictionary(pair => pair.Key, pair => pair.Value.Data);
-            if (TextureDictionary.Count > 0)
-                SaveData.data.Add("TextureDictionary", MessagePackSerializer.Serialize(TextureDictionary));
-            else
-                SaveData.data.Add("TextureDictionary", null);
-
-            if (rendererProperties.Count > 0)
-                SaveData.data.Add("RendererPropertyList", MessagePackSerializer.Serialize(rendererProperties));
-            else
-                SaveData.data.Add("RendererPropertyList", null);
-
-            if (materialFloatProperties.Count > 0)
-                SaveData.data.Add("MaterialFloatPropertyList", MessagePackSerializer.Serialize(materialFloatProperties));
-            else
-                SaveData.data.Add("MaterialFloatPropertyList", null);
-
-            if (materialColorProperties.Count > 0)
-                SaveData.data.Add("MaterialColorPropertyList", MessagePackSerializer.Serialize(materialColorProperties));
-            else
-                SaveData.data.Add("MaterialColorPropertyList", null);
-
-            if (materialTextureProperties.Count > 0)
-                SaveData.data.Add("MaterialTexturePropertyList", MessagePackSerializer.Serialize(materialTextureProperties));
-            else
-                SaveData.data.Add("MaterialTexturePropertyList", null);
-
-            if (materialShaders.Count > 0)
-                SaveData.data.Add("MaterialShaderList", MessagePackSerializer.Serialize(materialShaders));
-            else
-                SaveData.data.Add("MaterialShaderList", null);
-
-            ExtendedSave.SetExtendedDataById(Target.Chafile, "com.deathweasel.bepinex.materialeditor", SaveData);
+            mat_outer.Save(true);
+            Target.ME.Save(false);
 
 #if false // Additional_Card_Info 廃止予定 
             if (InsideMaker && Constants.PluginResults["Additional_Card_Info"])
@@ -454,12 +430,11 @@ namespace CosplayParty
 
         public void Apply4Generalize(ChaFileCoordinate newouter)
         {
-            var outfit = Target.Outfits[Index];
+            //var newmedata_outer = ExtendedSave.GetExtendedDataById(newouter, "com.deathweasel.bepinex.materialeditor");
+            //var mat1 = new ME_Coordinate(newmedata_outer, Target.ME.Support, Index);
 
-            if (!Target.FinalMaterials.Coordinates.TryGetValue(Index, out var ME_coord))
-            {
-                Target.FinalMaterials.Coordinates[Index] = ME_coord = new ME_Coordinate();
-            }
+            var outfit = Target.Outfits[Index];
+            var mat2 = Target.ME.Coord[Index];
 
             //UnderwearProcessed[outfitnum] = new bool[9];
 
@@ -473,7 +448,7 @@ namespace CosplayParty
 #if false // Additional_Card_Info 廃止予定 
                 ME_coord.SoftClear(PersonalClothingBools);
 #else
-                ME_coord.SoftClear(new bool[9]);
+//                ME_coord.SoftClear(new bool[9]);
 #endif
             }
 
@@ -768,8 +743,10 @@ namespace CosplayParty
 
             for (var i = 0; i < _modify.Clothes.Length; ++i)
             {
-                if (_modify.Clothes[i] == null) continue;
-                TargetCloth[i] = _modify.Clothes[i].Parts;
+                var cloth = _modify.Clothes[i];
+                if (cloth == null) continue;
+                TargetCloth[i] = cloth.Parts;
+                mat2.SetClothProps(Index, i, cloth.Material);
             }
 
             foreach (var acce in _modify.Accessory)
@@ -790,11 +767,12 @@ namespace CosplayParty
                              HairLength = -999
                          };
 
-                if (acce.Value.Material != null) ME_coord.AddAccessory(Index, acce.Key, acce.Value.Material);
+                mat2.SetAccessoryProps(Index, acce.Key, acce.Value.Material);
             }
 
             newouter.clothes.parts = TargetCloth;
             newouter.accessory.parts = TargetAcce.ToArray();
+            mat2.Save(true);
             TargetCoordinate.LoadBytes(newouter.SaveBytes(), newouter.loadVersion);
             //MoreAccessoriesKOI.MoreAccessories.ArraySync(Target.ChaControl);
 

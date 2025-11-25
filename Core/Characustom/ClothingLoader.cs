@@ -133,6 +133,8 @@ namespace CosplayParty
 
             try
             {
+                ThisOutfitData.ME.Save(false);
+
                 // ここで CoordinateProcessInfo が参照される 
                 Run_Repacks(character);
             }
@@ -190,7 +192,8 @@ namespace CosplayParty
             outfit.Override4Coordinate(coordinate,outfit.Inner.Coordinate);
         }
 
-        private void Additional_Clothing_Process(int index, int outfitnum, ME_Coordinate ME_Data)
+#if false
+        private void Additional_Clothing_Process(int index, int outfitnum, CoordProps ME_Data)
         {
             var finishcoords = ThisOutfitData.FinalMaterials.Coordinates;
             if (!finishcoords.TryGetValue(outfitnum, out var finishcoord))
@@ -244,5 +247,6 @@ namespace CosplayParty
                 }
             }
         }
+#endif
     }
 }
