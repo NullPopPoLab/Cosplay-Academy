@@ -152,8 +152,9 @@ namespace CosplayParty
             var outer = outfit.Outer.Coordinate;
             if (outer == null)
             {
+                var src = ThisOutfitData.Chafile.coordinate[outfitnum];
                 outer = new ChaFileCoordinate();
-                outer.LoadBytes(ThisOutfitData.ChaControl.nowCoordinate.SaveBytes(), ThisOutfitData.ChaControl.nowCoordinate.loadVersion);
+                outer.LoadBytes(src.SaveBytes(), src.loadVersion);
             }
             var inner = outfit.Inner.Coordinate;
             outfit.Override4Generalize(outer, inner);
