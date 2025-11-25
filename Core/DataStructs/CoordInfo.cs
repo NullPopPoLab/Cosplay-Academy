@@ -95,6 +95,19 @@ namespace CosplayParty
     {
         public ChaFileClothes.PartsInfo Parts;
 
+        public uint HiddenFlags {
+            get
+            {
+                uint r = 0;
+                uint f = 1;
+                for (var i = 0; i < Parts.hideOpt.Length; ++i, f <<= 1)
+                {
+                    if (Parts.hideOpt[i]) r |= f;
+                }
+                return r;
+            }
+        }
+
         public ClothInfo(ChaFileClothes.PartsInfo val)
         {
             Parts = val;
@@ -123,6 +136,8 @@ namespace CosplayParty
         public MaterialEditorProperties Material;
 
         public bool IsEmpty { get { return Parts.type < 121; } }
+        public string TypeName { get { return IsEmpty ? "Empty" : Type.ToString(); } }
+        public string PartsID { get { return Parts.type + "-" + Parts.id; } }
 
         public AccessoryInfo(ChaFileAccessory.PartsInfo val)
         {
@@ -209,6 +224,8 @@ namespace CosplayParty
 
     public class CoordInfo : IDisposable
     {
+        public const bool Dump = false;
+
         public List<ClothInfo> ClothList = new List<ClothInfo>();
         public List<AccessoryInfo> AcceList = new List<AccessoryInfo>();
 
@@ -254,6 +271,13 @@ namespace CosplayParty
             ClothList = ClothInfo.Build(coordinate);
             AcceList = AccessoryInfo.Build(coordinate,hair,mat);
 
+            for (var i = 0; i < ClothList.Count; ++i)
+            {
+                var cinfo = ClothList[i];
+
+                if (Dump) Settings.Logger.LogDebug($"Import: Cloth {i} id={cinfo.Parts.id} hid={cinfo.HiddenFlags:X}");
+            }
+
             // 強制的に保持するか 
             var xkeep = Settings.ExtremeAccKeeper.Value;
 
@@ -264,7 +288,7 @@ namespace CosplayParty
                 // アクセを残すか 
                 var keep = xkeep || ainfo.Type != AccessoryType.Standard;
 
-                //Settings.Logger.LogDebug($"Process: Acc {outfitnum}-{i} XK={xkeep} GI={geneinc} HK={hkeep} AK={akeep}");
+                if (Dump) Settings.Logger.LogDebug($"Import: Acc {i+1} keep={keep} type={ainfo.TypeName} id={ainfo.PartsID}");
 
                 //ExpandedOutfit.Logger.LogDebug($"ACC :{i}\tID: {data.nowAccessories[i].id}\tParent: {data.nowAccessories[i].parentKey}");
                 if (keep)

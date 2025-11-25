@@ -147,7 +147,14 @@ namespace CosplayParty
             ThisOutfitData.ChaControl.fileStatus.coordinateType = outfitnum;
 
             var outfit = ThisOutfitData.Outfits[outfitnum];
-            outfit.Override4Generalize(outfit.Outer.Coordinate, outfit.Inner.Coordinate);
+            var outer = outfit.Outer.Coordinate;
+            if (outer == null)
+            {
+                outer = new ChaFileCoordinate();
+                outer.LoadBytes(ThisOutfitData.ChaControl.nowCoordinate.SaveBytes(), ThisOutfitData.ChaControl.nowCoordinate.loadVersion);
+            }
+            var inner = outfit.Inner.Coordinate;
+            outfit.Override4Generalize(outer, inner);
         }
 
         //! コーデカードのロード 

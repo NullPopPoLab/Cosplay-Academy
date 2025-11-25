@@ -86,6 +86,13 @@ namespace CosplayParty
 
         public void Collaborate(CoordinateSuccession succession, ChaFileCoordinate outer, ChaFileCoordinate inner) {
 
+            if (CoordInfo.Dump) 
+            {
+                var outername = (outer == null) ? "none" : outer.coordinateName;
+                var innername = (inner == null) ? "none" : inner.coordinateName;
+                Settings.Logger.LogDebug($"Collaborate outer={outername} inner={innername}");
+            }
+
             // 現在のコーデ側 
             var OriginalAcce = Target.ChaControl.nowCoordinate.accessory.parts.ToList();
 
@@ -98,7 +105,7 @@ namespace CosplayParty
                 if (Inputdata.data.TryGetValue("CoordinateHairAccessories", out var loadedHairAccessories) && loadedHairAccessories != null)
                     HairData = MessagePackSerializer.Deserialize<Dictionary<int, HairSupport.HairAccessoryInfo>>((byte[])loadedHairAccessories);
 
-            var newacce = AccessoryInfo.Build(outer, HairData, Coordinate_ME_Data);
+            var outacce = AccessoryInfo.Build(outer, HairData, Coordinate_ME_Data);
             var keptacce = succession.KeptAccessories;
 
             // 髪型色にするアクセリスト 
@@ -106,9 +113,9 @@ namespace CosplayParty
             if (Settings.HairMatch.Value && Settings.DestinationHeadAccs.Value && !MakerAPI.InsideMaker)
             {
                 // 新コーデにあるアクセのうち、髪型扱いにするパーツのみ対象とする 
-                for (var i = 0; i < newacce.Count; ++i)
+                for (var i = 0; i < outacce.Count; ++i)
                 {
-                    var acce = newacce[i];
+                    var acce = outacce[i];
 
                     if (acce.Type != AccessoryType.HairStyle) continue;
                     HairToColor.Add(i);
@@ -130,6 +137,8 @@ namespace CosplayParty
                     }
 
                     var parts = inner.clothes.parts[i];
+                    if (CoordInfo.Dump) Settings.Logger.LogDebug($"Inner Cloth {i} overridden; id={parts.id}");
+
                     var ci = new ModifiedCloth();
                     ci.Parts = parts;
 
@@ -147,9 +156,9 @@ namespace CosplayParty
 
             // ロードを適用するアクセのみ適用 
             var aidx = 0;
-            for (var i = 0; i < newacce.Count; ++i)
+            for (var i = 0; i < outacce.Count; ++i)
             {
-                var acce = newacce[i];
+                var acce = outacce[i];
                 var modify = new ModifiedAccessory();
                 var use = false;
 
@@ -212,16 +221,15 @@ namespace CosplayParty
                         break;
                 }
 
-                var type = acce.IsEmpty ? "Empty" : acce.Type.ToString();
                 if (use)
                 {
-                    Settings.Logger.LogDebug($"New Accessory {i + 1} (as {type}) allowed; " + acce.Parts.id);
+                    if (CoordInfo.Dump) Settings.Logger.LogDebug($"Outer Accessory {i + 1} (as {acce.TypeName}) allowed; {acce.PartsID}");
 
                     modify.Parts = acce.Parts;
                 }
                 else
                 {
-                    Settings.Logger.LogDebug($"New Accessory {i + 1} (as {type}) denied; " + acce.Parts.id);
+                    if (CoordInfo.Dump) Settings.Logger.LogDebug($"Outer Accessory {i + 1} (as {acce.TypeName}) denied; {acce.PartsID}");
 
                     // 空にする 
                     acce.Parts.type = 120;
@@ -290,10 +298,9 @@ namespace CosplayParty
                         break;
                 }
 
-                var type = acce.IsEmpty ? "Empty" : acce.Type.ToString();
                 if (use)
                 {
-                    Settings.Logger.LogDebug($"Kept Accessory {aidx + 1} (as {type}) allowed; " + acce.Parts.id);
+                    if (CoordInfo.Dump) Settings.Logger.LogDebug($"Kept Accessory {aidx + 1} (as {acce.TypeName}) allowed; {acce.PartsID}");
 
                     ProcInfo.ACCKeepReturn.Add(aidx);
 
@@ -304,7 +311,7 @@ namespace CosplayParty
                 }
                 else
                 {
-                    Settings.Logger.LogDebug($"Kept Accessory {aidx + 1} (as {type}) denied; " + acce.Parts.id);
+                    if (CoordInfo.Dump) Settings.Logger.LogDebug($"Kept Accessory {aidx + 1} (as {acce.TypeName}) denied; {acce.PartsID}");
                 }
             }
         }
@@ -725,13 +732,8 @@ namespace CosplayParty
 #endif
             outfit.ProcInfo.UnderClothingKeep = UnderClothingKeep;
 
-            //var TargetCoordinate = Target.ChaControl.chaFile.coordinate[Index];
-            var TargetCoordinate = Target.ChaControl.nowCoordinate;
-            if (newouter == null)
-            {
-                newouter = new ChaFileCoordinate();
-                newouter.LoadBytes(TargetCoordinate.SaveBytes(), TargetCoordinate.loadVersion);
-            }
+            var TargetCoordinate = Target.ChaControl.chaFile.coordinate[Index];
+            //var TargetCoordinate = Target.ChaControl.nowCoordinate;
             var TargetAcce = newouter.accessory.parts.ToList();
 
             //            var UnderwearAccessoryStart = keptacce.Count;
