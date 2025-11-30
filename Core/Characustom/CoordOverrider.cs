@@ -243,6 +243,7 @@ namespace CosplayParty
 
                     // 空にする 
                     acce.Parts.type = 120;
+                    acce.Parts.id = 0;
                     modify.Parts = acce.Parts;
                 }
 
@@ -323,6 +324,19 @@ namespace CosplayParty
                 {
                     if (CoordInfo.Dump) Settings.Logger.LogDebug($"Kept Accessory {aidx + 1} (as {acce.TypeName}) denied; {acce.PartsID}");
                 }
+            }
+
+            // 元アクセの残り部分を明示的に消しておく必要がある 
+            for (; aidx < outer.AcceList.Count; ++aidx)
+            {
+                if (CoordInfo.Dump) Settings.Logger.LogDebug($"Padding Accessory {aidx + 1} (as Empty)");
+
+                var acce = outer.AcceList[aidx];
+                acce.Parts.type = 120;
+                acce.Parts.id = 0;
+                var modify = new ModifiedAccessory();
+                modify.Parts = acce.Parts;
+                _modify.Accessory[aidx] = modify;
             }
         }
 
