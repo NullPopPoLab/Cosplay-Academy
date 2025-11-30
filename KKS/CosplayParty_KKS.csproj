@@ -65,6 +65,9 @@
       <HintPath>Game\BepInEx\plugins\KKS_BepisPlugins\KKS_ExtensibleSaveFormat.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="KKS_MaterialEditor">
+      <HintPath>Game\BepInEx\plugins\KKS_Plugins\KKS_MaterialEditor.dll</HintPath>
+    </Reference>
     <Reference Include="KKS_Sideloader, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>Game\BepInEx\plugins\KKS_BepisPlugins\KKS_Sideloader.dll</HintPath>
       <Private>False</Private>

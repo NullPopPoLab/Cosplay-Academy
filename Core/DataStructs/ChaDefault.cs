@@ -14,7 +14,7 @@ namespace CosplayParty
     public class ChaDefault
     {
         internal ChaControl ChaControl;
-        internal ChaFile Chafile;
+        internal ChaFileControl ChaFile;
         internal ChaFileParameter Parameter;
         internal SaveData.Heroine Heroine;
 
@@ -37,7 +37,7 @@ namespace CosplayParty
         public int ProcessingRevision { get; private set; } = 1;
         internal void NeedProcess() {
             ++ProcessingRevision;
-            Settings.Logger.LogDebug($"NeedProcess rev={ProcessingRevision} for {Chafile.charaFileName}");
+            Settings.Logger.LogDebug($"NeedProcess rev={ProcessingRevision} for {ChaFile.charaFileName}");
         }
         public bool IsProcessed { get { return ProcessedRevision == ProcessingRevision; } }
         internal void MarkProcessed() { ProcessedRevision = ProcessingRevision; }
@@ -77,7 +77,7 @@ namespace CosplayParty
             Settings.Logger.LogDebug($"ChaDefault({chaFile?.parameter.fullname})");
 
             ChaControl = chaControl;
-            Chafile = chaFile;
+            ChaFile = chaFile;
             Parameter = ChaControl.fileParam;
             Heroine = heroine;
 
@@ -94,7 +94,7 @@ namespace CosplayParty
 
         public void Clear_Firstpass()
         {
-            ME.Clear();
+            //ME.Clear();
 
             for (int i = 0, n = Outfit_Size; i < n; i++)
             {
@@ -104,15 +104,15 @@ namespace CosplayParty
 
         public void Reset_Firstpass()
         {
-            Settings.Logger.LogDebug($"ChaDefault.Reset({Chafile?.parameter.fullname})");
+            Settings.Logger.LogDebug($"ChaDefault.Reset({ChaFile?.parameter.fullname})");
 
             var src = new ChaOutfit.ImportSources();
-            src.Chafile = Chafile;
-            src.HairExtendedData = ExtendedSave.GetExtendedDataById(Chafile, "com.deathweasel.bepinex.hairaccessorycustomizer");
+            src.Chafile = ChaFile;
+            src.HairExtendedData = ExtendedSave.GetExtendedDataById(ChaFile, "com.deathweasel.bepinex.hairaccessorycustomizer");
             if (src.HairExtendedData != null && src.HairExtendedData.data.TryGetValue("HairAccessories", out var AllHairAccessories) && AllHairAccessories != null)
                 src.CharaHair = MessagePackSerializer.Deserialize<Dictionary<int, Dictionary<int, HairSupport.HairAccessoryInfo>>>((byte[])AllHairAccessories);
             src.ME = ME;
-            src.Original_Coordinates = Chafile.coordinate;
+            src.Original_Coordinates = ChaFile.coordinate;
 
             for (int outfitnum = 0, n = Outfit_Size; outfitnum < n; outfitnum++)
             {

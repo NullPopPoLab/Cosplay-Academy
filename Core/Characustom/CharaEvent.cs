@@ -96,7 +96,7 @@ namespace CosplayParty
 #endif
                 )
             {
-                ThisOutfitData.Chafile = ChaFileControl;
+                ThisOutfitData.ChaFile = ChaFileControl;
 
                 ThisOutfitData.ClothingLoader.Run_Repacks(ChaControl);
 
@@ -154,7 +154,7 @@ namespace CosplayParty
             }
 
             ThisOutfitData.ChaControl = ChaControl;
-            ThisOutfitData.Chafile = ChaFileControl;
+            ThisOutfitData.ChaFile = ChaFileControl;
         }
 
         public void Process(GameMode currentGameMode)
@@ -203,7 +203,7 @@ namespace CosplayParty
 
                 if (!ThisOutfitData.IsRefreshed) //Save all accessories to avoid duplicating head accessories each load and be reuseable
                 {
-                    Settings.Logger.LogDebug($"Refresh: " + ThisOutfitData.Chafile.GetFancyCharacterName());
+                    Settings.Logger.LogDebug($"Refresh: " + ThisOutfitData.ChaFile.GetFancyCharacterName());
                     ThisOutfitData.MarkRefreshed();
 
                     ThisOutfitData.Clear_Firstpass();
@@ -257,7 +257,7 @@ namespace CosplayParty
                 {
                     if (currentGameMode == GameMode.MainGame && !ThisOutfitData.IsProcessed /*|| Settings.ChangeOutfit.Value && GameMode.Maker == currentGameMode*/)
                     {
-                        Settings.Logger.LogDebug("Processing: " + ThisOutfitData.Chafile.GetFancyCharacterName());
+                        Settings.Logger.LogDebug("Processing: " + ThisOutfitData.ChaFile.GetFancyCharacterName());
                         OutfitDecider.Decision(ChaControl.fileParam.fullname, ThisOutfitData);//Generate outfits
                         ThisOutfitData.MarkProcessed();
                     }

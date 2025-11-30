@@ -246,7 +246,7 @@ namespace CosplayParty
             if (InsideMaker && Constants.PluginResults["Accessory_Parents"])
                 ControllerReload_Loop("Accessory_Parents.CharaEvent, Accessory_Parents", ChaControl);
 
-            ControllerReload_Loop("KK_Plugins.MaterialEditor.MaterialEditorCharaController, KK_MaterialEditor", ChaControl);
+            ControllerReload_Loop(ME.ME_Common.ControllerName, ChaControl);
 
             ControllerReload_Loop("KK_Plugins.ClothingUnlockerController, KK_ClothingUnlocker", ChaControl);
 
@@ -270,7 +270,7 @@ namespace CosplayParty
 
         private void HairACC_Repack(ChaControl ChaControl)
         {
-            var ChafileData = ExtendedSave.GetExtendedDataById(ThisOutfitData.Chafile, "com.deathweasel.bepinex.hairaccessorycustomizer");
+            var ChafileData = ExtendedSave.GetExtendedDataById(ThisOutfitData.ChaFile, "com.deathweasel.bepinex.hairaccessorycustomizer");
             if (ChafileData != null)
             {
                 if (ChafileData.version == 0)
@@ -309,7 +309,7 @@ namespace CosplayParty
         {
             PluginData SavedData;
             var Clothdict = new Dictionary<CoordinateType, Dictionary<string, ClothesTexData>>();
-            var ExtendedCharacterData = ExtendedSave.GetExtendedDataById(ThisOutfitData.Chafile, "KCOX");
+            var ExtendedCharacterData = ExtendedSave.GetExtendedDataById(ThisOutfitData.ChaFile, "KCOX");
             if (ExtendedCharacterData != null)
             {
                 if (KCOX_Version.IsAvailable(ExtendedCharacterData.version))
@@ -427,7 +427,7 @@ namespace CosplayParty
         private void ClothingUnlocker_RePack(ChaControl ChaControl)
         {
             var FailureBools = new Dictionary<int, bool>();
-            var Original = ExtendedSave.GetExtendedDataById(ThisOutfitData.Chafile, "com.deathweasel.bepinex.clothingunlocker");
+            var Original = ExtendedSave.GetExtendedDataById(ThisOutfitData.ChaFile, "com.deathweasel.bepinex.clothingunlocker");
             if (Original != null)
             {
                 if (Original.version == 0)
@@ -473,7 +473,7 @@ namespace CosplayParty
             var Bra = new Dictionary<int, Pushup.ClothData>();
             var Top = new Dictionary<int, Pushup.ClothData>();
             Pushup.BodyData Body = null;
-            var Extended = ExtendedSave.GetExtendedDataById(ThisOutfitData.Chafile, "com.deathweasel.bepinex.pushup");
+            var Extended = ExtendedSave.GetExtendedDataById(ThisOutfitData.ChaFile, "com.deathweasel.bepinex.pushup");
             if (Extended != null)
             {
                 if (Extended.version == 0)
@@ -575,7 +575,7 @@ namespace CosplayParty
         {
             PluginData SavedData;
             var Modifiers = new List<ABMX.BoneModifier>();
-            SavedData = ExtendedSave.GetExtendedDataById(ThisOutfitData.Chafile, "KKABMPlugin.ABMData");
+            SavedData = ExtendedSave.GetExtendedDataById(ThisOutfitData.ChaFile, "KKABMPlugin.ABMData");
             if (SavedData != null && SavedData.data.TryGetValue("boneData", out var bytes) && bytes != null)
             {
                 try
@@ -659,7 +659,7 @@ namespace CosplayParty
             var Modifiers = new List<DynamicBonePlugin
                 .DynamicBoneData>();
 
-            var original = ExtendedSave.GetExtendedDataById(ThisOutfitData.Chafile, "com.deathweasel.bepinex.dynamicboneeditor");
+            var original = ExtendedSave.GetExtendedDataById(ThisOutfitData.ChaFile, "com.deathweasel.bepinex.dynamicboneeditor");
             if (original != null)
             {
                 if (original.version == 0)
@@ -720,7 +720,7 @@ namespace CosplayParty
             var TriggerPropertyList = new List<AccStateSync.TriggerProperty>();
             var TriggerGroupList = new List<AccStateSync.TriggerGroup>();
 
-            var ExtendedData = ExtendedSave.GetExtendedDataById(ThisOutfitData.Chafile, "madevil.kk.ass");
+            var ExtendedData = ExtendedSave.GetExtendedDataById(ThisOutfitData.ChaFile, "madevil.kk.ass");
             if (ExtendedData != null)
             {
                 if (ExtendedData.version > 6)
@@ -1042,7 +1042,7 @@ namespace CosplayParty
                 }
             }
 
-            var plugindata = ExtendedSave.GetExtendedDataById(ThisOutfitData.Chafile, "Accessory_Themes");
+            var plugindata = ExtendedSave.GetExtendedDataById(ThisOutfitData.ChaFile, "Accessory_Themes");
             if (plugindata != null)
             {
                 if (plugindata.version == 1)
@@ -1207,7 +1207,7 @@ namespace CosplayParty
                     Parent_Data[outfitnum] = new Accessory_Parents.CoordinateData();
             }
 
-            var MyData = ExtendedSave.GetExtendedDataById(ThisOutfitData.Chafile, "Accessory_Parents");
+            var MyData = ExtendedSave.GetExtendedDataById(ThisOutfitData.ChaFile, "Accessory_Parents");
             if (MyData != null)
             {
                 if (MyData.version == 1)
@@ -1289,7 +1289,7 @@ namespace CosplayParty
                 }
             }
 
-            var Extended_Data = ExtendedSave.GetExtendedDataById(ThisOutfitData.Chafile, "Accessory_States");
+            var Extended_Data = ExtendedSave.GetExtendedDataById(ThisOutfitData.ChaFile, "Accessory_States");
             if (Extended_Data != null)
             {
                 switch (Extended_Data.version)
@@ -1558,7 +1558,7 @@ namespace CosplayParty
             SetExtendedData("Accessory_States", (nulldata) ? null : SavedData, ChaControl);
         }
 
-        private void ControllerReload_Loop(string Controller_Name, ChaControl ChaControl)
+        public static void ControllerReload_Loop(string Controller_Name, ChaControl ChaControl)
         {
             var Controller = Type.GetType(Controller_Name, false);
             if (Controller != null)
@@ -1573,7 +1573,7 @@ namespace CosplayParty
             }
         }
 
-        private void ControllerCoordReload_Loop(string Controller_Name, ChaControl ChaControl, ChaFileCoordinate coordinate)
+        public static void ControllerCoordReload_Loop(string Controller_Name, ChaControl ChaControl, ChaFileCoordinate coordinate)
         {
             var Controller = Type.GetType(Controller_Name, false);
             if (Controller != null)
@@ -1591,7 +1591,7 @@ namespace CosplayParty
         public void SetExtendedData(string IDtoSET, PluginData data, ChaControl ChaControl)
         {
             ExtendedSave.SetExtendedDataById(ChaControl.chaFile, IDtoSET, data);
-            ExtendedSave.SetExtendedDataById(ThisOutfitData.Chafile, IDtoSET, data);
+            ExtendedSave.SetExtendedDataById(ThisOutfitData.ChaFile, IDtoSET, data);
 #if !KKS
             if (ThisOutfitData.Heroine != null)
             {

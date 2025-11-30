@@ -114,6 +114,9 @@ namespace CosplayParty
                     {
                         Settings.Logger.LogDebug($"loaded {(ChaFileDefine.CoordinateType)i} " + outfit.Inner.Path);
                     }
+
+                    // 寧ろ壊れる 
+                    //ThisOutfitData.ClothingLoader.ControllerCoordReload_Loop("ME_Common.ControllerName", ChaControl, outfit.Current.Coordinate);
                 }
                 else
                 {
@@ -133,10 +136,10 @@ namespace CosplayParty
 
             try
             {
-                ThisOutfitData.ME.Save(false);
+                //ThisOutfitData.ME.Save(false);
 
                 // ここで CoordinateProcessInfo が参照される 
-                Run_Repacks(character);
+                //Run_Repacks(character);
             }
             catch (Exception e)
             {
@@ -149,14 +152,21 @@ namespace CosplayParty
             ThisOutfitData.ChaControl.fileStatus.coordinateType = outfitnum;
 
             var outfit = ThisOutfitData.Outfits[outfitnum];
-            var outer = outfit.Outer.Coordinate;
-            if (outer == null)
+            var coord = outfit.Outer.Coordinate;
+            var outcapt = "";
+            if (coord == null)
             {
-                var src = ThisOutfitData.Chafile.coordinate[outfitnum];
-                outer = new ChaFileCoordinate();
-                outer.LoadBytes(src.SaveBytes(), src.loadVersion);
+                outcapt = ThisOutfitData.ChaFile.parameter.fullname + "-" + outfitnum;
+                var src = ThisOutfitData.ChaFile.coordinate[outfitnum];
+                coord = new ChaFileCoordinate();
+                coord.LoadBytes(src.SaveBytes(), src.loadVersion);
+
+                // PluginData はコピーされないので別途対応 
+                ExtendedSave.SetExtendedDataById(coord, ME_Common.ExtendedDataName, outfit.Current.Material.Export(true));
             }
-            var inner = outfit.Inner.Coordinate;
+
+            var outer = new CoordInfo(coord, outcapt);
+            var inner = new CoordInfo(outfit.Inner.Coordinate);
             outfit.Override4Generalize(outer, inner);
         }
 
@@ -169,9 +179,9 @@ namespace CosplayParty
             {
                 Settings.Logger.LogWarning($"ChaControl mismatch({chacontrol.name},{ThisOutfitData.ChaControl.name})");
             }
-            if (chafile != ThisOutfitData.Chafile)
+            if (chafile != ThisOutfitData.ChaFile)
             {
-                Settings.Logger.LogWarning($"ChaFile mismatch({chafile.charaFileName},{ThisOutfitData.Chafile.charaFileName})");
+                Settings.Logger.LogWarning($"ChaFile mismatch({chafile.charaFileName},{ThisOutfitData.ChaFile.charaFileName})");
             }
 
             ChaControl = chacontrol;
@@ -190,7 +200,10 @@ namespace CosplayParty
                     Settings.Logger.LogDebug($"loaded {(ChaFileDefine.CoordinateType)outfitnum} " + outfit.Inner.Path);
                 }
             }
-            outfit.Override4Coordinate(coordinate,outfit.Inner.Coordinate);
+
+            var outer = new CoordInfo(coordinate);
+            var inner = new CoordInfo(outfit.Inner.Coordinate);
+            outfit.Override4Coordinate(outer, inner);
         }
 
 #if false

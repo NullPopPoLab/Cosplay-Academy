@@ -5,6 +5,7 @@ using ExtensibleSaveFormat;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using MessagePack;
 
 #pragma warning disable 0162 // unreached code
 
@@ -234,9 +235,18 @@ namespace CosplayParty
         public Dictionary<int, HairSupport.HairAccessoryInfo> Hair;
         public ME_CoordProps Material;
 
+        public PluginData Plugin_Material;
+        public PluginData Plugin_Hair;
+
         /*! @note シリアライズ向けにアクセ情報がまとめて保持される。
         */
         public Dictionary<int, HairSupport.HairAccessoryInfo> HairAccessories = new Dictionary<int, HairSupport.HairAccessoryInfo>();
+
+        public CoordInfo() { }
+        public CoordInfo(ChaFileCoordinate coordinate,string caption="") {
+
+            Import(coordinate, new ME_CoordProps(coordinate,caption));
+        }
 
         public void Dispose()
         {
@@ -251,7 +261,7 @@ namespace CosplayParty
             AcceList.Clear();
         }
 
-        public void Import(ChaFileCoordinate coordinate, Dictionary<int, HairSupport.HairAccessoryInfo> hair, ME_CoordProps mat)
+        public void Import(ChaFileCoordinate coordinate, /*Dictionary<int, HairSupport.HairAccessoryInfo> hair,*/ ME_CoordProps mat)
         {
 #if false // Additional_Card_Info 廃止予定 
                     var HairKeep = new List<int>();
@@ -264,11 +274,24 @@ namespace CosplayParty
 #endif
 
             Coordinate = coordinate;
-            Hair = hair;
+            //Hair = hair;
             Material = mat;
 
+            if (coordinate == null)
+            {
+                return;
+            }
+
+            Plugin_Material = ExtendedSave.GetExtendedDataById(coordinate, ME_Common.ExtendedDataName);
+
+            Plugin_Hair = ExtendedSave.GetExtendedDataById(coordinate, "com.deathweasel.bepinex.hairaccessorycustomizer");
+            if (Plugin_Hair != null)
+                if (Plugin_Hair.data.TryGetValue("CoordinateHairAccessories", out var loadedHairAccessories) && loadedHairAccessories != null)
+                    Hair = MessagePackSerializer.Deserialize<Dictionary<int, HairSupport.HairAccessoryInfo>>((byte[])loadedHairAccessories);
+            if (Hair == null) Hair = new Dictionary<int, HairSupport.HairAccessoryInfo>();
+
             ClothList = ClothInfo.Build(coordinate,mat);
-            AcceList = AccessoryInfo.Build(coordinate,hair,mat);
+            AcceList = AccessoryInfo.Build(coordinate, Hair, mat);
 
             for (var i = 0; i < ClothList.Count; ++i)
             {
