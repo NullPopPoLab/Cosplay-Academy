@@ -166,7 +166,7 @@ namespace CosplayParty
             }
 
             var outer = new CoordInfo(coord, outcapt);
-            var inner = new CoordInfo(outfit.Inner.Coordinate);
+            var inner = (outfit.Inner.Coordinate==null)?null:new CoordInfo(outfit.Inner.Coordinate);
             outfit.Override4Generalize(outer, inner);
         }
 
@@ -202,7 +202,7 @@ namespace CosplayParty
             }
 
             var outer = new CoordInfo(coordinate);
-            var inner = new CoordInfo(outfit.Inner.Coordinate);
+            var inner = (outfit.Inner.Coordinate==null)?null:new CoordInfo(outfit.Inner.Coordinate);
             outfit.Override4Coordinate(outer, inner);
         }
 
