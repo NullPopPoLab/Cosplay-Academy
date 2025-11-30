@@ -74,7 +74,7 @@ namespace CosplayParty
 
     public class CoordOverrider
     {
-        public static bool Compact = true;
+        public static bool Compact = false;
         public ChaDefault Target;
         public int Index;
 
@@ -223,10 +223,10 @@ namespace CosplayParty
                         break;
 
                     default:
-                        // 適用する
+                        // 空でなければ適用する
                         /*! @todo 下着付属アクセは除外
                         */
-                        use = true;
+                        use = !acce.IsEmpty;
                         break;
                 }
 
