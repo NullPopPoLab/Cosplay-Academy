@@ -224,8 +224,6 @@ namespace CosplayParty
 
     public class CoordInfo : IDisposable
     {
-        public const bool Dump = false;
-
         public List<ClothInfo> ClothList = new List<ClothInfo>();
         public List<AccessoryInfo> AcceList = new List<AccessoryInfo>();
 
@@ -297,7 +295,7 @@ namespace CosplayParty
             {
                 var cinfo = ClothList[i];
 
-                if (Dump) Settings.Logger.LogDebug($"Import: Cloth {i} id={cinfo.Parts.id} hid={cinfo.HiddenFlags:X}");
+                if (Settings.Dump_Coord) Settings.Logger.LogDebug($"Import: Cloth {i} id={cinfo.Parts.id} hid={cinfo.HiddenFlags:X}");
             }
 
             // 強制的に保持するか 
@@ -310,7 +308,7 @@ namespace CosplayParty
                 // アクセを残すか 
                 var keep = xkeep || ainfo.Type != AccessoryType.Standard;
 
-                if (Dump) Settings.Logger.LogDebug($"Import: Acc {i+1} keep={keep} type={ainfo.TypeName} id={ainfo.PartsID}");
+                if (Settings.Dump_Coord) Settings.Logger.LogDebug($"Import: Acc {i+1} keep={keep} type={ainfo.TypeName} id={ainfo.PartsID}");
 
                 //ExpandedOutfit.Logger.LogDebug($"ACC :{i}\tID: {data.nowAccessories[i].id}\tParent: {data.nowAccessories[i].parentKey}");
                 if (keep)

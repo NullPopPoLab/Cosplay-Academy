@@ -12,6 +12,11 @@ namespace CosplayParty
     [BepInProcess("Koikatsu Party VR")]
     public partial class Settings : BaseUnityPlugin
     {
+        public const bool Dump_Coord = false;
+        public const bool Dump_ME_Load = false;
+        public const bool Dump_ME_Save = false;
+        public const bool Dump_Merge = true;
+
         public static ConfigEntry<bool> TeacherDress { get; private set; }
 
 //        public static ConfigEntry<bool> GrabUniform { get; private set; }

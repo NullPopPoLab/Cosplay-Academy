@@ -67,15 +67,14 @@
     <Reference Include="ConfigurationManager">
       <HintPath>Game\BepInEx\plugins\ConfigurationManager\ConfigurationManager.dll</HintPath>
     </Reference>
-    <Reference Include="ExtensibleSaveFormat, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>Game\plugins\KK_BepisPlugins\ExtensibleSaveFormat.dll</HintPath>
-      <Private>False</Private>
+    <Reference Include="ExtensibleSaveFormat">
+      <HintPath>Game\BepInEx\plugins\KK_BepisPlugins\ExtensibleSaveFormat.dll</HintPath>
     </Reference>
     <Reference Include="KKAPI">
       <HintPath>Game\BepInEx\plugins\KKAPI.dll</HintPath>
     </Reference>
     <Reference Include="KK_MaterialEditor">
-      <HintPath>..\..\..\..\..\..\game\Koikatsu\BepInEx\plugins\KK_Plugins\KK_MaterialEditor.dll</HintPath>
+      <HintPath>Game\BepInEx\plugins\KK_Plugins\KK_MaterialEditor.dll</HintPath>
     </Reference>
     <Reference Include="MonoMod.RuntimeDetour">
       <HintPath>Game\BepInEx\core\MonoMod.RuntimeDetour.dll</HintPath>

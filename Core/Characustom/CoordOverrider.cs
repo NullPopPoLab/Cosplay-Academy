@@ -90,7 +90,7 @@ namespace CosplayParty
 
         public void Collaborate(CoordinateSuccession succession, CoordInfo outer, CoordInfo inner) {
 
-            if (CoordInfo.Dump) 
+            if (Settings.Dump_Coord) 
             {
                 var outername = (outer == null) ? "none" : outer.Coordinate.coordinateName;
                 var innername = (inner == null) ? "none" : inner.Coordinate.coordinateName;
@@ -145,7 +145,7 @@ namespace CosplayParty
                     }
 
                     var parts = inner.Coordinate.clothes.parts[i];
-                    if (CoordInfo.Dump) Settings.Logger.LogDebug($"Inner Cloth {i} overridden; id={parts.id}");
+                    if (Settings.Dump_Coord) Settings.Logger.LogDebug($"Inner Cloth {i} overridden; id={parts.id}");
 
                     var ci = new ModifiedCloth();
                     ci.Parts = parts;
@@ -232,13 +232,13 @@ namespace CosplayParty
 
                 if (use)
                 {
-                    if (CoordInfo.Dump) Settings.Logger.LogDebug($"Outer Accessory {i + 1} => {aidx + 1} (as {acce.TypeName}) allowed; {acce.PartsID}");
+                    if (Settings.Dump_Coord) Settings.Logger.LogDebug($"Outer Accessory {i + 1} => {aidx + 1} (as {acce.TypeName}) allowed; {acce.PartsID}");
 
                     modify.Parts = acce.Parts;
                 }
                 else
                 {
-                    if (CoordInfo.Dump) Settings.Logger.LogDebug($"Outer Accessory {i + 1} (as {acce.TypeName}) denied; {acce.PartsID}");
+                    if (Settings.Dump_Coord) Settings.Logger.LogDebug($"Outer Accessory {i + 1} (as {acce.TypeName}) denied; {acce.PartsID}");
                     if (Compact) continue;
 
                     // 空にする 
@@ -311,7 +311,7 @@ namespace CosplayParty
 
                 if (use)
                 {
-                    if (CoordInfo.Dump) Settings.Logger.LogDebug($"Kept Accessory {aidx + 1} (as {acce.TypeName}) allowed; {acce.PartsID}");
+                    if (Settings.Dump_Coord) Settings.Logger.LogDebug($"Kept Accessory {aidx + 1} (as {acce.TypeName}) allowed; {acce.PartsID}");
 
                     ProcInfo.ACCKeepReturn.Add(aidx);
 
@@ -322,14 +322,14 @@ namespace CosplayParty
                 }
                 else
                 {
-                    if (CoordInfo.Dump) Settings.Logger.LogDebug($"Kept Accessory {aidx + 1} (as {acce.TypeName}) denied; {acce.PartsID}");
+                    if (Settings.Dump_Coord) Settings.Logger.LogDebug($"Kept Accessory {aidx + 1} (as {acce.TypeName}) denied; {acce.PartsID}");
                 }
             }
 
             // 元アクセの残り部分を明示的に消しておく必要がある 
             for (; aidx < outer.AcceList.Count; ++aidx)
             {
-                if (CoordInfo.Dump) Settings.Logger.LogDebug($"Padding Accessory {aidx + 1} (as Empty)");
+                if (Settings.Dump_Coord) Settings.Logger.LogDebug($"Padding Accessory {aidx + 1} (as Empty)");
 
                 var acce = outer.AcceList[aidx];
                 acce.Parts.type = 120;

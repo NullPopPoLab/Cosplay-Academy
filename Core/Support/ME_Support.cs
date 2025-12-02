@@ -11,10 +11,6 @@ namespace CosplayParty.ME
 {
     public static class ME_Common
     {
-        public const bool Dump_Load = true;
-        public const bool Dump_Save = true;
-        public const bool Dump_Merge = true;
-
 #if KK
         public const string ControllerName = "KK_Plugins.MaterialEditor.MaterialEditorCharaController, KK_MaterialEditor";
 #elif KKS
@@ -26,7 +22,7 @@ namespace CosplayParty.ME
         {
             if (pluginData == null)
             {
-                if (Dump_Load) Settings.Logger.LogDebug($"has no Material props");
+                if (Settings.Dump_ME_Load) Settings.Logger.LogDebug($"has no Material props");
                 return;
             }
             if (pluginData.version != 0)
@@ -42,7 +38,7 @@ namespace CosplayParty.ME
                     var tid = t.Key;
                     var pid = loader.Target.RegisterTexture(t.Value);
                     loader.TIDConv[tid] = pid;
-                    if (Dump_Load) Settings.Logger.LogDebug($"TexImage: tid={tid}=>{pid}");
+                    if (Settings.Dump_ME_Load) Settings.Logger.LogDebug($"TexImage: tid={tid}=>{pid}");
                 }
             }
 
@@ -56,7 +52,7 @@ namespace CosplayParty.ME
                     int? pid = null;
                     if (tid != null && loader.TIDConv.ContainsKey(tid.Value)) pid = loader.TIDConv[tid.Value];
 
-                    if (Dump_Load) Settings.Logger.LogDebug($"Texture: type={t.ObjectType} coord={t.CoordinateIndex} slot={t.Slot} tex={tid}=>{pid} mat={t.MaterialName} prop={t.Property}");
+                    if (Settings.Dump_ME_Load) Settings.Logger.LogDebug($"Texture: type={t.ObjectType} coord={t.CoordinateIndex} slot={t.Slot} tex={tid}=>{pid} mat={t.MaterialName} prop={t.Property}");
                     var u = new MaterialTextureProperty(t.ObjectType, t.CoordinateIndex, t.Slot, t.MaterialName, t.Property, pid, t.Offset, t.OffsetOriginal, t.Scale, t.ScaleOriginal);
                     loader.Target.AddTextureProp(u);
                 }
@@ -66,7 +62,7 @@ namespace CosplayParty.ME
             {
                 foreach (var t in MessagePackSerializer.Deserialize<List<MaterialShader>>((byte[])shaderProperties))
                 {
-                    if (Dump_Load) Settings.Logger.LogDebug($"Shader: type={t.ObjectType} coord={t.CoordinateIndex} slot={t.Slot} mat={t.MaterialName} shad={t.ShaderName}");
+                    if (Settings.Dump_ME_Load) Settings.Logger.LogDebug($"Shader: type={t.ObjectType} coord={t.CoordinateIndex} slot={t.Slot} mat={t.MaterialName} shad={t.ShaderName}");
                     loader.Target.AddShaderProp(t);
                 }
             }
@@ -75,7 +71,7 @@ namespace CosplayParty.ME
             {
                 foreach (var t in MessagePackSerializer.Deserialize<List<RendererProperty>>((byte[])rendererProperties))
                 {
-                    if (Dump_Load) Settings.Logger.LogDebug($"Renderer: type={t.ObjectType} coord={t.CoordinateIndex} slot={t.Slot} name={t.RendererName} val={t.Value}");
+                    if (Settings.Dump_ME_Load) Settings.Logger.LogDebug($"Renderer: type={t.ObjectType} coord={t.CoordinateIndex} slot={t.Slot} name={t.RendererName} val={t.Value}");
                     loader.Target.AddRendererProp(t);
                 }
             }
@@ -84,7 +80,7 @@ namespace CosplayParty.ME
             {
                 foreach (var t in MessagePackSerializer.Deserialize<List<MaterialColorProperty>>((byte[])materialColorProperties))
                 {
-                    if (Dump_Load) Settings.Logger.LogDebug($"Color: type={t.ObjectType} coord={t.CoordinateIndex} slot={t.Slot} mat={t.MaterialName} {t.Property}={t.Value}");
+                    if (Settings.Dump_ME_Load) Settings.Logger.LogDebug($"Color: type={t.ObjectType} coord={t.CoordinateIndex} slot={t.Slot} mat={t.MaterialName} {t.Property}={t.Value}");
                     loader.Target.AddColorProp(t);
                 }
             }
@@ -93,7 +89,7 @@ namespace CosplayParty.ME
             {
                 foreach (var t in MessagePackSerializer.Deserialize<List<MaterialFloatProperty>>((byte[])materialFloatProperties))
                 {
-                    if (Dump_Load) Settings.Logger.LogDebug($"Float: type={t.ObjectType} coord={t.CoordinateIndex} slot={t.Slot} mat={t.MaterialName} {t.Property}={t.Value}");
+                    if (Settings.Dump_ME_Load) Settings.Logger.LogDebug($"Float: type={t.ObjectType} coord={t.CoordinateIndex} slot={t.Slot} mat={t.MaterialName} {t.Property}={t.Value}");
                     loader.Target.AddFloatProp(t);
                 }
             }
@@ -158,7 +154,7 @@ namespace CosplayParty.ME
 
             if (Images.Count > 0)
             {
-                if (ME_Common.Dump_Load) Settings.Logger.LogDebug($"Pack: {Caption} has {Images.Count} Images");
+                if (Settings.Dump_ME_Load) Settings.Logger.LogDebug($"Pack: {Caption} has {Images.Count} Images");
                 pack.data.Add("TextureDictionary", MessagePackSerializer.Serialize(Images));
             }
             else
@@ -166,7 +162,7 @@ namespace CosplayParty.ME
 
             if (Texture.Count > 0)
             {
-                if (ME_Common.Dump_Load) Settings.Logger.LogDebug($"Pack: {Caption} has {Texture.Count} Textures");
+                if (Settings.Dump_ME_Load) Settings.Logger.LogDebug($"Pack: {Caption} has {Texture.Count} Textures");
                 pack.data.Add("MaterialTexturePropertyList", MessagePackSerializer.Serialize(Texture));
             }
             else
@@ -174,7 +170,7 @@ namespace CosplayParty.ME
 
             if (Shader.Count > 0)
             {
-                if (ME_Common.Dump_Load) Settings.Logger.LogDebug($"Pack: {Caption} has {Shader.Count} Shaders");
+                if (Settings.Dump_ME_Load) Settings.Logger.LogDebug($"Pack: {Caption} has {Shader.Count} Shaders");
                 pack.data.Add("MaterialShaderList", MessagePackSerializer.Serialize(Shader));
             }
             else
@@ -182,7 +178,7 @@ namespace CosplayParty.ME
 
             if (Renderer.Count > 0)
             {
-                if (ME_Common.Dump_Load) Settings.Logger.LogDebug($"Pack: {Caption} has {Renderer.Count} Renderers");
+                if (Settings.Dump_ME_Load) Settings.Logger.LogDebug($"Pack: {Caption} has {Renderer.Count} Renderers");
                 pack.data.Add("RendererPropertyList", MessagePackSerializer.Serialize(Renderer));
             }
             else
@@ -190,7 +186,7 @@ namespace CosplayParty.ME
 
             if (Color.Count > 0)
             {
-                if (ME_Common.Dump_Load) Settings.Logger.LogDebug($"Pack: {Caption} has {Color.Count} Colors");
+                if (Settings.Dump_ME_Load) Settings.Logger.LogDebug($"Pack: {Caption} has {Color.Count} Colors");
                 pack.data.Add("MaterialColorPropertyList", MessagePackSerializer.Serialize(Color));
             }
             else
@@ -198,7 +194,7 @@ namespace CosplayParty.ME
 
             if (Float.Count > 0)
             {
-                if (ME_Common.Dump_Load) Settings.Logger.LogDebug($"Pack: {Caption} has {Float.Count} Floats");
+                if (Settings.Dump_ME_Load) Settings.Logger.LogDebug($"Pack: {Caption} has {Float.Count} Floats");
                 pack.data.Add("MaterialFloatPropertyList", MessagePackSerializer.Serialize(Float));
             }
             else
@@ -286,7 +282,7 @@ namespace CosplayParty.ME
             {
                 var img = Get(i, !cleanup);
                 if (img == null) continue;
-                if(ME_Common.Dump_Save) Settings.Logger.LogDebug($"Save Image {i} for {saver.Caption}");
+                if(Settings.Dump_ME_Save) Settings.Logger.LogDebug($"Save Image {i} for {saver.Caption}");
                 saver.Images[i] = img;
             }
         }
@@ -320,7 +316,7 @@ namespace CosplayParty.ME
             if (prop.TexID != null)
             {
                 _pool.IncRef(prop.TexID.Value);
-                if(ME_Common.Dump_Load)Settings.Logger.LogDebug($"{Caption} IncRef: type={prop.ObjectType} coord={prop.CoordinateIndex} slot={prop.Slot} tex={prop.TexID} {_pool.CountRef(prop.TexID.Value)-1}=>{_pool.CountRef(prop.TexID.Value)}");
+                if(Settings.Dump_ME_Load) Settings.Logger.LogDebug($"{Caption} IncRef: type={prop.ObjectType} coord={prop.CoordinateIndex} slot={prop.Slot} tex={prop.TexID} {_pool.CountRef(prop.TexID.Value)-1}=>{_pool.CountRef(prop.TexID.Value)}");
             }
             Texture.Add(prop);
         }
@@ -333,7 +329,7 @@ namespace CosplayParty.ME
                 var src = Texture[i];
                 if (src.TexID == null) continue;
 
-                if (ME_Common.Dump_Load) Settings.Logger.LogDebug($"{Caption} DecRef: type={src.ObjectType} coord={src.CoordinateIndex} slot={src.Slot} tex={src.TexID} {_pool.CountRef(src.TexID.Value)}=>{_pool.CountRef(src.TexID.Value)-1}");
+                if (Settings.Dump_ME_Load) Settings.Logger.LogDebug($"{Caption} DecRef: type={src.ObjectType} coord={src.CoordinateIndex} slot={src.Slot} tex={src.TexID} {_pool.CountRef(src.TexID.Value)}=>{_pool.CountRef(src.TexID.Value)-1}");
                 _pool.DecRef(src.TexID.Value);
             }
         }
@@ -354,14 +350,14 @@ namespace CosplayParty.ME
                     else
                     {
                         tid2pid[tid.Value] = pid = _pool.Register(src._pool.Get(tid.Value, true));
-                        if (ME_Common.Dump_Merge) Settings.Logger.LogDebug($"{Caption} +TexImage: tid={tid}=>{pid}");
+                        if (Settings.Dump_Merge) Settings.Logger.LogDebug($"{Caption} +TexImage: tid={tid}=>{pid}");
                     }
                 }
                 var u = new MaterialTextureProperty(t.ObjectType, 
                     (coord != null) ? coord.Value : t.CoordinateIndex, 
                     (slot != null) ? slot.Value : t.Slot, 
                     t.MaterialName, t.Property, pid, t.Offset, t.OffsetOriginal, t.Scale, t.ScaleOriginal);
-                if (ME_Common.Dump_Merge) Settings.Logger.LogDebug($"{Caption} +Texture: type={t.ObjectType} coord={t.CoordinateIndex}=>{u.CoordinateIndex} slot={t.Slot}=>{u.Slot} tex={t.TexID}=>{u.TexID} mat={t.MaterialName} prop={t.Property}");
+                if (Settings.Dump_Merge) Settings.Logger.LogDebug($"{Caption} +Texture: type={t.ObjectType} coord={t.CoordinateIndex}=>{u.CoordinateIndex} slot={t.Slot}=>{u.Slot} tex={t.TexID}=>{u.TexID} mat={t.MaterialName} prop={t.Property}");
                 AttachTexture(u);
             }
 
@@ -372,7 +368,7 @@ namespace CosplayParty.ME
                     (coord != null) ? coord.Value : t.CoordinateIndex,
                     (slot != null) ? slot.Value : t.Slot,
                     t.MaterialName, t.ShaderName, t.ShaderNameOriginal, t.RenderQueue, t.RenderQueueOriginal);
-                if (ME_Common.Dump_Merge) Settings.Logger.LogDebug($"{Caption} +Shader: type={t.ObjectType} coord={t.CoordinateIndex}=>{u.CoordinateIndex} slot={t.Slot}=>{u.Slot} mat={t.MaterialName} shad={t.ShaderName}");
+                if (Settings.Dump_Merge) Settings.Logger.LogDebug($"{Caption} +Shader: type={t.ObjectType} coord={t.CoordinateIndex}=>{u.CoordinateIndex} slot={t.Slot}=>{u.Slot} mat={t.MaterialName} shad={t.ShaderName}");
                 Shader.Add(u);
             }
 
@@ -383,7 +379,7 @@ namespace CosplayParty.ME
                     (coord != null) ? coord.Value : t.CoordinateIndex,
                     (slot != null) ? slot.Value : t.Slot,
                     t.RendererName, t.Property, t.Value, t.ValueOriginal);
-                if (ME_Common.Dump_Merge) Settings.Logger.LogDebug($"{Caption} +Renderer: type={t.ObjectType} coord={t.CoordinateIndex}=>{u.CoordinateIndex} slot={t.Slot}=>{u.Slot} name={t.RendererName} val={t.Value}");
+                if (Settings.Dump_Merge) Settings.Logger.LogDebug($"{Caption} +Renderer: type={t.ObjectType} coord={t.CoordinateIndex}=>{u.CoordinateIndex} slot={t.Slot}=>{u.Slot} name={t.RendererName} val={t.Value}");
                 Renderer.Add(u);
             }
 
@@ -394,7 +390,7 @@ namespace CosplayParty.ME
                     (coord != null) ? coord.Value : t.CoordinateIndex,
                     (slot != null) ? slot.Value : t.Slot,
                     t.MaterialName, t.Property, t.Value, t.ValueOriginal);
-                if (ME_Common.Dump_Merge) Settings.Logger.LogDebug($"{Caption} +Color: type={t.ObjectType} coord={t.CoordinateIndex}=>{u.CoordinateIndex} slot={t.Slot}=>{u.Slot} mat={t.MaterialName} {t.Property}={t.Value}");
+                if (Settings.Dump_Merge) Settings.Logger.LogDebug($"{Caption} +Color: type={t.ObjectType} coord={t.CoordinateIndex}=>{u.CoordinateIndex} slot={t.Slot}=>{u.Slot} mat={t.MaterialName} {t.Property}={t.Value}");
                 Color.Add(u);
             }
 
@@ -405,7 +401,7 @@ namespace CosplayParty.ME
                     (coord != null) ? coord.Value : t.CoordinateIndex,
                     (slot != null) ? slot.Value : t.Slot,
                     t.MaterialName, t.Property, t.Value, t.ValueOriginal);
-                if (ME_Common.Dump_Merge) Settings.Logger.LogDebug($"{Caption} +Float: type={t.ObjectType} coord={t.CoordinateIndex}=>{u.CoordinateIndex} slot={t.Slot}=>{u.Slot} mat={t.MaterialName} {t.Property}={t.Value}");
+                if (Settings.Dump_Merge) Settings.Logger.LogDebug($"{Caption} +Float: type={t.ObjectType} coord={t.CoordinateIndex}=>{u.CoordinateIndex} slot={t.Slot}=>{u.Slot} mat={t.MaterialName} {t.Property}={t.Value}");
                 Float.Add(u);
             }
         }
@@ -424,7 +420,7 @@ namespace CosplayParty.ME
                     (slot != null) ? slot.Value : src.Slot,
                     src.MaterialName, src.Property,
                     src.TexID, src.Offset, src.OffsetOriginal, src.Scale, src.ScaleOriginal);
-                if (ME_Common.Dump_Save) Settings.Logger.LogDebug($"Save Texture[{i}]({dst.CoordinateIndex}-{dst.Slot}) for {saver.Caption}");
+                if (Settings.Dump_ME_Save) Settings.Logger.LogDebug($"Save Texture[{i}]({dst.CoordinateIndex}-{dst.Slot}) for {saver.Caption}");
                 saver.Texture.Add(dst);
             }
 
@@ -435,7 +431,7 @@ namespace CosplayParty.ME
                     (coord != null) ? coord.Value : src.CoordinateIndex,
                     (slot != null) ? slot.Value : src.Slot, 
                     src.MaterialName, src.ShaderName, src.ShaderNameOriginal, src.RenderQueue, src.RenderQueueOriginal);
-                if (ME_Common.Dump_Save) Settings.Logger.LogDebug($"Save Shader[{i}]({dst.CoordinateIndex}-{dst.Slot}) for {saver.Caption}");
+                if (Settings.Dump_ME_Save) Settings.Logger.LogDebug($"Save Shader[{i}]({dst.CoordinateIndex}-{dst.Slot}) for {saver.Caption}");
                 saver.Shader.Add(dst);
             }
 
@@ -446,7 +442,7 @@ namespace CosplayParty.ME
                     (coord != null) ? coord.Value : src.CoordinateIndex,
                     (slot != null) ? slot.Value : src.Slot,
                     src.RendererName, src.Property, src.Value, src.ValueOriginal);
-                if (ME_Common.Dump_Save) Settings.Logger.LogDebug($"Save Renderer[{i}]({dst.CoordinateIndex}-{dst.Slot}) for {saver.Caption}");
+                if (Settings.Dump_ME_Save) Settings.Logger.LogDebug($"Save Renderer[{i}]({dst.CoordinateIndex}-{dst.Slot}) for {saver.Caption}");
                 saver.Renderer.Add(dst);
             }
 
@@ -457,7 +453,7 @@ namespace CosplayParty.ME
                     (coord != null) ? coord.Value : src.CoordinateIndex,
                     (slot != null) ? slot.Value : src.Slot, 
                     src.MaterialName, src.Property, src.Value, src.ValueOriginal);
-                if (ME_Common.Dump_Save) Settings.Logger.LogDebug($"Save Color[{i}]({dst.CoordinateIndex}-{dst.Slot}) for {saver.Caption}");
+                if (Settings.Dump_ME_Save) Settings.Logger.LogDebug($"Save Color[{i}]({dst.CoordinateIndex}-{dst.Slot}) for {saver.Caption}");
                 saver.Color.Add(dst);
             }
 
@@ -468,7 +464,7 @@ namespace CosplayParty.ME
                     (coord != null) ? coord.Value : src.CoordinateIndex,
                     (slot != null) ? slot.Value : src.Slot, 
                     src.MaterialName, src.Property, src.Value, src.ValueOriginal);
-                if (ME_Common.Dump_Save) Settings.Logger.LogDebug($"Save Float[{i}]({dst.CoordinateIndex}-{dst.Slot}) for {saver.Caption}");
+                if (Settings.Dump_ME_Save) Settings.Logger.LogDebug($"Save Float[{i}]({dst.CoordinateIndex}-{dst.Slot}) for {saver.Caption}");
                 saver.Float.Add(dst);
             }
         }
@@ -617,7 +613,7 @@ namespace CosplayParty.ME
         {
             var prop = GetClothProps(idx, false);
             if (prop == null) return;
-            if(ME_Common.Dump_Merge) Settings.Logger.LogDebug($"RemoveClothProps({idx})");
+            if(Settings.Dump_Merge) Settings.Logger.LogDebug($"RemoveClothProps({idx})");
             prop.DetachTextures();
             Cloth.Remove(idx);
         }
@@ -627,7 +623,7 @@ namespace CosplayParty.ME
         {
             var prop = GetAccessoryProps(idx, false);
             if (prop == null) return;
-            if (ME_Common.Dump_Merge) Settings.Logger.LogDebug($"RemoveAccessoryProps({idx})");
+            if (Settings.Dump_Merge) Settings.Logger.LogDebug($"RemoveAccessoryProps({idx})");
             prop.DetachTextures();
             Accessory.Remove(idx);
         }
@@ -638,7 +634,7 @@ namespace CosplayParty.ME
             RemoveClothProps(idx);
 
             if (src == null) return;
-            if (ME_Common.Dump_Merge) Settings.Logger.LogDebug($"SetClothProps({coord},{idx})");
+            if (Settings.Dump_Merge) Settings.Logger.LogDebug($"SetClothProps({coord},{idx})");
             var prop = GetClothProps(idx, true);
             prop.Merge(src, coord, idx);
         }
@@ -649,7 +645,7 @@ namespace CosplayParty.ME
             RemoveAccessoryProps(idx);
 
             if (src == null) return;
-            if (ME_Common.Dump_Merge) Settings.Logger.LogDebug($"SetAccessoryProps({coord},{idx})");
+            if (Settings.Dump_Merge) Settings.Logger.LogDebug($"SetAccessoryProps({coord},{idx})");
             var prop = GetAccessoryProps(idx, true);
             prop.Merge(src, coord, idx);
         }

@@ -118,7 +118,7 @@ namespace CosplayParty
             {
                 var outfit = Outfits[outfitnum];
 
-                if (CoordInfo.Dump) Settings.Logger.LogDebug($"Import Outfit {outfitnum}; " + src.Original_Coordinates[outfitnum].coordinateName);
+                if (Settings.Dump_Coord) Settings.Logger.LogDebug($"Import Outfit {outfitnum}; " + src.Original_Coordinates[outfitnum].coordinateName);
                 outfit.Import(src);
             }
         }
