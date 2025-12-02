@@ -20,6 +20,7 @@ namespace CosplayParty
         private readonly ChaDefault ThisOutfitData;
         private ChaControl ChaControl;
         private ChaFile ChaFile;
+
 #if false // 再検討; 下着可換 
         private static readonly int underwearindex = Constants.InputStrings.ToList().IndexOf($"{sep}Underwear");
 #endif
@@ -116,7 +117,7 @@ namespace CosplayParty
                     }
 
                     // 寧ろ壊れる 
-                    //ThisOutfitData.ClothingLoader.ControllerCoordReload_Loop("ME_Common.ControllerName", ChaControl, outfit.Current.Coordinate);
+                    //ThisOutfitData.ClothingLoader.ControllerCoordReload_Loop("Common.ControllerName", ChaControl, outfit.Current.Coordinate);
                 }
                 else
                 {
@@ -162,7 +163,7 @@ namespace CosplayParty
                 coord.LoadBytes(src.SaveBytes(), src.loadVersion);
 
                 // PluginData はコピーされないので別途対応 
-                ExtendedSave.SetExtendedDataById(coord, ME_Common.ExtendedDataName, outfit.Current.Material.Export(true));
+                ExtendedSave.SetExtendedDataById(coord, ME.Common.ExtendedDataName, ThisOutfitData.Info.Coord[outfitnum].Material.Export(true));
             }
 
             var outer = new CoordInfo(coord, outcapt);

@@ -8,9 +8,13 @@ namespace CosplayParty
     public partial class Settings : BaseUnityPlugin
     {
         public const bool Dump_Coord = false;
+
         public const bool Dump_ME_Load = false;
         public const bool Dump_ME_Save = false;
-        public const bool Dump_Merge = true;
+        public const bool Dump_ME_Merge = true;
+
+        public const bool Dump_Hair_Load = true;
+        public const bool Dump_Hair_Save = true;
 
         public static ConfigEntry<bool> RandomDresscode { get; private set; }
 

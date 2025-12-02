@@ -97,7 +97,7 @@ namespace CosplayParty
     public class ClothInfo
     {
         public ChaFileClothes.PartsInfo Parts;
-        public ME_ClothProps Material;
+        public ClothProps Material;
 
         public uint HiddenFlags {
             get
@@ -112,13 +112,13 @@ namespace CosplayParty
             }
         }
 
-        public ClothInfo(ChaFileClothes.PartsInfo val, ME_ClothProps mat)
+        public ClothInfo(ChaFileClothes.PartsInfo val, ClothProps mat)
         {
             Parts = val;
             Material = mat;
         }
 
-        public static List<ClothInfo> Build(ChaFileCoordinate coordinate, ME_CoordProps mat)
+        public static List<ClothInfo> Build(ChaFileCoordinate coordinate, ME.CoordProps mat)
         {
             var dst = new List<ClothInfo>();
             var src = coordinate.clothes.parts;
@@ -136,22 +136,22 @@ namespace CosplayParty
     {
         public ChaFileAccessory.PartsInfo Parts;
         public AccessoryType Type;
-        public ME_AccessoryProps Material;
-        public HairSupport.HairAccessoryInfo Hair;
+        public ME.AccessoryProps Material;
+        public Hair.AccessoryProps Hair;
 
         public bool IsEmpty { get { return Parts.type < 121; } }
         public string TypeName { get { return IsEmpty ? "Empty" : Type.ToString(); } }
         public string PartsID { get { return Parts.type + "-" + Parts.id; } }
         public bool IsHair { get { return Hair!= null; } }
 
-        public AccessoryInfo(ChaFileAccessory.PartsInfo val, ME_AccessoryProps mat, HairSupport.HairAccessoryInfo hair)
+        public AccessoryInfo(ChaFileAccessory.PartsInfo val, ME.AccessoryProps mat, Hair.AccessoryProps hair)
         {
             Parts = val;
             Material = mat;
             Hair = hair;
         }
 
-        public static List<AccessoryInfo> Build(ChaFileCoordinate coordinate, Dictionary<int, HairSupport.HairAccessoryInfo> hair, ME_CoordProps mat)
+        public static List<AccessoryInfo> Build(ChaFileCoordinate coordinate, Hair.CoordProps hair, ME.CoordProps mat)
         {
             var dst = new List<AccessoryInfo>();
             if (coordinate == null) return dst;
@@ -160,7 +160,7 @@ namespace CosplayParty
             var src = coordinate.accessory.parts;
             for (var i = 0; i < src.Length; ++i)
             {
-                hair.TryGetValue(i, out var h);
+                hair.Accessory.TryGetValue(i, out var h);
                 var ainfo = new AccessoryInfo(src[i], mat.GetAccessoryProps(i,true), h);
 
 #if false
@@ -224,30 +224,52 @@ namespace CosplayParty
 
     public class CoordInfo : IDisposable
     {
+        public CharaInfo Owner;
         public List<ClothInfo> ClothList = new List<ClothInfo>();
         public List<AccessoryInfo> AcceList = new List<AccessoryInfo>();
 
         public readonly CoordinateSuccession Succession = new CoordinateSuccession();
 
-        public ChaFileCoordinate Coordinate;
-        public Dictionary<int, HairSupport.HairAccessoryInfo> Hair;
-        public ME_CoordProps Material;
+        public ChaFileCoordinate Source;
+//        public Dictionary<int, HairSupport.HairAccessoryInfo> Hair;
+        public ME.CoordProps Material;
+        public Hair.CoordProps Hair2;
 
-        public PluginData Plugin_Material;
-        public PluginData Plugin_Hair;
+        //public PluginData Plugin_Material;
+        //public PluginData Plugin_Hair;
 
         /*! @note シリアライズ向けにアクセ情報がまとめて保持される。
         */
         public Dictionary<int, HairSupport.HairAccessoryInfo> HairAccessories = new Dictionary<int, HairSupport.HairAccessoryInfo>();
 
-        public CoordInfo() { }
-        public CoordInfo(ChaFileCoordinate coordinate,string caption="") {
+#if false
+        public CoordInfo() {
+            Settings.Logger.LogDebug($"CoordInfo(empty)");
+        }
+#endif
+        public CoordInfo(ChaFileCoordinate src,string caption="") {
 
-            Import(coordinate, new ME_CoordProps(coordinate,caption));
+            Settings.Logger.LogDebug($"CoordInfo({caption})");
+
+            Material = new ME.CoordProps(src, caption);
+            Hair2 = new Hair.CoordProps(src, caption);
+            Import(src);
+        }
+        public CoordInfo(CharaInfo owner, int idx)
+        {
+            Settings.Logger.LogDebug($"CoordInfo({owner.Source.parameter.fullname},{idx})");
+
+            Owner = owner;
+            var coord = owner.Source.coordinate[idx];
+            var caption = owner.Source.parameter.fullname + "-" + idx;
+            Material = owner.Material.Coord[idx]?? new ME.CoordProps(coord, caption);
+            Hair2 = owner.Hair.Coord[idx] ?? new Hair.CoordProps(coord, caption);
+            Import(coord);
         }
 
         public void Dispose()
         {
+            Owner = null;
             Succession.Dispose();
         }
 
@@ -259,7 +281,7 @@ namespace CosplayParty
             AcceList.Clear();
         }
 
-        public void Import(ChaFileCoordinate coordinate, /*Dictionary<int, HairSupport.HairAccessoryInfo> hair,*/ ME_CoordProps mat)
+        public void Import(ChaFileCoordinate coordinate)
         {
 #if false // Additional_Card_Info 廃止予定 
                     var HairKeep = new List<int>();
@@ -271,25 +293,25 @@ namespace CosplayParty
                     }
 #endif
 
-            Coordinate = coordinate;
+            Source = coordinate;
             //Hair = hair;
-            Material = mat;
 
             if (coordinate == null)
             {
                 return;
             }
 
-            Plugin_Material = ExtendedSave.GetExtendedDataById(coordinate, ME_Common.ExtendedDataName);
-
-            Plugin_Hair = ExtendedSave.GetExtendedDataById(coordinate, "com.deathweasel.bepinex.hairaccessorycustomizer");
+#if false
+            Plugin_Material = ExtendedSave.GetExtendedDataById(coordinate, ME.Common.ExtendedDataName);
+            Plugin_Hair = ExtendedSave.GetExtendedDataById(coordinate, CosplayParty.Hair.Common.ExtendedDataName);
             if (Plugin_Hair != null)
                 if (Plugin_Hair.data.TryGetValue("CoordinateHairAccessories", out var loadedHairAccessories) && loadedHairAccessories != null)
                     Hair = MessagePackSerializer.Deserialize<Dictionary<int, HairSupport.HairAccessoryInfo>>((byte[])loadedHairAccessories);
             if (Hair == null) Hair = new Dictionary<int, HairSupport.HairAccessoryInfo>();
+#endif
 
-            ClothList = ClothInfo.Build(coordinate,mat);
-            AcceList = AccessoryInfo.Build(coordinate, Hair, mat);
+            ClothList = ClothInfo.Build(coordinate, Material);
+            AcceList = AccessoryInfo.Build(coordinate, Hair2, Material);
 
             for (var i = 0; i < ClothList.Count; ++i)
             {

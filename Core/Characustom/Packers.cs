@@ -246,7 +246,7 @@ namespace CosplayParty
             if (InsideMaker && Constants.PluginResults["Accessory_Parents"])
                 ControllerReload_Loop("Accessory_Parents.CharaEvent, Accessory_Parents", ChaControl);
 
-            ControllerReload_Loop(ME.ME_Common.ControllerName, ChaControl);
+            ControllerReload_Loop(ME.Common.ControllerName, ChaControl);
 
             ControllerReload_Loop("KK_Plugins.ClothingUnlockerController, KK_ClothingUnlocker", ChaControl);
 
@@ -270,39 +270,12 @@ namespace CosplayParty
 
         private void HairACC_Repack(ChaControl ChaControl)
         {
-            var ChafileData = ExtendedSave.GetExtendedDataById(ThisOutfitData.ChaFile, "com.deathweasel.bepinex.hairaccessorycustomizer");
-            if (ChafileData != null)
-            {
-                if (ChafileData.version == 0)
-                {
-                    if (ChafileData.data.TryGetValue("HairAccessories", out var ByteData) && ByteData != null)
-                    {
-                        var original = MessagePackSerializer.Deserialize<Dictionary<int, Dictionary<int, Hair.HairSupport.HairAccessoryInfo>>>((byte[])ByteData);
-                        for (var i = 0; i < ThisOutfitData.Outfit_Size; i++)
-                        {
-                            var outfit = ThisOutfitData.Outfits[i];
-                            if (!outfit.Outer.IsReady || !original.ContainsKey(i))
-                            {
-                                continue;
-                            }
-                            outfit.Current.HairAccessories = original[i];
-                        }
-                    }
-                }
-                else
-                {
-                    OutdatedMessage("hairaccessorycustomizer", true);
-                }
-            }
-            var HairPlugin = new PluginData();
-
-            HairPlugin.data.Add("HairAccessories", MessagePackSerializer.Serialize(ThisOutfitData.HairAccessoriesPack));
-            SetExtendedData("com.deathweasel.bepinex.hairaccessorycustomizer", HairPlugin, ChaControl);
+            ThisOutfitData.Info.Hair.Save();
         }
 
         private void ME_RePack(ChaControl ChaControl)
         {
-            ThisOutfitData.ME.Save(true);
+            ThisOutfitData.Info.Material.Save(true);
         }
 
         private void KCOX_RePack(ChaControl ChaControl)
@@ -350,7 +323,7 @@ namespace CosplayParty
             {
                 var outfit = ThisOutfitData.Outfits[outfitnum];
 
-                var underwearproccessed = outfit.ProcInfo.UnderwearProcessed;
+//                var underwearproccessed = outfit.ProcInfo.UnderwearProcessed;
                 if (!Clothdict.ContainsKey((CoordinateType)outfitnum))
                 {
                     Clothdict[(CoordinateType)outfitnum] = new Dictionary<string, ClothesTexData>();
@@ -500,7 +473,7 @@ namespace CosplayParty
             var originalbra = Bra.ToNewDictionary();
             var originaltop = Top.ToNewDictionary();
 
-            Pushup.ClothData UnderBra = null;
+//            Pushup.ClothData UnderBra = null;
 #if false // 再検討; 下着可換 
             Extended = ExtendedSave.GetExtendedDataById(Underwear, "com.deathweasel.bepinex.pushup");
             if (Extended != null)
@@ -521,8 +494,8 @@ namespace CosplayParty
                 {
                     continue;
                 }
-                var UnderwearProcessed = outfit.ProcInfo.UnderwearProcessed;
-                var UnderClothingKeep = outfit.ProcInfo.UnderClothingKeep;
+//                var UnderwearProcessed = outfit.ProcInfo.UnderwearProcessed;
+//                var UnderClothingKeep = outfit.ProcInfo.UnderClothingKeep;
                 Bra.Remove(outfitnum);
                 Top.Remove(outfitnum);
 
@@ -546,6 +519,7 @@ namespace CosplayParty
                     }
                 }
 
+#if false
                 if (UnderClothingKeep[0])
                 {
                     Top[outfitnum] = originaltop[outfitnum];
@@ -560,6 +534,7 @@ namespace CosplayParty
                     Bra.Remove(outfitnum);
                     if (UnderBra != null) Bra[outfitnum] = UnderBra;
                 }
+#endif
             }
             var data = new PluginData();
             data.data.Add("Pushup_BraData", MessagePackSerializer.Serialize(Bra));

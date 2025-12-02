@@ -58,9 +58,9 @@ namespace CosplayParty
 
         internal ClothingLoader ClothingLoader;
 
+        public CharaInfo Info;
 
-        public ME_CharaProps ME;
-
+#if false
         //! シリアライズ用 HairAccessoryInfo 群 
         public Dictionary<int, Dictionary<int, Hair.HairSupport.HairAccessoryInfo>> HairAccessoriesPack
         {
@@ -71,6 +71,7 @@ namespace CosplayParty
                 return t;
             }
         }
+#endif
 
         public ChaDefault(ChaControl chaControl,ChaFileControl chaFile, SaveData.Heroine heroine)
         {
@@ -81,7 +82,7 @@ namespace CosplayParty
             Parameter = ChaControl.fileParam;
             Heroine = heroine;
 
-            ME = new ME_CharaProps(chaFile);
+            Info = new CharaInfo(chaFile,chaControl);
 
             ClothingLoader = new ClothingLoader(this);
 
@@ -107,18 +108,17 @@ namespace CosplayParty
             Settings.Logger.LogDebug($"ChaDefault.Reset({ChaFile?.parameter.fullname})");
 
             var src = new ChaOutfit.ImportSources();
-            src.Chafile = ChaFile;
-            src.HairExtendedData = ExtendedSave.GetExtendedDataById(ChaFile, "com.deathweasel.bepinex.hairaccessorycustomizer");
+            src.Info = Info;
+            src.HairExtendedData = ExtendedSave.GetExtendedDataById(ChaFile, CosplayParty.Hair.Common.ExtendedDataName);
             if (src.HairExtendedData != null && src.HairExtendedData.data.TryGetValue("HairAccessories", out var AllHairAccessories) && AllHairAccessories != null)
                 src.CharaHair = MessagePackSerializer.Deserialize<Dictionary<int, Dictionary<int, HairSupport.HairAccessoryInfo>>>((byte[])AllHairAccessories);
-            src.ME = ME;
-            src.Original_Coordinates = ChaFile.coordinate;
+            src.Info.Source.coordinate = ChaFile.coordinate;
 
             for (int outfitnum = 0, n = Outfit_Size; outfitnum < n; outfitnum++)
             {
                 var outfit = Outfits[outfitnum];
 
-                if (Settings.Dump_Coord) Settings.Logger.LogDebug($"Import Outfit {outfitnum}; " + src.Original_Coordinates[outfitnum].coordinateName);
+                if (Settings.Dump_Coord) Settings.Logger.LogDebug($"Import Outfit {outfitnum}; " + src.Info.Source.coordinate[outfitnum].coordinateName);
                 outfit.Import(src);
             }
         }

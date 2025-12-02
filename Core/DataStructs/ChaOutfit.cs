@@ -6,6 +6,7 @@ using System.Collections.Generic;
 
 namespace CosplayParty
 {
+#if false
     //! コーデ編集情報 
     /*! @note 編集前に Reset() を呼ぶ。
     */
@@ -32,33 +33,35 @@ namespace CosplayParty
             UnderClothingKeep = new bool[9];
         }
     }
+#endif
 
     public class ChaOutfit : IDisposable
     {
         public class ImportSources
         {
-            public ChaFile Chafile;
-            public ChaFileCoordinate[] Original_Coordinates;
+            public CharaInfo Info;
+
+            //public ChaFileCoordinate[] Original_Coordinates;
             public Dictionary<int, Dictionary<int, HairSupport.HairAccessoryInfo>> CharaHair;
             public PluginData HairExtendedData;
-
-            public ME_CharaProps ME;
         }
 
         private ChaDefault ThisOutfitData;
+        public CharaInfo Info;
         public int Index { get; private set; }
 
-        public readonly CoordInfo Current = new CoordInfo();
         public readonly CoordLoader Outer = new CoordLoader();
         public readonly CoordLoader Inner = new CoordLoader();
 
+        //        public readonly CoordInfo Current;
+
         // このあたりの構造、ロード前のコーデ適用なんかもあるのでロードと密連動させてはならない 
         // 用途に応じて適切なタイミングで扱う必要がある。 
-        public readonly CoordinateProcessInfo ProcInfo;
+        //        public readonly CoordinateProcessInfo ProcInfo;
 
         // FirstPass 処理で構築 
         // Clear() でも残す 
-        public ChaFileCoordinate Original_Coordinate;
+        //        public ChaFileCoordinate Original_Coordinate;
         //public Dictionary<int, HairSupport.HairAccessoryInfo> HairInfo;
 
         public bool MakeUpKeep = false;
@@ -68,26 +71,27 @@ namespace CosplayParty
             ThisOutfitData = tod;
             Index = idx;
 
-            ProcInfo = new CoordinateProcessInfo();
+//            ProcInfo = new CoordinateProcessInfo();
             //HairInfo = new Dictionary<int, HairSupport.HairAccessoryInfo>();
         }
 
         public void Dispose()
         {
             Reset();
-            Outer.Dispose();
-            Inner.Dispose();
-            Current.Dispose();
-            ProcInfo.Dispose();
+            //Current.Dispose();
+ //           ProcInfo.Dispose();
             ThisOutfitData = null;
             //HairInfo = null;
+
+            Outer.Dispose();
+            Inner.Dispose();
         }
 
         public void Reset()
         {
             // firstpass 時点で内容消去必要あるものを処理
-            Current.Reset();
-            ProcInfo.Reset();
+            //Current.Reset();
+//            ProcInfo.Reset();
         }
 
         private ChaFileCoordinate _cloneCoordinate(ChaFileCoordinate OriginalCoordinate)
@@ -102,7 +106,8 @@ namespace CosplayParty
 
         public void Import(ImportSources src)
         {
-            Original_Coordinate = _cloneCoordinate(src.Original_Coordinates[Index]);
+            Info = src.Info;
+//            Original_Coordinate = _cloneCoordinate(src.Info.Source.coordinate[Index]);
             //if (src.CharaHair == null)
             //{
             //    src.CharaHair = new Dictionary<int, Dictionary<int, HairSupport.HairAccessoryInfo>>();
@@ -111,21 +116,21 @@ namespace CosplayParty
             //{
             //    HairInfo = new Dictionary<int, HairSupport.HairAccessoryInfo>();
             //}
-            var mat = src.ME.Coord[Index];
-            Current.Import(src.Chafile.coordinate[Index], /*HairInfo,*/ mat);
+            //var mat = src.Info.Material.Coord[Index];
+            //Current.Import(src.Info.Source.coordinate[Index]);
         }
 
         public void Override4Coordinate(CoordInfo outer, CoordInfo inner)
         {
-            var co = new CoordOverrider(ThisOutfitData, Index);
-            co.Collaborate(Current.Succession, outer, inner);
+            var co = new CoordOverrider(ThisOutfitData.Info, Index);
+            co.Collaborate(Info.Coord[Index].Succession, outer, inner);
             co.Apply4Coordinate(outer);
         }
 
         public void Override4Generalize(CoordInfo outer, CoordInfo inner)
         {
-            var co = new CoordOverrider(ThisOutfitData, Index);
-            co.Collaborate(Current.Succession, outer, inner);
+            var co = new CoordOverrider(ThisOutfitData.Info, Index);
+            co.Collaborate(Info.Coord[Index].Succession, outer, inner);
             co.Apply4Generalize(outer);
         }
     }
