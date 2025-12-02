@@ -20,6 +20,7 @@ namespace CosplayParty
 
         public const bool Dump_Hair_Load = true;
         public const bool Dump_Hair_Save = true;
+        public const bool Dump_Hair_Merge = true;
 
         public static ConfigEntry<bool> TeacherDress { get; private set; }
 

@@ -30,6 +30,12 @@ namespace CosplayParty.Hair
     {
         public HairSupport.HairAccessoryInfo Source;
 
+        public AccessoryProps(string caption)
+            : base(caption)
+        {
+            Source = new HairSupport.HairAccessoryInfo();
+        }
+
         public AccessoryProps(HairSupport.HairAccessoryInfo src, string caption)
             : base(caption)
         {
@@ -66,6 +72,12 @@ namespace CosplayParty.Hair
                 if (Settings.Dump_Hair_Load) Settings.Logger.LogDebug($"has no HairAccessoryCustomizer props");
                 return;
             }
+            if (data.version != 0)
+            {
+                ClothingLoader.OutdatedMessage("HairAccessoryCustomizer PluginData", true);
+                return;
+            }
+
             if (!data.data.TryGetValue("CoordinateHairAccessories", out var img) || img == null)
             {
                 if (Settings.Dump_Hair_Load) Settings.Logger.LogDebug("invalid HairAccessoryCustomizer props");
@@ -83,6 +95,37 @@ namespace CosplayParty.Hair
             {
                 Accessory[t.Key] = new AccessoryProps(t.Value, Caption + "-" + t.Key);
             }
+        }
+
+        //! get by an accessory 
+        public AccessoryProps GetAccessoryProps(int idx, bool force)
+        {
+            Accessory.TryGetValue(idx, out var ret);
+            if (force && ret == null)
+            {
+                Accessory[idx] = ret = new AccessoryProps(Caption + "-" + idx);
+            }
+            return ret;
+        }
+
+        //! remove accessory properties 
+        public void RemoveAccessoryProps(int idx)
+        {
+            var prop = GetAccessoryProps(idx, false);
+            if (prop == null) return;
+            if (Settings.Dump_Hair_Merge) Settings.Logger.LogDebug($"RemoveAccessoryProps({idx})");
+            Accessory.Remove(idx);
+        }
+
+        //! replace accessory properties 
+        public void SetAccessoryProps(int? coord, int idx, AccessoryProps src)
+        {
+            RemoveAccessoryProps(idx);
+
+            if (src == null) return;
+            if (Settings.Dump_Hair_Merge) Settings.Logger.LogDebug($"SetAccessoryProps({coord},{idx})");
+            var prop = GetAccessoryProps(idx, true);
+            prop.Source = src.Source;
         }
 
         public Dictionary<int, HairSupport.HairAccessoryInfo> Pack()
@@ -129,6 +172,12 @@ namespace CosplayParty.Hair
                 if (Settings.Dump_Hair_Load) Settings.Logger.LogDebug("has no HairAccessoryCustomizer props");
                 return;
             }
+            if (data.version != 0)
+            {
+                ClothingLoader.OutdatedMessage("HairAccessoryCustomizer PluginData", true);
+                return;
+            }
+
             if (!data.data.TryGetValue("HairAccessories", out var img) || img == null)
             {
                 if (Settings.Dump_Hair_Load) Settings.Logger.LogDebug("invalid HairAccessoryCustomizer props");
@@ -165,33 +214,6 @@ namespace CosplayParty.Hair
             var img = Pack();
             if (img.Count < 1) img = null;
 
-#if false
-            var ChafileData = ExtendedSave.GetExtendedDataById(ThisOutfitData.ChaFile, CosplayParty.Hair.Common.ExtendedDataName);
-            if (ChafileData != null)
-            {
-                if (ChafileData.version == 0)
-                {
-                    if (ChafileData.data.TryGetValue("HairAccessories", out var ByteData) && ByteData != null)
-                    {
-                        var original = MessagePackSerializer.Deserialize<Dictionary<int, Dictionary<int, Hair.HairSupport.HairAccessoryInfo>>>((byte[])ByteData);
-                        for (var i = 0; i < ThisOutfitData.Outfit_Size; i++)
-                        {
-                            var outfit = ThisOutfitData.Outfits[i];
-                            if (!outfit.Outer.IsReady || !original.ContainsKey(i))
-                            {
-                                continue;
-                            }
-                            outfit.Current.HairAccessories = original[i];
-                        }
-                    }
-                }
-                else
-                {
-                    OutdatedMessage("hairaccessorycustomizer", true);
-                }
-            }
-            SetExtendedData(CosplayParty.Hair.Common.ExtendedDataName, HairPlugin, ChaControl);
-#endif
             var dst = new PluginData();
             dst.data.Add("HairAccessories", MessagePackSerializer.Serialize(img));
             ExtendedSave.SetExtendedDataById(Source, Common.ExtendedDataName, dst);

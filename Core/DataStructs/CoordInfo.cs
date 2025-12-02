@@ -156,7 +156,6 @@ namespace CosplayParty
             var dst = new List<AccessoryInfo>();
             if (coordinate == null) return dst;
 
-            //var src = new List<ChaFileAccessory.PartsInfo>();
             var src = coordinate.accessory.parts;
             for (var i = 0; i < src.Length; ++i)
             {
@@ -231,12 +230,8 @@ namespace CosplayParty
         public readonly CoordinateSuccession Succession = new CoordinateSuccession();
 
         public ChaFileCoordinate Source;
-//        public Dictionary<int, HairSupport.HairAccessoryInfo> Hair;
         public ME.CoordProps Material;
-        public Hair.CoordProps Hair2;
-
-        //public PluginData Plugin_Material;
-        //public PluginData Plugin_Hair;
+        public Hair.CoordProps Hair;
 
         /*! @note シリアライズ向けにアクセ情報がまとめて保持される。
         */
@@ -252,7 +247,7 @@ namespace CosplayParty
             Settings.Logger.LogDebug($"CoordInfo({caption})");
 
             Material = new ME.CoordProps(src, caption);
-            Hair2 = new Hair.CoordProps(src, caption);
+            Hair = new Hair.CoordProps(src, caption);
             Import(src);
         }
         public CoordInfo(CharaInfo owner, int idx)
@@ -263,7 +258,7 @@ namespace CosplayParty
             var coord = owner.Source.coordinate[idx];
             var caption = owner.Source.parameter.fullname + "-" + idx;
             Material = owner.Material.Coord[idx]?? new ME.CoordProps(coord, caption);
-            Hair2 = owner.Hair.Coord[idx] ?? new Hair.CoordProps(coord, caption);
+            Hair = owner.Hair.Coord[idx] ?? new Hair.CoordProps(coord, caption);
             Import(coord);
         }
 
@@ -301,17 +296,8 @@ namespace CosplayParty
                 return;
             }
 
-#if false
-            Plugin_Material = ExtendedSave.GetExtendedDataById(coordinate, ME.Common.ExtendedDataName);
-            Plugin_Hair = ExtendedSave.GetExtendedDataById(coordinate, CosplayParty.Hair.Common.ExtendedDataName);
-            if (Plugin_Hair != null)
-                if (Plugin_Hair.data.TryGetValue("CoordinateHairAccessories", out var loadedHairAccessories) && loadedHairAccessories != null)
-                    Hair = MessagePackSerializer.Deserialize<Dictionary<int, HairSupport.HairAccessoryInfo>>((byte[])loadedHairAccessories);
-            if (Hair == null) Hair = new Dictionary<int, HairSupport.HairAccessoryInfo>();
-#endif
-
             ClothList = ClothInfo.Build(coordinate, Material);
-            AcceList = AccessoryInfo.Build(coordinate, Hair2, Material);
+            AcceList = AccessoryInfo.Build(coordinate, Hair, Material);
 
             for (var i = 0; i < ClothList.Count; ++i)
             {

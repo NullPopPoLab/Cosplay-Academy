@@ -125,9 +125,7 @@ namespace CosplayParty
                 var cards = rt.BaseFolder.GetAllCards();
 
                 Settings.Logger.LogDebug($"{cards.Count} cards found in {rt.BaseDir}");
-#if false // 廃止予定 
-                cards.AddRange(Grabber(sets));
-#endif
+
                 rt.CoordSet.Replace(cards, false);
             }
 
@@ -177,31 +175,6 @@ namespace CosplayParty
             }
 #endif
         }
-
-#if false // 廃止予定 
-        private static List<CardData> Grabber(int sets)
-        {
-#if KK
-            if (Settings.GrabSwimsuits.Value && sets == 4)
-            {
-                return DataStruct.DefaultFolder[3].FolderData[0].GetAllCards();
-            }
-            if (Settings.GrabUniform.Value && sets == 1)
-            {
-                return DataStruct.DefaultFolder[0].FolderData[0].GetAllCards();
-            }
-
-#endif
-#if KKS
-            if (Settings.GrabSwimsuits.Value && sets == 1)
-            {
-                return DataStruct.DefaultFolder[8].FolderData[hstate].GetAllCards();
-            }
-#endif
-
-            return new List<CardData>();
-        }
-#endif
 
         public static void Decision(string name, ChaDefault cha)
         {

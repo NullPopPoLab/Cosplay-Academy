@@ -37,13 +37,6 @@ namespace CosplayParty
         internal static void MakerAPI_MakerExiting()
         {
             Firstpass = 0;
-#if false
-            if (!MakerAPI.IsInsideClassMaker())
-            {
-                ChaDefaults.Clear();
-                OutfitDecider.ResetDecider();
-            }
-#endif
         }
 
         public static void RegisterCustomSubCategories(object sender, RegisterSubCategoriesEvent e)
@@ -205,9 +198,6 @@ namespace CosplayParty
                 {
                     Settings.Logger.LogDebug($"Refresh: " + ThisOutfitData.ChaFile.GetFancyCharacterName());
                     ThisOutfitData.MarkRefreshed();
-
-                    ThisOutfitData.Clear_Firstpass();
-                    ThisOutfitData.Reset_Firstpass();
 
                     #region ACI Data
 #if false // Additional_Card_Info 廃止予定 

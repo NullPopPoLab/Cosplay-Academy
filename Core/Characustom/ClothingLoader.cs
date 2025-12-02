@@ -21,17 +21,7 @@ namespace CosplayParty
         private ChaControl ChaControl;
         private ChaFile ChaFile;
 
-#if false // 再検討; 下着可換 
-        private static readonly int underwearindex = Constants.InputStrings.ToList().IndexOf($"{sep}Underwear");
-#endif
         private static bool InsideMaker = false;
-
-#if false // 再検討; 下着可換 
-        public readonly ChaFileCoordinate Underwear = new ChaFileCoordinate();
-        //private readonly Dictionary<int, bool[]> Underwearbools = new Dictionary<int, bool[]>(); //0: not bot; 1: notbra; 2: notshorts
-        private List<ChaFileAccessory.PartsInfo> Underwear_PartsInfos = new List<ChaFileAccessory.PartsInfo>();
-        private ME_Coordinate Underwear_ME_Data;
-#endif
 
 #region ACI_Data
 #if false // Additional_Card_Info 廃止予定 
@@ -83,15 +73,6 @@ namespace CosplayParty
 
             ThisOutfitData.FillOutfitpaths();
             var holdoutfitstate = ChaControl.fileStatus.coordinateType;
-
-            //Underwear.LoadFile(ThisOutfitData.allunderwearpaths[underwearindex].GetFullPath());
-            //Settings.Logger.LogDebug($"loaded underwear " + ThisOutfitData.allunderwearpaths[underwearindex]);
-
-#if false // 再検討; 下着可換 
-            Underwear_ME_Data = new ME_Coordinate(ExtendedSave.GetExtendedDataById(Underwear, "com.deathweasel.bepinex.materialeditor"), ThisOutfitData, 0);
-            Underwear_PartsInfos = new List<ChaFileAccessory.PartsInfo>(Underwear.accessory.parts);
-            //Underwear_PartsInfos.AddRange(Support.MoreAccessories.Coordinate_Accessory_Extract(Underwear));
-#endif
 
             for (var i = 0; i < Constants.GameCoordinateSize; i++)
             {

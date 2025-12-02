@@ -60,19 +60,6 @@ namespace CosplayParty
 
         public CharaInfo Info;
 
-#if false
-        //! シリアライズ用 HairAccessoryInfo 群 
-        public Dictionary<int, Dictionary<int, Hair.HairSupport.HairAccessoryInfo>> HairAccessoriesPack
-        {
-            get
-            {
-                var t = new Dictionary<int, Dictionary<int, Hair.HairSupport.HairAccessoryInfo>>();
-                for (var i = 0; i < Outfits.Length; ++i) t[i] = Outfits[i].Current.HairAccessories;
-                return t;
-            }
-        }
-#endif
-
         public ChaDefault(ChaControl chaControl,ChaFileControl chaFile, SaveData.Heroine heroine)
         {
             Settings.Logger.LogDebug($"ChaDefault({chaFile?.parameter.fullname})");
@@ -89,37 +76,7 @@ namespace CosplayParty
             Outfits = new ChaOutfit[Outfit_Size];
             for (int i = 0, n = Outfit_Size; i < n; i++)
             {
-                Outfits[i] = new ChaOutfit(this, i);
-            }
-        }
-
-        public void Clear_Firstpass()
-        {
-            //ME.Clear();
-
-            for (int i = 0, n = Outfit_Size; i < n; i++)
-            {
-                Outfits[i].Reset();
-            }
-        }
-
-        public void Reset_Firstpass()
-        {
-            Settings.Logger.LogDebug($"ChaDefault.Reset({ChaFile?.parameter.fullname})");
-
-            var src = new ChaOutfit.ImportSources();
-            src.Info = Info;
-            src.HairExtendedData = ExtendedSave.GetExtendedDataById(ChaFile, CosplayParty.Hair.Common.ExtendedDataName);
-            if (src.HairExtendedData != null && src.HairExtendedData.data.TryGetValue("HairAccessories", out var AllHairAccessories) && AllHairAccessories != null)
-                src.CharaHair = MessagePackSerializer.Deserialize<Dictionary<int, Dictionary<int, HairSupport.HairAccessoryInfo>>>((byte[])AllHairAccessories);
-            src.Info.Source.coordinate = ChaFile.coordinate;
-
-            for (int outfitnum = 0, n = Outfit_Size; outfitnum < n; outfitnum++)
-            {
-                var outfit = Outfits[outfitnum];
-
-                if (Settings.Dump_Coord) Settings.Logger.LogDebug($"Import Outfit {outfitnum}; " + src.Info.Source.coordinate[outfitnum].coordinateName);
-                outfit.Import(src);
+                Outfits[i] = new ChaOutfit(Info,i);
             }
         }
 
