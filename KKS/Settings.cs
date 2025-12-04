@@ -9,13 +9,13 @@ namespace CosplayParty
     {
         public const bool Dump_Coord = false;
 
-        public const bool Dump_ME_Load = false;
-        public const bool Dump_ME_Save = false;
-        public const bool Dump_ME_Merge = true;
+        public const bool Dump_ME_Load = true;
+        public const bool Dump_ME_Save = true;
+        public const bool Dump_ME_Merge = false;
 
-        public const bool Dump_Hair_Load = true;
+        public const bool Dump_Hair_Load = false;
         public const bool Dump_Hair_Save = true;
-        public const bool Dump_Hair_Merge = true;
+        public const bool Dump_Hair_Merge = false;
 
         public static ConfigEntry<bool> RandomDresscode { get; private set; }
 

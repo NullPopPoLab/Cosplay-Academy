@@ -6,24 +6,34 @@ using UnityEngine;
 
 #pragma warning disable 0162
 
-namespace CosplayParty.Hair
+namespace CosplayParty.PluginDataEdittingTemplate
 {
-    using AccessorySource = HairSupport.HairAccessoryInfo;
-    using CoordSource = Dictionary<int, HairSupport.HairAccessoryInfo>;
-    using CharaSource = Dictionary<int, Dictionary<int, HairSupport.HairAccessoryInfo>>;
+    using ClothSource = ClothSourceTemplate;
+    using AccessorySource= AccessorySourceTemplate;
+    using CoordSource = CoordSourceTemplate;
+    using CharaSource = CharaSourceTemplate;
 
     public class Common
     {
-        public const string PluginName = "HairAccessoryCustomizer";
-        public const string ExtendedDataName = "com.deathweasel.bepinex.hairaccessorycustomizer";
-        public const string CharaDataName = "HairAccessories";
-        public const string CoordDataName = "CoordinateHairAccessories";
-#if KK
-        public const string ControllerName = "KK_Plugins.HairAccessoryCustomizer+HairAccessoryController, KK_HairAccessoryCustomizer";
-#elif KKS
-        public const string ControllerName = "KK_Plugins.HairAccessoryCustomizer+HairAccessoryController, KKS_HairAccessoryCustomizer";
-#endif
+        public const string PluginName = "{PluginName}";
+        public const string ExtendedDataName = "{DataName}";
+        public const string CharaDataName = "{CharaDataName}";
+        public const string CoordDataName = "{CoordDataName}";
+        public const string ControllerName = "{FuncName}, {PlugFile}";
 
+        public const bool Dump_Load = true;
+        public const bool Dump_Save = true;
+        public const bool Dump_Merge = true;
+    }
+
+    public class ClothSourceTemplate { }
+    public class AccessorySourceTemplate { }
+    public class CoordSourceTemplate {
+        public Dictionary<int, ClothSource> Cloth = new Dictionary<int, ClothSource>();
+        public Dictionary<int, AccessorySource> Accessory = new Dictionary<int, AccessorySource>();
+    }
+    public class CharaSourceTemplate {
+        public Dictionary<int, CoordSource> Coord = new Dictionary<int, CoordSource>();
     }
 
     public class BaseProps
@@ -41,6 +51,22 @@ namespace CosplayParty.Hair
         }
     }
 
+    public class ClothProps : BaseProps
+    {
+        public ClothSource Source;
+
+        public ClothProps(string caption)
+            : base(caption)
+        {
+        }
+
+        public ClothProps(ClothSource src,string caption)
+            : base(caption)
+        {
+            Source = src;
+        }
+    }
+
     public class AccessoryProps : BaseProps
     {
         public AccessorySource Source;
@@ -48,7 +74,6 @@ namespace CosplayParty.Hair
         public AccessoryProps(string caption)
             : base(caption)
         {
-            Source = new AccessorySource();
         }
 
         public AccessoryProps(AccessorySource src, string caption)
@@ -61,6 +86,7 @@ namespace CosplayParty.Hair
     public class CoordProps : BaseProps
     {
         public ChaFileCoordinate Source { get; private set; }
+        public Dictionary<int, ClothProps> Cloth = new Dictionary<int, ClothProps>();
         public Dictionary<int, AccessoryProps> Accessory = new Dictionary<int, AccessoryProps>();
 
         //! for chara internal coord 
@@ -84,7 +110,7 @@ namespace CosplayParty.Hair
             var data = ExtendedSave.GetExtendedDataById(coordFile, Common.ExtendedDataName);
             if (data == null)
             {
-                if (Settings.Dump_Hair_Load) Settings.Logger.LogDebug($"has no {Common.PluginName} props");
+                if (Common.Dump_Load) Settings.Logger.LogDebug($"has no {Common.PluginName} props");
                 return;
             }
             if (!IsSupportedVersion(data.version))
@@ -95,7 +121,7 @@ namespace CosplayParty.Hair
 
             if (!data.data.TryGetValue(Common.CoordDataName, out var img) || img == null)
             {
-                if (Settings.Dump_Hair_Load) Settings.Logger.LogDebug($"has no {Common.CoordDataName} props");
+                if (Common.Dump_Load) Settings.Logger.LogDebug($"has no {Common.CoordDataName} props");
                 return;
             }
 
@@ -111,12 +137,28 @@ namespace CosplayParty.Hair
 
         internal void Load(CoordSource src)
         {
+            Cloth.Clear();
             Accessory.Clear();
 
-            foreach (var t in src)
+            foreach (var t in src.Cloth)
+            {
+                Cloth[t.Key] = new ClothProps(t.Value, Caption + "-" + t.Key);
+            }
+            foreach (var t in src.Accessory)
             {
                 Accessory[t.Key] = new AccessoryProps(t.Value, Caption + "-" + t.Key);
             }
+        }
+
+        //! get by a cloth  
+        public ClothProps GetClothProps(int idx, bool force)
+        {
+            Cloth.TryGetValue(idx, out var ret);
+            if (force && ret == null)
+            {
+                Cloth[idx] = ret = new ClothProps(Caption + "-" + idx);
+            }
+            return ret;
         }
 
         //! get by an accessory 
@@ -130,13 +172,31 @@ namespace CosplayParty.Hair
             return ret;
         }
 
+        //! remove cloth properties 
+        public void RemoveClothProps(int idx)
+        {
+            var prop = GetClothProps(idx, false);
+            if (prop == null) return;
+            Cloth.Remove(idx);
+        }
+
         //! remove accessory properties 
         public void RemoveAccessoryProps(int idx)
         {
             var prop = GetAccessoryProps(idx, false);
             if (prop == null) return;
-            if (Settings.Dump_Hair_Merge) Settings.Logger.LogDebug($"RemoveAccessoryProps({idx})");
             Accessory.Remove(idx);
+        }
+
+        //! replace cloth properties 
+        public void SetClothProps(int? coord, int idx, ClothProps src)
+        {
+            RemoveClothProps(idx);
+
+            if (src == null) return;
+            if (Common.Dump_Merge) Settings.Logger.LogDebug($"SetClothProps({coord},{idx})");
+            var prop = GetClothProps(idx, true);
+            prop.Source = src.Source;
         }
 
         //! replace accessory properties 
@@ -145,17 +205,21 @@ namespace CosplayParty.Hair
             RemoveAccessoryProps(idx);
 
             if (src == null) return;
-            if (Settings.Dump_Hair_Merge) Settings.Logger.LogDebug($"SetAccessoryProps({coord},{idx})");
+            if (Common.Dump_Merge) Settings.Logger.LogDebug($"SetAccessoryProps({coord},{idx})");
             var prop = GetAccessoryProps(idx, true);
             prop.Source = src.Source;
         }
 
-        public Dictionary<int, AccessorySource> Pack()
+        public CoordSource Pack()
         {
-            var dst = new Dictionary<int, AccessorySource>();
+            var dst = new CoordSource();
+            foreach (var t in Cloth)
+            {
+                dst.Cloth[t.Key] = t.Value.Source;
+            }
             foreach (var t in Accessory)
             {
-                dst[t.Key] = t.Value.Source;
+                dst.Accessory[t.Key] = t.Value.Source;
             }
             return dst;
         }
@@ -163,7 +227,7 @@ namespace CosplayParty.Hair
         public void Save()
         {
             var img = Pack();
-            if (img.Count < 1) img = null;
+            if (img == null) img = null;
 
             var dst = new PluginData();
             dst.data.Add(Common.CoordDataName, MessagePackSerializer.Serialize(img));
@@ -191,7 +255,7 @@ namespace CosplayParty.Hair
             var data = ExtendedSave.GetExtendedDataById(chaFile, Common.ExtendedDataName);
             if (data == null)
             {
-                if (Settings.Dump_Hair_Load) Settings.Logger.LogDebug($"has no {Common.PluginName} props");
+                if (Common.Dump_Load) Settings.Logger.LogDebug($"has no {Common.PluginName} props");
                 return;
             }
             if (!IsSupportedVersion(data.version))
@@ -202,7 +266,7 @@ namespace CosplayParty.Hair
 
             if (!data.data.TryGetValue(Common.CharaDataName, out var img) || img == null)
             {
-                if (Settings.Dump_Hair_Load) Settings.Logger.LogDebug($"has no {Common.CharaDataName} props");
+                if (Common.Dump_Load) Settings.Logger.LogDebug($"has no {Common.CharaDataName} props");
                 return;
             }
 
@@ -220,7 +284,7 @@ namespace CosplayParty.Hair
         {
             for (var i = 0; i < Coord.Count; ++i)
             {
-                if (!src.TryGetValue(i, out var sub) || sub == null) continue;
+                if (!src.Coord.TryGetValue(i, out var sub) || sub == null) continue;
 
                 Coord[i].Load(sub);
             }
@@ -232,7 +296,7 @@ namespace CosplayParty.Hair
             for (var i = 0; i < Coord.Count; ++i)
             {
                 var sub = Coord[i].Pack();
-                if (sub.Count > 0) dst[i] = sub;
+                if (sub !=null) dst.Coord[i] = sub;
             }
             return dst;
         }
@@ -240,32 +304,11 @@ namespace CosplayParty.Hair
         public void Save()
         {
             var img = Pack();
-            if (img.Count < 1) img = null;
+            if (img == null) img = null;
 
             var dst = new PluginData();
             dst.data.Add(Common.CharaDataName, MessagePackSerializer.Serialize(img));
             ExtendedSave.SetExtendedDataById(Source, Common.ExtendedDataName, dst);
         }
-    }
-
-    #region Stuff Hair Accessories needs
-    public class HairSupport
-    {
-        [Serializable]
-        [MessagePackObject]
-        public class HairAccessoryInfo
-        {
-            [Key("HairGloss")]
-            public bool HairGloss;
-            [Key("ColorMatch")]
-            public bool ColorMatch;
-            [Key("OutlineColor")]
-            public Color OutlineColor;
-            [Key("AccessoryColor")]
-            public Color AccessoryColor;
-            [Key("HairLength")]
-            public float HairLength;
-        }
-        #endregion
     }
 }

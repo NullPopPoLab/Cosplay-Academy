@@ -49,6 +49,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Support\MoreAccessories.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Support\Overlay_Support.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Support\PushUp.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Support\_SupportTemplate.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="$(MSBuildThisFileDirectory)Characustom\" />

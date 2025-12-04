@@ -135,21 +135,15 @@ namespace CosplayParty
     public class AccessoryInfo
     {
         public ChaFileAccessory.PartsInfo Parts;
-        public AccessoryType Type;
         public ME.AccessoryProps Material;
         public Hair.AccessoryProps Hair;
+
+        public AccessoryType Type;
 
         public bool IsEmpty { get { return Parts.type < 121; } }
         public string TypeName { get { return IsEmpty ? "Empty" : Type.ToString(); } }
         public string PartsID { get { return Parts.type + "-" + Parts.id; } }
         public bool IsHair { get { return Hair!= null; } }
-
-        public AccessoryInfo(ChaFileAccessory.PartsInfo val, ME.AccessoryProps mat, Hair.AccessoryProps hair)
-        {
-            Parts = val;
-            Material = mat;
-            Hair = hair;
-        }
 
         public static List<AccessoryInfo> Build(ChaFileCoordinate coordinate, Hair.CoordProps hair, ME.CoordProps mat)
         {
@@ -159,8 +153,12 @@ namespace CosplayParty
             var src = coordinate.accessory.parts;
             for (var i = 0; i < src.Length; ++i)
             {
-                hair.Accessory.TryGetValue(i, out var h);
-                var ainfo = new AccessoryInfo(src[i], mat.GetAccessoryProps(i,true), h);
+                var ainfo = new AccessoryInfo()
+                {
+                    Parts = src[i],
+                    Material = mat.GetAccessoryProps(i, true),
+                    Hair = hair.GetAccessoryProps(i, false),
+                };
 
 #if false
                 if (!ainfo.IsHair)
@@ -237,11 +235,6 @@ namespace CosplayParty
         */
         public Dictionary<int, HairSupport.HairAccessoryInfo> HairAccessories = new Dictionary<int, HairSupport.HairAccessoryInfo>();
 
-#if false
-        public CoordInfo() {
-            Settings.Logger.LogDebug($"CoordInfo(empty)");
-        }
-#endif
         public CoordInfo(ChaFileCoordinate src,string caption="") {
 
             Settings.Logger.LogDebug($"CoordInfo({caption})");
@@ -257,8 +250,8 @@ namespace CosplayParty
             Owner = owner;
             var coord = owner.Source.coordinate[idx];
             var caption = owner.Source.parameter.fullname + "-" + idx;
-            Material = owner.Material.Coord[idx]?? new ME.CoordProps(coord, caption);
-            Hair = owner.Hair.Coord[idx] ?? new Hair.CoordProps(coord, caption);
+            Material = owner.Material.Coord[idx];
+            Hair = owner.Hair.Coord[idx];
             Import(coord);
         }
 
