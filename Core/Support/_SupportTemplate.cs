@@ -85,7 +85,7 @@ namespace CosplayParty.PluginDataEdittingTemplate
 
     public class CoordProps : BaseProps
     {
-        public ChaFileCoordinate Source { get; private set; }
+        public PluginControl.CoordData Keeper { get; private set; }
         public Dictionary<int, ClothProps> Cloth = new Dictionary<int, ClothProps>();
         public Dictionary<int, AccessoryProps> Accessory = new Dictionary<int, AccessoryProps>();
 
@@ -94,7 +94,8 @@ namespace CosplayParty.PluginDataEdittingTemplate
             : base(chaFile.parameter.fullname + "-" + idx)
         {
             Settings.Logger.LogDebug($"{Common.PluginName}.CoordProps({Caption})");
-            Source = chaFile.coordinate[idx];
+
+            Keeper = new PluginControl.CoordData(chaFile.coordinate[idx], Common.ExtendedDataName);
         }
 
         //! from coord card 
@@ -107,30 +108,20 @@ namespace CosplayParty.PluginDataEdittingTemplate
                 return;
             }
 
-            var data = ExtendedSave.GetExtendedDataById(coordFile, Common.ExtendedDataName);
-            if (data == null)
+            Keeper = new PluginControl.CoordData(coordFile, Common.ExtendedDataName);
+            if (!Keeper.IsLoaded)
             {
                 if (Common.Dump_Load) Settings.Logger.LogDebug($"has no {Common.PluginName} props");
                 return;
             }
-            if (!IsSupportedVersion(data.version))
+            if (!IsSupportedVersion(Keeper.Version))
             {
                 ClothingLoader.OutdatedMessage($"{Common.PluginName} PluginData", true);
                 return;
             }
 
-            if (!data.data.TryGetValue(Common.CoordDataName, out var img) || img == null)
-            {
-                if (Common.Dump_Load) Settings.Logger.LogDebug($"has no {Common.CoordDataName} props");
-                return;
-            }
-
-            var src = MessagePackSerializer.Deserialize<CoordSource>((byte[])img);
-            if (src == null)
-            {
-                Settings.Logger.LogWarning($"invalid {Common.CoordDataName} props");
-                return;
-            }
+            var src = Keeper.Import<CoordSource>(Common.CoordDataName);
+            if (src == null) return;
 
             Load(src);
         }
@@ -229,53 +220,42 @@ namespace CosplayParty.PluginDataEdittingTemplate
             var img = Pack();
             if (img == null) img = null;
 
-            var dst = new PluginData();
-            dst.data.Add(Common.CoordDataName, MessagePackSerializer.Serialize(img));
-            ExtendedSave.SetExtendedDataById(Source, Common.ExtendedDataName, dst);
+            Keeper.Put(Common.CoordDataName, img);
+            Keeper.Save();
         }
     }
 
     public class CharaProps : BaseProps
     {
+        public PluginControl.CharaData Keeper { get; private set; }
         public List<CoordProps> Coord;
-        public ChaFileControl Source { get; private set; }
 
         //! from chara card 
         public CharaProps(ChaFileControl chaFile, string caption = "")
             : base((caption != null) ? caption : chaFile.parameter.fullname)
         {
             Settings.Logger.LogDebug($"{Common.PluginName}.CharaProps({Caption})");
-            Source = chaFile;
+
             Coord = new List<CoordProps>();
             for (var i = 0; i < chaFile.coordinate.Length; ++i)
             {
                 Coord.Add(new CoordProps(chaFile, i));
             }
 
-            var data = ExtendedSave.GetExtendedDataById(chaFile, Common.ExtendedDataName);
-            if (data == null)
+            Keeper = new PluginControl.CharaData(chaFile, Common.ExtendedDataName);
+            if (!Keeper.IsLoaded)
             {
                 if (Common.Dump_Load) Settings.Logger.LogDebug($"has no {Common.PluginName} props");
                 return;
             }
-            if (!IsSupportedVersion(data.version))
+            if (!IsSupportedVersion(Keeper.Version))
             {
                 ClothingLoader.OutdatedMessage($"{Common.PluginName} PluginData", true);
                 return;
             }
 
-            if (!data.data.TryGetValue(Common.CharaDataName, out var img) || img == null)
-            {
-                if (Common.Dump_Load) Settings.Logger.LogDebug($"has no {Common.CharaDataName} props");
-                return;
-            }
-
-            var src = MessagePackSerializer.Deserialize<CharaSource>((byte[])img);
-            if (src == null)
-            {
-                Settings.Logger.LogWarning($"invalid {Common.CharaDataName} props");
-                return;
-            }
+            var src = Keeper.Import<CharaSource>(Common.CharaDataName);
+            if (src == null) return;
 
             Load(src);
         }
@@ -306,9 +286,8 @@ namespace CosplayParty.PluginDataEdittingTemplate
             var img = Pack();
             if (img == null) img = null;
 
-            var dst = new PluginData();
-            dst.data.Add(Common.CharaDataName, MessagePackSerializer.Serialize(img));
-            ExtendedSave.SetExtendedDataById(Source, Common.ExtendedDataName, dst);
+            Keeper.Put(Common.CoordDataName, img);
+            Keeper.Save();
         }
     }
 }
