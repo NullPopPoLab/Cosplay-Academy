@@ -18,7 +18,7 @@ namespace CosplayParty.PluginControl
             DataName = name;
         }
 
-        public T Import<T>(string name)
+        public T Read<T>(string name)
         {
             if (!Data.data.TryGetValue(name, out var img) || img == null)
             {
@@ -48,7 +48,7 @@ namespace CosplayParty.PluginControl
             Data.data[name] = null;
         }
 
-        public void Put<T>(string name, T img)
+        public void Write<T>(string name, T img)
         {
             if (Data == null) return;
             if (Data.data == null) return;

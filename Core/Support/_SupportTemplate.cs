@@ -120,7 +120,7 @@ namespace CosplayParty.PluginDataEdittingTemplate
                 return;
             }
 
-            var src = Keeper.Import<CoordSource>(Common.CoordDataName);
+            var src = Keeper.Read<CoordSource>(Common.CoordDataName);
             if (src == null) return;
 
             Load(src);
@@ -220,7 +220,7 @@ namespace CosplayParty.PluginDataEdittingTemplate
             var img = Pack();
             if (img == null) img = null;
 
-            Keeper.Put(Common.CoordDataName, img);
+            Keeper.Write(Common.CoordDataName, img);
             Keeper.Save();
         }
     }
@@ -254,7 +254,7 @@ namespace CosplayParty.PluginDataEdittingTemplate
                 return;
             }
 
-            var src = Keeper.Import<CharaSource>(Common.CharaDataName);
+            var src = Keeper.Read<CharaSource>(Common.CharaDataName);
             if (src == null) return;
 
             Load(src);
@@ -286,7 +286,7 @@ namespace CosplayParty.PluginDataEdittingTemplate
             var img = Pack();
             if (img == null) img = null;
 
-            Keeper.Put(Common.CoordDataName, img);
+            Keeper.Write(Common.CoordDataName, img);
             Keeper.Save();
         }
     }
