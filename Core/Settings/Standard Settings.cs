@@ -25,6 +25,20 @@ namespace CosplayParty
         public static Settings Instance;
         internal static new ManualLogSource Logger { get; private set; }
 
+        public const bool Dump_Coord = false;
+
+        public const bool Dump_ME_Load = true;
+        public const bool Dump_ME_Save = true;
+        public const bool Dump_ME_Merge = false;
+
+        public const bool Dump_Hair_Load = false;
+        public const bool Dump_Hair_Save = true;
+        public const bool Dump_Hair_Merge = false;
+
+        public const bool Dump_KCOX_Load = false;
+        public const bool Dump_KCOX_Save = true;
+        public const bool Dump_KCOX_Merge = false;
+
         public static ConfigEntry<bool> UpdateCache { get; private set; }
         public static ConfigEntry<bool> UpdateFolders { get; private set; }
 
