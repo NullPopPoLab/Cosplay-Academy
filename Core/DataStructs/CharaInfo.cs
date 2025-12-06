@@ -7,6 +7,7 @@ namespace CosplayParty
     {
         public ChaControl Control;
         public ChaFileControl Source;
+        public KCOX.CharaProps Overlay;
         public ME.CharaProps Material;
         public Hair.CharaProps Hair;
 
@@ -35,6 +36,7 @@ namespace CosplayParty
         {
             Source = src;
             Control = ctrl;
+            Overlay = new KCOX.CharaProps(src);
             Material = new ME.CharaProps(src);
             Hair = new Hair.CharaProps(src);
 

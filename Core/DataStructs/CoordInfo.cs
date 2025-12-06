@@ -228,6 +228,7 @@ namespace CosplayParty
         public readonly CoordinateSuccession Succession = new CoordinateSuccession();
 
         public ChaFileCoordinate Source;
+        public KCOX.CoordProps Overlay;
         public ME.CoordProps Material;
         public Hair.CoordProps Hair;
 
@@ -239,6 +240,7 @@ namespace CosplayParty
 
             Settings.Logger.LogDebug($"CoordInfo({caption})");
 
+            Overlay = new KCOX.CoordProps(src, caption);
             Material = new ME.CoordProps(src, caption);
             Hair = new Hair.CoordProps(src, caption);
             Import(src);
@@ -250,6 +252,7 @@ namespace CosplayParty
             Owner = owner;
             var coord = owner.Source.coordinate[idx];
             var caption = owner.Source.parameter.fullname + "-" + idx;
+            Overlay = owner.Overlay.Coord[idx];
             Material = owner.Material.Coord[idx];
             Hair = owner.Hair.Coord[idx];
             Import(coord);

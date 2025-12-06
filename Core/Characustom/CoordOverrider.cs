@@ -15,7 +15,8 @@ namespace CosplayParty
     public class ModifiedCloth
     {
         public ChaFileClothes.PartsInfo Parts;
-        public ClothProps Material;
+        public KCOX.ClothProps Overlay;
+        public ME.ClothProps Material;
     }
     public class ModifiedAccessory
     {
@@ -677,6 +678,7 @@ namespace CosplayParty
                 var cloth = _modify.Clothes[i];
                 if (cloth == null) continue;
                 TargetCloth[i] = cloth.Parts;
+                target.Overlay.SetClothProps(Index, i, cloth.Overlay);
                 target.Material.SetClothProps(Index, i, cloth.Material);
             }
 
@@ -710,6 +712,7 @@ namespace CosplayParty
 
             newouter.Source.clothes.parts = TargetCloth;
             newouter.Source.accessory.parts = TargetAcce.ToArray();
+            target.Overlay.Save();
             target.Material.Save(true);
             target.Hair.Save();
 
@@ -720,6 +723,7 @@ namespace CosplayParty
             //Target.ChaControl.AssignCoordinate((ChaFileDefine.CoordinateType)Index, newouter.Coordinate);
 
             //ClothingLoader.ControllerCoordReload_Loop(typeof(KK_Plugins.MaterialEditor.MaterialEditorCharaController), Target.ChaControl, TargetCoordinate);
+            ClothingLoader.ControllerCoordReload_Loop(KCOX.Common.ControllerName, Target.Control, TargetCoordinate);
             ClothingLoader.ControllerCoordReload_Loop(ME.Common.ControllerName, Target.Control, TargetCoordinate);
             ClothingLoader.ControllerCoordReload_Loop(Hair.Common.ControllerName, Target.Control, TargetCoordinate);
 

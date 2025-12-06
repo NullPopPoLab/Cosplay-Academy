@@ -280,16 +280,19 @@ namespace CosplayParty
 
         private void KCOX_RePack(ChaControl ChaControl)
         {
+#if true
+            ThisOutfitData.Info.Overlay.Save();
+#else
             PluginData SavedData;
-            var Clothdict = new Dictionary<CoordinateType, Dictionary<string, ClothesTexData>>();
+            var Clothdict = new Dictionary<CoordinateType, Dictionary<string, KCOX.ClothesTexData>>();
             var ExtendedCharacterData = ExtendedSave.GetExtendedDataById(ThisOutfitData.ChaFile, "KCOX");
             if (ExtendedCharacterData != null)
             {
-                if (KCOX_Version.IsAvailable(ExtendedCharacterData.version))
+                if (KCOX.Common.IsSupportedVersion(ExtendedCharacterData.version))
                 {
                     if (ExtendedCharacterData.data.TryGetValue("Overlays", out var coordinatedata) && coordinatedata != null)
                     {
-                        Clothdict = MessagePackSerializer.Deserialize<Dictionary<CoordinateType, Dictionary<string, ClothesTexData>>>((byte[])coordinatedata);
+                        Clothdict = MessagePackSerializer.Deserialize<Dictionary<CoordinateType, Dictionary<string, KCOX.ClothesTexData>>>((byte[])coordinatedata);
                     }
                 }
                 else
@@ -326,7 +329,7 @@ namespace CosplayParty
 //                var underwearproccessed = outfit.ProcInfo.UnderwearProcessed;
                 if (!Clothdict.ContainsKey((CoordinateType)outfitnum))
                 {
-                    Clothdict[(CoordinateType)outfitnum] = new Dictionary<string, ClothesTexData>();
+                    Clothdict[(CoordinateType)outfitnum] = new Dictionary<string, KCOX.ClothesTexData>();
                 }
 
                 if (outfit.Outer.IsReady)
@@ -335,11 +338,11 @@ namespace CosplayParty
                     SavedData = ExtendedSave.GetExtendedDataById(ChaControl.chaFile.coordinate[outfitnum], "KCOX");
                     if (SavedData != null)
                     {
-                        if (KCOX_Version.IsAvailable(SavedData.version))
+                        if (KCOX.Common.IsSupportedVersion(SavedData.version))
                         {
                             if (SavedData.data.TryGetValue("Overlays", out var bytes))
                             {
-                                var dict = MessagePackSerializer.Deserialize<Dictionary<string, ClothesTexData>>((byte[])bytes);
+                                var dict = MessagePackSerializer.Deserialize<Dictionary<string, KCOX.ClothesTexData>>((byte[])bytes);
                                 if (dict != null)
                                 {
                                     Clothdict[(CoordinateType)outfitnum] = dict;
@@ -392,9 +395,10 @@ namespace CosplayParty
                 }
 #endif
             }
-            var data = new PluginData { version = KCOX_Version.Save };
+            var data = new PluginData { version = KCOX.Common.SaveVersion };
             data.data.Add("Overlays", MessagePackSerializer.Serialize(Clothdict));
             SetExtendedData("KCOX", data, ChaControl);
+#endif
         }
 
         private void ClothingUnlocker_RePack(ChaControl ChaControl)
