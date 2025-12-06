@@ -156,6 +156,13 @@ namespace CosplayParty.Hair
 
         public void Save()
         {
+            if (Keeper.Target == null)
+            {
+                Settings.Logger.LogWarning($"no target to save {PluginName} props for {Caption}");
+                return;
+            }
+
+            Settings.Logger.LogDebug($"Save {PluginName} Props for {Caption}");
             var img = Pack();
             if (img.Count < 1) Keeper.Remove(CoordDataName);
             else Keeper.Write(CoordDataName, img);
@@ -221,6 +228,13 @@ namespace CosplayParty.Hair
 
         public void Save()
         {
+            if (Keeper.Target == null)
+            {
+                Settings.Logger.LogWarning($"no target to save {PluginName} props for {Caption}");
+                return;
+            }
+
+            Settings.Logger.LogDebug($"Save {PluginName} Props for {Caption}");
             var img = Pack();
             if (img.Count < 1) Keeper.Remove(CharaDataName);
             else Keeper.Write(CharaDataName, img);

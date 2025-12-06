@@ -217,6 +217,13 @@ namespace CosplayParty.PluginDataEdittingTemplate
 
         public void Save()
         {
+            if (Keeper.Target == null)
+            {
+                Settings.Logger.LogWarning($"no target to save {PluginName} props for {Caption}");
+                return;
+            }
+
+            Settings.Logger.LogDebug($"Save {PluginName} Props for {Caption}");
             var img = Pack();
             if (img == null) img = null;
 
@@ -283,6 +290,13 @@ namespace CosplayParty.PluginDataEdittingTemplate
 
         public void Save()
         {
+            if (Keeper.Target == null)
+            {
+                Settings.Logger.LogWarning($"no target to save {PluginName} props for {Caption}");
+                return;
+            }
+
+            Settings.Logger.LogDebug($"Save {PluginName} Props for {Caption}");
             var img = Pack();
             if (img == null) img = null;
 

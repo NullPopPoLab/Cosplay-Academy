@@ -144,7 +144,7 @@ namespace CosplayParty
                 coord.LoadBytes(src.SaveBytes(), src.loadVersion);
 
                 // PluginData はコピーされないので別途対応 
-                ExtendedSave.SetExtendedDataById(coord, ME.Common.ExtendedDataName, ThisOutfitData.Info.Coord[outfitnum].Material.Export(true));
+                ThisOutfitData.Info.Coord[outfitnum].Material.Transfer(coord, "MergeTemporary", true);
             }
 
             var outer = new CoordInfo(coord, outcapt);

@@ -90,6 +90,14 @@ namespace CosplayParty.KCOX
     {
         public CoordOverlaySource Overlay;
         public CoordTexSizeSource TexSize;
+
+        public static CoordSource CreateEmpty()
+        {
+            var t = new CoordSource();
+            t.Overlay = new CoordOverlaySource();
+            t.TexSize = new CoordTexSizeSource();
+            return t;
+        }
     }
 
     public class CharaSource
@@ -240,9 +248,7 @@ namespace CosplayParty.KCOX
 
         public CoordSource Pack()
         {
-            var dst = new CoordSource();
-            dst.Overlay = new CoordOverlaySource();
-            dst.TexSize = new CoordTexSizeSource();
+            var dst = CoordSource.CreateEmpty();
 
             foreach (var t in Overlay)
             {
@@ -261,6 +267,13 @@ namespace CosplayParty.KCOX
 
         public void Save()
         {
+            if (Keeper.Target == null)
+            {
+                Settings.Logger.LogWarning($"no target to save {PluginName} props for {Caption}");
+                return;
+            }
+
+            Settings.Logger.LogDebug($"Save {PluginName} Props for {Caption}");
             var img = Pack();
 
             if (img.Overlay.Count > 0) Keeper.Write(OverlayDataName, img.Overlay);
@@ -335,6 +348,13 @@ namespace CosplayParty.KCOX
 
         public void Save()
         {
+            if (Keeper.Target == null)
+            {
+                Settings.Logger.LogWarning($"no target to save {PluginName} props for {Caption}");
+                return;
+            }
+
+            Settings.Logger.LogDebug($"Save {PluginName} Props for {Caption}");
             var img = Pack();
 
             if (img.Overlay.Count > 0) Keeper.Write(OverlayDataName, img.Overlay);
