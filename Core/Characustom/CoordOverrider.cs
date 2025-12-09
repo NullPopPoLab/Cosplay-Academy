@@ -88,6 +88,7 @@ namespace CosplayParty
 
                     var ci = new ModifiedCloth();
                     ci.Parts = parts;
+                    ci.Overlay = inner.Overlay.GetClothProps(i, false);
                     ci.Material = inner.Material.GetClothProps(i, false);
 
                     _modify.Clothes[i] = ci;
@@ -291,6 +292,7 @@ namespace CosplayParty
                 var cloth = _modify.Clothes[i];
                 if (cloth == null) continue;
                 TargetCloth[i] = cloth.Parts;
+                coord.Overlay.SetClothProps(Index, i, cloth.Overlay);
                 coord.Material.SetClothProps(Index, i, cloth.Material);
             }
 
@@ -319,10 +321,13 @@ namespace CosplayParty
             }
 
             Target.Control.nowCoordinate.accessory.parts = TargetAcce.ToArray();
-            //MoreAccessoriesKOI.MoreAccessories.ArraySync(Target.ChaControl);
+            // こっちは要るらしい 
+            MoreAccessoriesKOI.MoreAccessories.ArraySync(Target.Control);
 
+            // 何故か壊れる 
+            //coord.Overlay.Save();
             coord.Material.Save(false);
-            //Target.ME.Save(false);
+            coord.Hair.Save();
 
 #if false // Additional_Card_Info 廃止予定 
             if (InsideMaker && Constants.PluginResults["Additional_Card_Info"])
@@ -712,7 +717,8 @@ namespace CosplayParty
 
             newouter.Source.clothes.parts = TargetCloth;
             newouter.Source.accessory.parts = TargetAcce.ToArray();
-            target.Overlay.Save();
+            // 何故か壊れる 
+            //target.Overlay.Save();
             target.Material.Save(true);
             target.Hair.Save();
 

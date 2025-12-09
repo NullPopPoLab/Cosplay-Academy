@@ -85,7 +85,7 @@ namespace CosplayParty.PluginDataEdittingTemplate
 
     public class CoordProps : BaseProps
     {
-        public PluginControl.CoordData Keeper { get; private set; }
+        public PluginControl.CoordPlugKeeper Keeper { get; private set; }
         public Dictionary<int, ClothProps> Cloth = new Dictionary<int, ClothProps>();
         public Dictionary<int, AccessoryProps> Accessory = new Dictionary<int, AccessoryProps>();
 
@@ -95,7 +95,7 @@ namespace CosplayParty.PluginDataEdittingTemplate
         {
             Settings.Logger.LogDebug($"{PluginName}.CoordProps({Caption})");
 
-            Keeper = new PluginControl.CoordData(chaFile.coordinate[idx], ExtendedDataName);
+            Keeper = new PluginControl.CoordPlugKeeper(chaFile.coordinate[idx], ExtendedDataName);
         }
 
         //! from coord card 
@@ -108,7 +108,7 @@ namespace CosplayParty.PluginDataEdittingTemplate
                 return;
             }
 
-            Keeper = new PluginControl.CoordData(coordFile, ExtendedDataName);
+            Keeper = new PluginControl.CoordPlugKeeper(coordFile, ExtendedDataName);
             if (!Keeper.IsLoaded)
             {
                 if (Dump_Load) Settings.Logger.LogDebug($"has no {PluginName} props");
@@ -234,7 +234,7 @@ namespace CosplayParty.PluginDataEdittingTemplate
 
     public class CharaProps : BaseProps
     {
-        public PluginControl.CharaData Keeper { get; private set; }
+        public PluginControl.CharaPlugKeeper Keeper { get; private set; }
         public List<CoordProps> Coord;
 
         //! from chara card 
@@ -249,7 +249,7 @@ namespace CosplayParty.PluginDataEdittingTemplate
                 Coord.Add(new CoordProps(chaFile, i));
             }
 
-            Keeper = new PluginControl.CharaData(chaFile, ExtendedDataName);
+            Keeper = new PluginControl.CharaPlugKeeper(chaFile, ExtendedDataName);
             if (!Keeper.IsLoaded)
             {
                 if (Dump_Load) Settings.Logger.LogDebug($"has no {PluginName} props");

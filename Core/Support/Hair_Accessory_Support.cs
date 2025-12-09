@@ -63,7 +63,7 @@ namespace CosplayParty.Hair
 
     public class CoordProps : BaseProps
     {
-        public PluginControl.CoordData Keeper { get; private set; }
+        public PluginControl.CoordPlugKeeper Keeper { get; private set; }
         public Dictionary<int, AccessoryProps> Accessory = new Dictionary<int, AccessoryProps>();
 
         //! for chara internal coord 
@@ -72,7 +72,7 @@ namespace CosplayParty.Hair
         {
             Settings.Logger.LogDebug($"{PluginName}.CoordProps({Caption})");
 
-            Keeper = new PluginControl.CoordData(chaFile.coordinate[idx], ExtendedDataName);
+            Keeper = new PluginControl.CoordPlugKeeper(chaFile.coordinate[idx], ExtendedDataName);
         }
 
         //! from coord card 
@@ -85,7 +85,7 @@ namespace CosplayParty.Hair
                 return;
             }
 
-            Keeper = new PluginControl.CoordData(coordFile, ExtendedDataName);
+            Keeper = new PluginControl.CoordPlugKeeper(coordFile, ExtendedDataName);
             if (!Keeper.IsLoaded)
             {
                 if (Dump_Load) Settings.Logger.LogDebug($"has no {PluginName} props");
@@ -172,7 +172,7 @@ namespace CosplayParty.Hair
 
     public class CharaProps : BaseProps
     {
-        public PluginControl.CharaData Keeper { get; private set; }
+        public PluginControl.CharaPlugKeeper Keeper { get; private set; }
         public List<CoordProps> Coord;
 
         //! from chara card 
@@ -187,7 +187,7 @@ namespace CosplayParty.Hair
                 Coord.Add(new CoordProps(chaFile, i));
             }
 
-            Keeper = new PluginControl.CharaData(chaFile, ExtendedDataName);
+            Keeper = new PluginControl.CharaPlugKeeper(chaFile, ExtendedDataName);
             if (!Keeper.IsLoaded)
             {
                 if (Dump_Load) Settings.Logger.LogDebug($"has no {PluginName} props");

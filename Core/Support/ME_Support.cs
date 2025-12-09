@@ -201,7 +201,7 @@ namespace CosplayParty.ME
             }
         }
 
-        internal void Load(PluginControl.Keeper keeper)
+        internal void Load(PluginControl.PlugKeeper keeper)
         {
             var src = new PluginSource();
             src.Images = keeper.Read<ImageDataSource>(ImageDataName);
@@ -263,7 +263,7 @@ namespace CosplayParty.ME
                 }
         }
 
-        internal void Save(PluginControl.Keeper keeper, PluginSource pack)
+        internal void Save(PluginControl.PlugKeeper keeper, PluginSource pack)
         {
             if (pack.Images.Count > 0)
             {
@@ -545,7 +545,7 @@ namespace CosplayParty.ME
 
     public class CoordProps: BaseProps
     {
-        public PluginControl.CoordData Keeper { get; private set; }
+        public PluginControl.CoordPlugKeeper Keeper { get; private set; }
         public Dictionary<int, ClothProps> Cloth = new Dictionary<int, ClothProps>();
         public Dictionary<int, AccessoryProps> Accessory = new Dictionary<int, AccessoryProps>();
 
@@ -555,7 +555,7 @@ namespace CosplayParty.ME
         {
             Settings.Logger.LogDebug($"ME.CoordProps({Caption})");
 
-            Keeper = new PluginControl.CoordData(chaFile.coordinate[idx], ExtendedDataName);
+            Keeper = new PluginControl.CoordPlugKeeper(chaFile.coordinate[idx], ExtendedDataName);
         }
 
         //! from coord card 
@@ -569,7 +569,7 @@ namespace CosplayParty.ME
             }
 
             Settings.Logger.LogDebug($"{PluginName}.CoordProps({Caption})");
-            Keeper = new PluginControl.CoordData(coordFile, ExtendedDataName);
+            Keeper = new PluginControl.CoordPlugKeeper(coordFile, ExtendedDataName);
             if (!Keeper.IsLoaded)
             {
                 if (Dump_Load) Settings.Logger.LogDebug($"has no {PluginName} props");
@@ -775,7 +775,7 @@ namespace CosplayParty.ME
 
         public void Transfer(ChaFileCoordinate target, string caption, bool cleanup)
         {
-            var keeper = new PluginControl.CoordData(target, caption);
+            var keeper = new PluginControl.CoordPlugKeeper(target, caption);
             var pack = Pack(cleanup);
             Save(keeper, pack);
         }
@@ -783,7 +783,7 @@ namespace CosplayParty.ME
 
     public class CharaProps : BaseProps
     {
-        public PluginControl.CharaData Keeper { get; private set; }
+        public PluginControl.CharaPlugKeeper Keeper { get; private set; }
         public List<CoordProps> Coord;
 
         //! from chara card 
@@ -799,7 +799,7 @@ namespace CosplayParty.ME
                 Coord.Add(new CoordProps(chaFile, i, _pool));
             }
 
-            Keeper = new PluginControl.CharaData(chaFile, ExtendedDataName);
+            Keeper = new PluginControl.CharaPlugKeeper(chaFile, ExtendedDataName);
             if (!Keeper.IsLoaded)
             {
                 if (Dump_Load) Settings.Logger.LogDebug($"has no {PluginName} props");
