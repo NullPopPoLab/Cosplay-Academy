@@ -252,6 +252,7 @@ namespace CosplayParty.KCOX
 
             foreach (var t in Overlay)
             {
+                if(Dump_Save) Settings.Logger.LogDebug($"KCOX Overlay for {Caption}: {t.Key}={t.Value}");
                 dst.Overlay[t.Key] = t.Value;
             }
 
@@ -259,6 +260,7 @@ namespace CosplayParty.KCOX
             {
                 if (t.Value.TexSize == null) continue;
 
+                if (Dump_Save) Settings.Logger.LogDebug($"KCOX TexSize for {Caption}: {t.Value}");
                 dst.TexSize[SlotNames[t.Key]] = t.Value.TexSize.Value;
             }
 
@@ -281,6 +283,11 @@ namespace CosplayParty.KCOX
             if(img.TexSize.Count>0)Keeper.Write(TexSizeDataName, img.TexSize);
             else Keeper.Remove(TexSizeDataName);
             Keeper.Save();
+        }
+
+        public void Apply(ChaControl ctrl)
+        {
+            //ClothingLoader.ControllerCoordReload_Loop(ControllerName, ctrl, Keeper.Target);
         }
     }
 
@@ -363,12 +370,17 @@ namespace CosplayParty.KCOX
             else Keeper.Remove(TexSizeDataName);
             Keeper.Save();
         }
+
+        public void Apply(ChaControl ctrl)
+        {
+            ClothingLoader.ControllerReload_Loop(ControllerName, ctrl);
+        }
     }
 
 
 
 
-#region Stuff KCOX_RePack Needs
+    #region Stuff KCOX_RePack Needs
 
 
     [MessagePackObject]

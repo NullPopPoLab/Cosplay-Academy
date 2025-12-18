@@ -168,6 +168,11 @@ namespace CosplayParty.Hair
             else Keeper.Write(CoordDataName, img);
             Keeper.Save();
         }
+
+        public void Apply(ChaControl ctrl)
+        {
+            ClothingLoader.ControllerCoordReload_Loop(ControllerName, ctrl, Keeper.Target);
+        }
     }
 
     public class CharaProps : BaseProps
@@ -239,6 +244,11 @@ namespace CosplayParty.Hair
             if (img.Count < 1) Keeper.Remove(CharaDataName);
             else Keeper.Write(CharaDataName, img);
             Keeper.Save();
+        }
+
+        public void Apply(ChaControl ctrl)
+        {
+            ClothingLoader.ControllerReload_Loop(ControllerName, ctrl);
         }
     }
 

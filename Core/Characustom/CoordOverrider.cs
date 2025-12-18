@@ -320,13 +320,13 @@ namespace CosplayParty
                 coord.Hair.SetAccessoryProps(Index, acce.Key, acce.Value.Hair);
             }
 
+            Target.Control.nowCoordinate.clothes.parts = TargetCloth;
             Target.Control.nowCoordinate.accessory.parts = TargetAcce.ToArray();
             // こっちは要るらしい 
             MoreAccessoriesKOI.MoreAccessories.ArraySync(Target.Control);
 
-            // 何故か壊れる 
-            //coord.Overlay.Save();
             coord.Material.Save(false);
+            //coord.Overlay.Save(); // 何故か壊れる 
             coord.Hair.Save();
 
 #if false // Additional_Card_Info 廃止予定 
@@ -717,21 +717,23 @@ namespace CosplayParty
 
             newouter.Source.clothes.parts = TargetCloth;
             newouter.Source.accessory.parts = TargetAcce.ToArray();
-            // 何故か壊れる 
-            //target.Overlay.Save();
+
             target.Material.Save(true);
+            //target.Overlay.Save(); // 何故か壊れる 
             target.Hair.Save();
 
-            // MoreAccessories は追加の手順なしでも反映されてる 
-            //MoreAccessoriesKOI.MoreAccessories.ArraySync(Target.ChaControl);
+            // MoreAccessories は追加の手順なしでも反映されてる? 
+            Target.Control.nowCoordinate.clothes.parts = TargetCloth;
+            Target.Control.nowCoordinate.accessory.parts = TargetAcce.ToArray();
+            MoreAccessoriesKOI.MoreAccessories.ArraySync(Target.Control);
 
             TargetCoordinate.LoadBytes(newouter.Source.SaveBytes(), newouter.Source.loadVersion);
             //Target.ChaControl.AssignCoordinate((ChaFileDefine.CoordinateType)Index, newouter.Coordinate);
 
             //ClothingLoader.ControllerCoordReload_Loop(typeof(KK_Plugins.MaterialEditor.MaterialEditorCharaController), Target.ChaControl, TargetCoordinate);
-            ClothingLoader.ControllerCoordReload_Loop(KCOX.Common.ControllerName, Target.Control, TargetCoordinate);
-            ClothingLoader.ControllerCoordReload_Loop(ME.Common.ControllerName, Target.Control, TargetCoordinate);
-            ClothingLoader.ControllerCoordReload_Loop(Hair.Common.ControllerName, Target.Control, TargetCoordinate);
+            target.Material.Apply(Target.Control);
+            target.Overlay.Apply(Target.Control);
+            target.Hair.Apply(Target.Control);
 
             //outfit.Outer.HairAccessories = HairAccInfo;
 

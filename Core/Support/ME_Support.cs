@@ -773,6 +773,11 @@ namespace CosplayParty.ME
             Save(Keeper, pack);
         }
 
+        public void Apply(ChaControl ctrl)
+        {
+            ClothingLoader.ControllerCoordReload_Loop(ControllerName, ctrl, Keeper.Target);
+        }
+
         public void Transfer(ChaFileCoordinate target, string caption, bool cleanup)
         {
             var keeper = new PluginControl.CoordPlugKeeper(target, caption);
@@ -956,9 +961,14 @@ namespace CosplayParty.ME
             var pack = Pack(cleanup);
             Save(Keeper, pack);
         }
+
+        public void Apply(ChaControl ctrl)
+        {
+            ClothingLoader.ControllerReload_Loop(ControllerName, ctrl);
+        }
     }
 
-#region Original Stuff
+    #region Original Stuff
     public class Support
     {
         public Dictionary<int, TextureContainer> TextureDictionary = new Dictionary<int, TextureContainer>();

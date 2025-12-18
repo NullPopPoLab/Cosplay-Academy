@@ -81,7 +81,7 @@ namespace CosplayParty
             {
                 Process(currentGameMode);
 
-                ThisOutfitData.ClothingLoader.Reload_RePacks(ChaControl, inH);
+                //ThisOutfitData.ClothingLoader.Reload_RePacks(ThisOutfitData.Info, inH);
             }
             else if (ThisOutfitData != null && ThisOutfitData.IsProcessed
 #if !KKS
@@ -91,9 +91,9 @@ namespace CosplayParty
             {
                 ThisOutfitData.ChaFile = ChaFileControl;
 
-                ThisOutfitData.ClothingLoader.Run_Repacks(ChaControl);
+                //ThisOutfitData.ClothingLoader.Run_Repacks(ChaControl);
 
-                ThisOutfitData.ClothingLoader.Reload_RePacks(ChaControl, inH);
+                ThisOutfitData.ClothingLoader.Reload_RePacks(ThisOutfitData.Info, inH);
             }
 
             if (/*IsMaker && Firstpass++ == 0 ||*/ inH)

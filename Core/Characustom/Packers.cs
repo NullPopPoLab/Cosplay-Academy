@@ -215,7 +215,7 @@ namespace CosplayParty
 #endif
         }
 
-        public void Reload_RePacks(ChaControl ChaControl, bool ForceALL)
+        public void Reload_RePacks(CharaInfo chara, bool ForceALL)
         {
 #if TRACE
             var Start = TimeWatch[3].ElapsedMilliseconds;
@@ -232,34 +232,34 @@ namespace CosplayParty
                 return;
             }
 
-            ControllerReload_Loop("KoiClothesOverlayX.KoiClothesOverlayController, KK_OverlayMods", ChaControl);
+            ThisOutfitData.Info.Overlay.Apply(chara.Control);
 
             if (Constants.PluginResults["Accessory_States"])
-                ControllerReload_Loop("Accessory_States.CharaEvent, Accessory_States", ChaControl);
+                ControllerReload_Loop("Accessory_States.CharaEvent, Accessory_States", chara.Control);
 
             if (Constants.PluginResults["Additional_Card_Info"])
-                ControllerReload_Loop("Additional_Card_Info.CharaEvent, Additional_Card_Info", ChaControl);
+                ControllerReload_Loop("Additional_Card_Info.CharaEvent, Additional_Card_Info", chara.Control);
 
             if (InsideMaker && Constants.PluginResults["Accessory_Themes"])
-                ControllerReload_Loop("Accessory_Themes.CharaEvent, Accessory_Themes", ChaControl);
+                ControllerReload_Loop("Accessory_Themes.CharaEvent, Accessory_Themes", chara.Control);
 
             if (InsideMaker && Constants.PluginResults["Accessory_Parents"])
-                ControllerReload_Loop("Accessory_Parents.CharaEvent, Accessory_Parents", ChaControl);
+                ControllerReload_Loop("Accessory_Parents.CharaEvent, Accessory_Parents", chara.Control);
 
-            ControllerReload_Loop(ME.Common.ControllerName, ChaControl);
+            ThisOutfitData.Info.Material.Apply(chara.Control);
 
-            ControllerReload_Loop("KK_Plugins.ClothingUnlockerController, KK_ClothingUnlocker", ChaControl);
+            ControllerReload_Loop("KK_Plugins.ClothingUnlockerController, KK_ClothingUnlocker", chara.Control);
 
-            ControllerReload_Loop("KK_Plugins.Pushup+PushupController, KK_Pushup", ChaControl);
+            ControllerReload_Loop("KK_Plugins.Pushup+PushupController, KK_Pushup", chara.Control);
 
-            ControllerReload_Loop("KKABMX.Core.BoneController, KKABMX", ChaControl);
+            ControllerReload_Loop("KKABMX.Core.BoneController, KKABMX", chara.Control);
 
-            ControllerReload_Loop("KK_Plugins.DynamicBoneEditor.CharaController, KK_DynamicBoneEditor", ChaControl);
+            ControllerReload_Loop("KK_Plugins.DynamicBoneEditor.CharaController, KK_DynamicBoneEditor", chara.Control);
 
-            ControllerReload_Loop("KK_Plugins.HairAccessoryCustomizer+HairAccessoryController, KK_HairAccessoryCustomizer", ChaControl);
+            ThisOutfitData.Info.Hair.Apply(chara.Control);
 
             if (Constants.PluginResults["madevil.kk.ass"])
-                ControllerReload_Loop("AccStateSync.AccStateSync+AccStateSyncController, KK_AccStateSync", ChaControl);
+                ControllerReload_Loop("AccStateSync.AccStateSync+AccStateSyncController, KK_AccStateSync", chara.Control);
 #if TRACE
             TimeWatch[3].Stop();
             var temp2 = TimeWatch[3].ElapsedMilliseconds - Start;
@@ -1539,31 +1539,45 @@ namespace CosplayParty
 
         public static void ControllerReload_Loop(string Controller_Name, ChaControl ChaControl)
         {
-            var Controller = Type.GetType(Controller_Name, false);
-            if (Controller != null)
+            try
             {
-                var temp = ChaControl.GetComponent(Controller);
-                var Input_Parameter = new object[2] { KoikatuAPI.GetCurrentGameMode(), false };
-                Traverse.Create(temp).Method("OnReload", Input_Parameter).GetValue();
+                var Controller = Type.GetType(Controller_Name, false);
+                if (Controller != null)
+                {
+                    var temp = ChaControl.GetComponent(Controller);
+                    var Input_Parameter = new object[2] { KoikatuAPI.GetCurrentGameMode(), false };
+                    Traverse.Create(temp).Method("OnReload", Input_Parameter).GetValue();
+                }
+                else
+                {
+                    Settings.Logger.LogError($"Controller {Controller_Name} not found");
+                }
             }
-            else
+            catch (Exception e)
             {
-                Settings.Logger.LogError($"Controller {Controller_Name} not found");
+                Settings.Logger.LogError($"Controller {Controller_Name} happens: "+e);
             }
         }
 
         public static void ControllerCoordReload_Loop(string Controller_Name, ChaControl ChaControl, ChaFileCoordinate coordinate)
         {
-            var Controller = Type.GetType(Controller_Name, false);
-            if (Controller != null)
+            try
             {
-                var temp = ChaControl.GetComponent(Controller);
-                var Input_Parameter = new object[2] { coordinate, false };
-                Traverse.Create(temp).Method("OnCoordinateBeingLoaded", Input_Parameter).GetValue();
+                var Controller = Type.GetType(Controller_Name, false);
+                if (Controller != null)
+                {
+                    var temp = ChaControl.GetComponent(Controller);
+                    var Input_Parameter = new object[2] { coordinate, false };
+                    Traverse.Create(temp).Method("OnCoordinateBeingLoaded", Input_Parameter).GetValue();
+                }
+                else
+                {
+                    Settings.Logger.LogError($"Controller {Controller_Name} not found");
+                }
             }
-            else
+            catch (Exception e)
             {
-                Settings.Logger.LogError($"Controller {Controller_Name} not found");
+                Settings.Logger.LogError($"Controller {Controller_Name} happens: " + e);
             }
         }
 
